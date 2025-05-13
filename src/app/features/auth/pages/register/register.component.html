@@ -1,4 +1,4 @@
-<div class="max-w-md mx-auto my-8 p-8 bg-white rounded-lg shadow-md">
+<div class="max-w-2xl mx-auto my-8 p-8 bg-white rounded-lg shadow-md">
   <h2 class="text-2xl font-semibold text-center text-gray-800 mb-6">Create an Account</h2>
   
   @if (errorMessage()) {
@@ -6,73 +6,376 @@
       {{ errorMessage() }}
     </div>
   }
-  
-  <form [formGroup]="registerForm" (ngSubmit)="onSubmit()">
-    <div class="mb-5">
-      <label for="name" class="block text-gray-700 font-medium mb-2">Full Name</label>
-      <input 
-        id="name" 
-        type="text" 
-        formControlName="name"
-        class="w-full px-3 py-3 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent"
-        placeholder="Enter your full name">
-      @if (registerForm.controls['name'].invalid && registerForm.controls['name'].touched) {
-        <div class="text-red-600 text-sm mt-1">
-          Name is required
-        </div>
-      }
-    </div>
 
-    <div class="mb-5">
-      <label for="email" class="block text-gray-700 font-medium mb-2">Email</label>
-      <input 
-        id="email" 
-        type="email" 
-        formControlName="email"
-        class="w-full px-3 py-3 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent"
-        placeholder="Enter your email">
-      @if (registerForm.controls['email'].invalid && registerForm.controls['email'].touched) {
-        <div class="text-red-600 text-sm mt-1">
-          @if (registerForm.controls['email'].errors?.['required']) {
-            Email is required
-          } @else if (registerForm.controls['email'].errors?.['email']) {
+  <!-- Step indicator -->
+  <div class="mb-8">
+    <div class="flex items-center justify-between">
+      <div class="flex flex-col items-center">
+        <div class="w-10 h-10 flex items-center justify-center rounded-full" 
+          [ngClass]="currentStep() === 'user' ? 'bg-blue-500 text-white' : 'bg-blue-100 text-blue-500'">
+          1
+        </div>
+        <span class="mt-2 text-sm font-medium" [ngClass]="currentStep() === 'user' ? 'text-blue-500' : 'text-gray-500'">User Information</span>
+      </div>
+      <div class="flex-1 h-1 mx-4" [ngClass]="currentStep() === 'association' ? 'bg-blue-500' : 'bg-gray-200'"></div>
+      <div class="flex flex-col items-center">
+        <div class="w-10 h-10 flex items-center justify-center rounded-full" 
+          [ngClass]="currentStep() === 'association' ? 'bg-blue-500 text-white' : 'bg-gray-200 text-gray-500'">
+          2
+        </div>
+        <span class="mt-2 text-sm font-medium" [ngClass]="currentStep() === 'association' ? 'text-blue-500' : 'text-gray-500'">Association Details</span>
+      </div>
+    </div>
+  </div>
+  
+  <!-- User Information Form -->
+  @if (currentStep() === 'user') {
+    <form [formGroup]="userForm">
+      <div class="grid grid-cols-1 md:grid-cols-2 gap-5">
+        <div class="mb-5">
+          <label for="firstName" class="block text-gray-700 font-medium mb-2">First Name</label>
+          <input 
+            id="firstName" 
+            type="text" 
+            formControlName="firstName"
+            class="w-full px-3 py-3 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent"
+            placeholder="Enter your first name">
+          @if (userForm.controls['firstName'].invalid && userForm.controls['firstName'].touched) {
+            <div class="text-red-600 text-sm mt-1">
+              @if (userForm.controls['firstName'].errors?.['required']) {
+                First name is required
+              } @else if (userForm.controls['firstName'].errors?.['minlength'] || userForm.controls['firstName'].errors?.['maxlength']) {
+                First name must be between 2 and 50 characters
+              }
+            </div>
+          }
+        </div>
+
+        <div class="mb-5">
+          <label for="lastName" class="block text-gray-700 font-medium mb-2">Last Name</label>
+          <input 
+            id="lastName" 
+            type="text" 
+            formControlName="lastName"
+            class="w-full px-3 py-3 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent"
+            placeholder="Enter your last name">
+          @if (userForm.controls['lastName'].invalid && userForm.controls['lastName'].touched) {
+            <div class="text-red-600 text-sm mt-1">
+              @if (userForm.controls['lastName'].errors?.['required']) {
+                Last name is required
+              } @else if (userForm.controls['lastName'].errors?.['minlength'] || userForm.controls['lastName'].errors?.['maxlength']) {
+                Last name must be between 2 and 50 characters
+              }
+            </div>
+          }
+        </div>
+      </div>
+
+      <div class="mb-5">
+        <label for="userName" class="block text-gray-700 font-medium mb-2">Username</label>
+        <input 
+          id="userName" 
+          type="text" 
+          formControlName="userName"
+          class="w-full px-3 py-3 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent"
+          placeholder="Choose a username">
+        @if (userForm.controls['userName'].invalid && userForm.controls['userName'].touched) {
+          <div class="text-red-600 text-sm mt-1">
+            @if (userForm.controls['userName'].errors?.['required']) {
+              Username is required
+            } @else if (userForm.controls['userName'].errors?.['minlength'] || userForm.controls['userName'].errors?.['maxlength']) {
+              Username must be between 2 and 25 characters
+            }
+          </div>
+        }
+      </div>
+
+      <div class="mb-5">
+        <label for="email" class="block text-gray-700 font-medium mb-2">Email</label>
+        <input 
+          id="email" 
+          type="email" 
+          formControlName="email"
+          class="w-full px-3 py-3 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent"
+          placeholder="Enter your email">
+        @if (userForm.controls['email'].invalid && userForm.controls['email'].touched) {
+          <div class="text-red-600 text-sm mt-1">
+            @if (userForm.controls['email'].errors?.['required']) {
+              Email is required
+            } @else if (userForm.controls['email'].errors?.['email']) {
+              Please enter a valid email
+            }
+          </div>
+        }
+      </div>
+
+      <div class="mb-5" formGroupName="phoneNumber">
+        <label class="block text-gray-700 font-medium mb-2">Phone Number (Optional)</label>
+        <div class="grid grid-cols-3 gap-2">
+          <div>
+            <input 
+              type="text" 
+              formControlName="prefix"
+              class="w-full px-3 py-3 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent"
+              placeholder="+1">
+            @if (userForm.get('phoneNumber.prefix')?.invalid && userForm.get('phoneNumber.prefix')?.touched) {
+              <div class="text-red-600 text-sm mt-1">
+                Invalid prefix format
+              </div>
+            }
+          </div>
+          <div class="col-span-2">
+            <input 
+              type="text" 
+              formControlName="nationalNumber"
+              class="w-full px-3 py-3 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent"
+              placeholder="1234567890">
+            @if (userForm.get('phoneNumber.nationalNumber')?.invalid && userForm.get('phoneNumber.nationalNumber')?.touched) {
+              <div class="text-red-600 text-sm mt-1">
+                Invalid phone number format
+              </div>
+            }
+          </div>
+        </div>
+      </div>
+
+      <div class="mb-5">
+        <label for="password" class="block text-gray-700 font-medium mb-2">Password</label>
+        <input 
+          id="password" 
+          type="password" 
+          formControlName="password"
+          class="w-full px-3 py-3 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent"
+          placeholder="Create a password">
+        @if (userForm.controls['password'].invalid && userForm.controls['password'].touched) {
+          <div class="text-red-600 text-sm mt-1">
+            @if (userForm.controls['password'].errors?.['required']) {
+              Password is required
+            } @else if (userForm.controls['password'].errors?.['pattern']) {
+              Password must be 8-32 characters and include: uppercase, lowercase, number, and special character
+            }
+          </div>
+        }
+      </div>
+
+      <div class="mb-5">
+        <label for="confirmPassword" class="block text-gray-700 font-medium mb-2">Confirm Password</label>
+        <input 
+          id="confirmPassword" 
+          type="password" 
+          formControlName="confirmPassword"
+          class="w-full px-3 py-3 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent"
+          placeholder="Confirm your password">
+        @if (userForm.controls['confirmPassword'].invalid && userForm.controls['confirmPassword'].touched) {
+          <div class="text-red-600 text-sm mt-1">
+            @if (userForm.controls['confirmPassword'].errors?.['required']) {
+              Please confirm your password
+            } @else if (userForm.controls['confirmPassword'].errors?.['mismatch']) {
+              Passwords don't match
+            }
+          </div>
+        }
+      </div>
+
+      <button 
+        type="button" 
+        (click)="nextStep()"
+        class="w-full py-3 bg-blue-500 text-white font-medium rounded-md hover:bg-blue-600 transition-colors focus:outline-none focus:ring-2 focus:ring-blue-500 focus:ring-offset-2">
+        Continue to Association Details
+      </button>
+    </form>
+  }
+
+  <!-- Association Form -->
+  @if (currentStep() === 'association') {
+    <form [formGroup]="associationForm" (ngSubmit)="onSubmit()">
+      <div class="mb-5">
+        <label for="associationName" class="block text-gray-700 font-medium mb-2">Association Name</label>
+        <input 
+          id="associationName" 
+          type="text" 
+          formControlName="associationName"
+          class="w-full px-3 py-3 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent"
+          placeholder="Enter association name">
+        @if (associationForm.controls['associationName'].invalid && associationForm.controls['associationName'].touched) {
+          <div class="text-red-600 text-sm mt-1">
+            @if (associationForm.controls['associationName'].errors?.['required']) {
+              Association name is required
+            } @else if (associationForm.controls['associationName'].errors?.['minlength'] || associationForm.controls['associationName'].errors?.['maxlength']) {
+              Association name must be between 2 and 100 characters
+            }
+          </div>
+        }
+      </div>
+
+      <div class="mb-5">
+        <label for="description" class="block text-gray-700 font-medium mb-2">Description</label>
+        <textarea 
+          id="description" 
+          formControlName="description"
+          rows="3"
+          class="w-full px-3 py-3 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent"
+          placeholder="Describe your association"></textarea>
+        @if (associationForm.controls['description'].invalid && associationForm.controls['description'].touched) {
+          <div class="text-red-600 text-sm mt-1">
+            Description must not exceed 500 characters
+          </div>
+        }
+      </div>
+
+      <div class="mb-5">
+        <label for="associationEmail" class="block text-gray-700 font-medium mb-2">Association Email (Optional)</label>
+        <input 
+          id="associationEmail" 
+          type="email" 
+          formControlName="email"
+          class="w-full px-3 py-3 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent"
+          placeholder="Enter association email">
+        @if (associationForm.controls['email'].invalid && associationForm.controls['email'].touched) {
+          <div class="text-red-600 text-sm mt-1">
             Please enter a valid email
-          }
-        </div>
-      }
-    </div>
+          </div>
+        }
+      </div>
 
-    <div class="mb-5">
-      <label for="password" class="block text-gray-700 font-medium mb-2">Password</label>
-      <input 
-        id="password" 
-        type="password" 
-        formControlName="password"
-        class="w-full px-3 py-3 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent"
-        placeholder="Create a password">
-      @if (registerForm.controls['password'].invalid && registerForm.controls['password'].touched) {
-        <div class="text-red-600 text-sm mt-1">
-          @if (registerForm.controls['password'].errors?.['required']) {
-            Password is required
-          } @else if (registerForm.controls['password'].errors?.['minlength']) {
-            Password must be at least 8 characters
-          }
+      <div class="mb-5" formGroupName="phoneNumber">
+        <label class="block text-gray-700 font-medium mb-2">Association Phone (Optional)</label>
+        <div class="grid grid-cols-3 gap-2">
+          <div>
+            <input 
+              type="text" 
+              formControlName="prefix"
+              class="w-full px-3 py-3 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent"
+              placeholder="+1">
+            @if (associationForm.get('phoneNumber.prefix')?.invalid && associationForm.get('phoneNumber.prefix')?.touched) {
+              <div class="text-red-600 text-sm mt-1">
+                Invalid prefix format
+              </div>
+            }
+          </div>
+          <div class="col-span-2">
+            <input 
+              type="text" 
+              formControlName="nationalNumber"
+              class="w-full px-3 py-3 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent"
+              placeholder="1234567890">
+            @if (associationForm.get('phoneNumber.nationalNumber')?.invalid && associationForm.get('phoneNumber.nationalNumber')?.touched) {
+              <div class="text-red-600 text-sm mt-1">
+                Invalid phone number format
+              </div>
+            }
+          </div>
         </div>
-      }
-    </div>
+      </div>
 
-    <button 
-      type="submit" 
-      [disabled]="registerForm.invalid || isLoading()"
-      class="w-full py-3 bg-blue-500 text-white font-medium rounded-md hover:bg-blue-600 transition-colors focus:outline-none focus:ring-2 focus:ring-blue-500 focus:ring-offset-2 disabled:opacity-60 disabled:cursor-not-allowed disabled:bg-gray-500">
-      @if (isLoading()) {
-        <span>Registering...</span>
-      } @else {
-        <span>Register</span>
-      }
-    </button>
-  </form>
+      <!-- Address Section -->
+      <div formGroupName="addressData" class="mb-5 p-4 border border-gray-200 rounded-md bg-gray-50">
+        <h3 class="font-medium text-lg mb-4">Association Address</h3>
+        
+        <!-- Google Places-like Address Input -->
+        <div class="mb-4 relative" id="addressContainer">
+          <label for="addressInput" class="block text-gray-700 font-medium mb-2">Search Address</label>
+          <input 
+            id="addressInput" 
+            type="text" 
+            formControlName="addressInput"
+            class="w-full px-3 py-3 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent"
+            placeholder="Start typing an address..."
+            (input)="onAddressInputChange($event)"
+            (focus)="focusAddressInput($event)">
+          
+          @if (associationForm.get('addressData.addressInput')?.invalid && associationForm.get('addressData.addressInput')?.touched) {
+            <div class="text-red-600 text-sm mt-1">
+              Please enter a valid address
+            </div>
+          }
+          
+          <!-- Address suggestions dropdown -->
+          @if (showAddressSuggestions()) {
+            <div class="absolute z-50 w-full mt-1 bg-white border-2 border-blue-300 rounded-md shadow-lg max-h-60 overflow-auto">
+              <div class="sticky top-0 bg-blue-50 text-blue-700 font-medium text-sm py-2 px-4 border-b border-blue-200">
+                Address Suggestions
+              </div>
+              @for (suggestion of addressSuggestions(); track suggestion.placeId) {
+                <div 
+                  class="px-4 py-2 hover:bg-blue-50 cursor-pointer flex items-start border-b border-gray-100 last:border-b-0"
+                  (click)="selectAddress(suggestion)">
+                  <div class="flex-shrink-0 text-gray-400 mt-1 mr-3">
+                    <svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5" viewBox="0 0 20 20" fill="currentColor">
+                      <path fill-rule="evenodd" d="M5.05 4.05a7 7 0 119.9 9.9L10 18.9l-4.95-4.95a7 7 0 010-9.9zM10 11a2 2 0 100-4 2 2 0 000 4z" clip-rule="evenodd" />
+                    </svg>
+                  </div>
+                  <div>
+                    <div class="font-medium">{{ suggestion.formattedAddress }}</div>
+                  </div>
+                </div>
+              }
+              @if (addressSuggestions().length === 0) {
+                <div class="px-4 py-3 text-gray-500 text-center">
+                  No address matches found
+                </div>
+              }
+            </div>
+          }
+          
+          <!-- Hidden fields populated when an address is selected -->
+          <input type="hidden" formControlName="placeId">
+          <input type="hidden" formControlName="latitude">
+          <input type="hidden" formControlName="longitude">
+          <input type="hidden" formControlName="city">
+          <input type="hidden" formControlName="province">
+          <input type="hidden" formControlName="zipCode">
+          <input type="hidden" formControlName="formattedAddress">
+        </div>
+        
+        <!-- Selected Address Information -->
+        @if (associationForm.get('addressData.formattedAddress')?.value) {
+          <div class="mb-4 p-3 bg-blue-50 border border-blue-200 rounded-md">
+            <h4 class="font-medium text-blue-700 mb-2">Selected Address</h4>
+            <p class="text-gray-700">{{ associationForm.get('addressData.formattedAddress')?.value }}</p>
+            <div class="grid grid-cols-3 gap-2 mt-2 text-sm">
+              <div>
+                <span class="text-gray-500">City:</span> 
+                <span class="font-medium">{{ associationForm.get('addressData.city')?.value }}</span>
+              </div>
+              <div>
+                <span class="text-gray-500">Province:</span> 
+                <span class="font-medium">{{ associationForm.get('addressData.province')?.value }}</span>
+              </div>
+              <div>
+                <span class="text-gray-500">Zip Code:</span> 
+                <span class="font-medium">{{ associationForm.get('addressData.zipCode')?.value }}</span>
+              </div>
+            </div>
+          </div>
+        }
+        
+        <p class="text-sm text-gray-500 mt-3">Note: This simulates Google Places API behavior with mock data</p>
+      </div>
+
+      <div class="flex space-x-4">
+        <button 
+          type="button" 
+          (click)="previousStep()"
+          class="flex-1 py-3 bg-gray-200 text-gray-800 font-medium rounded-md hover:bg-gray-300 transition-colors focus:outline-none focus:ring-2 focus:ring-gray-500 focus:ring-offset-2">
+          Back to User Details
+        </button>
+        
+        <button 
+          type="submit" 
+          [disabled]="associationForm.invalid || isLoading()"
+          class="flex-1 py-3 bg-blue-500 text-white font-medium rounded-md hover:bg-blue-600 transition-colors focus:outline-none focus:ring-2 focus:ring-blue-500 focus:ring-offset-2 disabled:opacity-60 disabled:cursor-not-allowed disabled:bg-gray-500">
+          @if (isLoading()) {
+            <span>Registering...</span>
+          } @else {
+            <span>Complete Registration</span>
+          }
+        </button>
+      </div>
+    </form>
+  }
   
+  <!-- Footer with login link, shown on both steps -->
   <div class="text-center mt-6 text-gray-600 text-sm">
     Already have an account? <a routerLink="/auth/login" class="text-blue-600 font-medium hover:underline">Log in</a>
   </div>

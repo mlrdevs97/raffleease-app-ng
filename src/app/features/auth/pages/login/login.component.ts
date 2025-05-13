@@ -45,6 +45,7 @@ export class LoginComponent {
     
     this.authService.login(email, password)
       .catch(error => {
+        console.error('Login error:', error);
         this.errorMessage.set(error.message || 'Login failed. Please try again.');
       })
       .finally(() => {

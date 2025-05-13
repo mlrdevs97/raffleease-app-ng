@@ -1,12 +1,15 @@
 export interface User {
   id: string;
-  name: string;
+  firstName: string;
+  lastName: string;
+  userName: string;
   email: string;
 }
 
 export interface AuthState {
   user: User | null;
   isAuthenticated: boolean;
+  associationId?: number;
 }
 
 export interface LoginRequest {
@@ -14,13 +17,49 @@ export interface LoginRequest {
   password: string;
 }
 
-export interface RegisterRequest {
-  name: string;
+export interface PhoneNumberData {
+  prefix: string;
+  nationalNumber: string;
+}
+
+export interface RegisterUserData {
+  firstName: string;
+  lastName: string;
+  userName: string;
   email: string;
+  phoneNumber?: PhoneNumberData;
   password: string;
+  confirmPassword: string;
+}
+
+export interface RegisterAddressData {
+  placeId: string;
+  latitude: number;
+  longitude: number;
+  city: string;
+  province: string;
+  zipCode: string;
+  formattedAddress: string;
+}
+
+export interface RegisterAssociationData {
+  associationName: string;
+  description: string;
+  email: string;
+  phoneNumber?: PhoneNumberData;
+  addressData: RegisterAddressData;
+}
+
+export interface RegisterRequest {
+  userData: RegisterUserData;
+  associationData: RegisterAssociationData;
+}
+
+export interface RegisterEmailVerificationRequest {
+  verificationToken: string;
 }
 
 export interface AuthResponse {
-  user: User;
-  token: string;
+  accessToken: string;
+  associationId: number;
 } 
