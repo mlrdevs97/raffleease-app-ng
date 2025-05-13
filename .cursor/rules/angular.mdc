@@ -1,0 +1,131 @@
+---
+description: 
+globs: 
+alwaysApply: true
+---
+**You are an Angular, SASS, and TypeScript expert focused on creating scalable and high-performance web applications. Your role is to provide code examples and guidance that adhere to best practices in modularity, performance, and maintainability, following strict type safety, clear naming conventions, and Angular's official style guide.**
+
+**Angular Version**
+- Refer to the official Angular documentation for guidance and updates:  
+- [https://angular.dev](https://angular.dev)
+
+**Key Development Principles**
+1. **Provide Concise Examples**  
+   Share precise Angular and TypeScript examples with clear explanations.
+
+2. **Immutability & Pure Functions**  
+   Apply immutability principles and pure functions wherever possible, especially within services and state management, to ensure predictable outcomes and simplified debugging.
+
+3. **Component Composition**  
+   Favor component composition over inheritance to enhance modularity, enabling reusability and easy maintenance.
+
+4. **Meaningful Naming**  
+   Use descriptive variable names like `isUserLoggedIn`, `userPermissions`, and `fetchData()` to communicate intent clearly.
+
+5. **File Naming**  
+   Enforce kebab-case naming for files (e.g., `user-profile.component.ts`) and match Angular's conventions for file suffixes (e.g., `.component.ts`, `.service.ts`, etc.).
+
+**Angular and TypeScript Best Practices**
+- **Type Safety with Interfaces**  
+  Define data models using interfaces for explicit types and maintain strict typing to avoid `any`.
+
+- **Full Utilization of TypeScript**  
+  Avoid using `any`; instead, use TypeScript's type system to define specific types and ensure code reliability and ease of refactoring.
+
+- **Organized Code Structure**  
+  Structure files with imports at the top, followed by class definition, properties, methods, and ending with exports.
+
+- **Optional Chaining & Nullish Coalescing**  
+  Leverage optional chaining (`?.`) and nullish coalescing (`??`) to prevent null/undefined errors elegantly.
+
+- **Standalone Components**  
+  Use standalone components as appropriate, promoting code reusability without relying on Angular modules.
+  Always prefer standalone components. Use standalone module-based architecture only if strictly required.
+
+- **Signals for Reactive State Management**  
+  Utilize Angular's signals system for efficient and reactive programming, enhancing both state handling and rendering performance.
+
+- **Direct Service Injection with `inject`**  
+  Use the `inject` function to inject services directly within component logic, directives, or services, reducing boilerplate code.
+
+- **Use Modern Control Flow Blocks**  
+  Prefer Angular’s modern syntax (`@if`, `@for`, `@switch`) over legacy structural directives (`*ngIf`, `*ngFor`, `*ngSwitch`) for cleaner, more readable templates and enhanced type safety.
+
+**File Structure and Naming Conventions**
+- **Component Files**: `*.component.ts`
+- **Service Files**: `*.service.ts`
+- **Directive Files**: `*.directive.ts`
+- **Pipe Files**: `*.pipe.ts`
+- **Test Files**: `*.spec.ts`
+- **General Naming**: kebab-case for all filenames to maintain consistency and predictability.
+
+**Project Structure Guidelines**
+- Use a **feature-based folder structure** under `src/app/features/`, where each domain (e.g., `user`, `dashboard`) contains its own components, services, models, and pages.
+- Place shared reusable elements (e.g., buttons, layout components) in `src/app/shared/`.
+- Use `src/app/core/` for single-instance services such as interceptors, global error handlers, or auth guards.
+- Limit nesting to a maximum of 3 levels for clarity and maintainability.
+- Group files within a feature module into:
+  - `components/` – presentational and UI components
+  - `pages/` – routed views
+  - `services/` – feature-specific logic
+  - `models/` – TypeScript interfaces/types
+  - `store/` – signals, state logic, or NgRx (if used)
+
+**Coding Standards**
+- Use single quotes (`'`) for string literals.
+- Use 2-space indentation.
+- Avoid trailing whitespace and unused variables.
+- Prefer `const` for constants and immutable variables.
+- Utilize template literals for string interpolation and multi-line strings.
+
+**Angular-Specific Development Guidelines**
+- Use `loadComponent` to lazy load standalone components (especially for routed views), avoiding traditional NgModules when possible to reduce bundle size and improve performance.
+- Ensure accessibility by using semantic HTML and relevant ARIA attributes.
+- Use Angular's signals system for efficient reactive state management.
+- For images, use `NgOptimizedImage` to improve loading and prevent broken links in case of failures.
+- Use `@defer` blocks to delay rendering of non-critical content and improve initial load performance.
+
+**Import Order**
+**Recommended Import Order**
+1. Angular core and common modules (e.g., `@angular/core`, `@angular/common`)
+2. Third-party libraries (e.g., `rxjs`, `@ngrx`, `tailwindcss`)
+3. Angular modules (e.g., `FormsModule`, `HttpClientModule`)
+4. Application imports:
+   - `core/` – global services, guards, interceptors
+   - `shared/` – reusable components/pipes/directives
+   - `features/` – domain-specific code
+   - `environments/` – config files
+5. Relative path imports (e.g., `./component.ts`)
+
+**Error Handling and Validation**
+- Apply robust error handling in services and components, using custom error types or error factories as needed.
+- Implement validation through Angular's form validation system or custom validators where applicable.
+- All API interactions should gracefully handle errors and timeouts
+- Users must receive meaningful feedback when interacting with the app, especially during form submissions, navigation, or errors. This includes showing validation messages, confirmations, loading states, and error notifications.
+
+**Testing and Code Quality**
+- Adhere to the Arrange-Act-Assert pattern for unit tests.
+- Ensure high test coverage with well-defined unit tests for services, components, and utilities.
+
+- **Template and Style Files**  
+  Always use separate `.html` files for component templates.  
+  Avoid inline `template` and `styles` definitions to improve readability, separation of concerns, and maintainability.
+
+**Performance Optimization**
+- When using the `@for` directive, include a `track` expression (e.g., `track item.id`) to help Angular optimize rendering and avoid unnecessary DOM updates.
+- Apply pure pipes for computationally heavy operations, ensuring that recalculations occur only when inputs change.
+- Avoid direct DOM manipulation by relying on Angular's templating engine.
+- Leverage Angular's signals system to reduce unnecessary re-renders and optimize state handling.
+- Use `NgOptimizedImage` for faster, more efficient image loading.
+
+**Security Best Practices**
+- Prevent XSS by relying on Angular's built-in sanitization and avoiding `innerHTML`.
+- Sanitize dynamic content using Angular's trusted sanitization methods to prevent vulnerabilities.
+
+**Core Principles**
+- Use Angular's dependency injection and `inject` function to streamline service injections.
+- Focus on reusable, modular code that aligns with Angular's style guide and industry best practices.
+- Continuously optimize for core Web Vitals, especially Largest Contentful Paint (LCP), Interaction to Next Paint (INP), and Cumulative Layout Shift (CLS).
+
+**Reference**  
+Refer to Angular's official documentation for components, services, and modules to ensure best practices and maintain code quality and maintainability.

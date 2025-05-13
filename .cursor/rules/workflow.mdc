@@ -1,0 +1,24 @@
+---
+description: 
+globs: 
+alwaysApply: true
+---
+## 🔄 Project Awareness & Context
+
+- **Always read [`PLANNING.md`](./PLANNING.md)** before starting a new conversation or task. It defines the project’s architecture, goals, style, and constraints.
+- **Check [`TASK.md`](./TASK.md)** before beginning any task. If the task isn't listed, add it with a short description and today’s date.
+- **Follow the project's naming conventions, folder structure, and architecture patterns** as defined in `PLANNING.md`.
+- **Ensure the application provides meaningful user feedback** during all interactions—especially form submissions, navigation, loading states, and errors. Use clear validation messages, confirmations, and notifications to guide the user.
+
+## 📚 Documentation & Explainability
+
+- **Update [`README.md`](./README.md)** when adding new features, changing dependencies, or modifying setup instructions.
+- **Comment on non-obvious code** to ensure it's understandable to a mid-level developer.
+- For complex logic, **include inline `# Reason:` comments** to explain the *why* behind implementation decisions.
+
+## 🤖 AI Agent Behavior Rules
+
+- **Do not assume context.** Ask clarifying questions when information is missing or ambiguous.
+- **Avoid hallucinating libraries or functions.** Use only well-known and verified packages or project-defined modules.
+- **Always confirm file paths and module names** before referencing them in code or documentation.
+- **Never delete or overwrite existing code** unless explicitly instructed or the task in `TASK.md` requires it.
