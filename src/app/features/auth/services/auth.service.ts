@@ -26,9 +26,19 @@ export class AuthService {
   }
 
   private checkAuthState(): void {
-    const storedUser = localStorage.getItem('user');
-    const storedToken = localStorage.getItem('accessToken');
-    const storedAssociationId = localStorage.getItem('associationId');
+    // Check localStorage first (for "remember me" users)
+    let storedUser = localStorage.getItem('user');
+    let storedToken = localStorage.getItem('accessToken');
+    let storedAssociationId = localStorage.getItem('associationId');
+    let storageType = localStorage;
+    
+    // If not found in localStorage, check sessionStorage (for regular users)
+    if (!storedToken) {
+      storedUser = sessionStorage.getItem('user');
+      storedToken = sessionStorage.getItem('accessToken');
+      storedAssociationId = sessionStorage.getItem('associationId');
+      storageType = sessionStorage;
+    }
     
     if (!storedToken) {
       return;
@@ -51,9 +61,14 @@ export class AuthService {
   }
   
   private clearStoredAuth(): void {
+    // Clear both storage types to be safe
     localStorage.removeItem('user');
     localStorage.removeItem('accessToken');
     localStorage.removeItem('associationId');
+    
+    sessionStorage.removeItem('user');
+    sessionStorage.removeItem('accessToken');
+    sessionStorage.removeItem('associationId');
   }
 
   async register(registerData: RegisterRequest): Promise<void> {
@@ -74,8 +89,8 @@ export class AuthService {
     this.router.navigate(['/auth/login']);
   }
 
-  async login(email: string, password: string): Promise<void> {
-    const loginRequest: LoginRequest = { email, password };
+  async login(email: string, password: string, rememberMe: boolean = false): Promise<void> {
+    const loginRequest: LoginRequest = { email, password, rememberMe };
     
     const response = await firstValueFrom(
       this.http.post<SuccessResponse<AuthResponse>>(`${this.apiUrl}/auth/login`, loginRequest)
@@ -87,8 +102,10 @@ export class AuthService {
       throw new Error('Invalid server response');
     }
     
-    localStorage.setItem('accessToken', authResponse.accessToken);
-    localStorage.setItem('associationId', authResponse.associationId.toString());
+    // Store auth data in localStorage or sessionStorage based on rememberMe
+    const storage = rememberMe ? localStorage : sessionStorage;
+    storage.setItem('accessToken', authResponse.accessToken);
+    storage.setItem('associationId', authResponse.associationId.toString());
     
     const user = await this.fetchUserProfile();
     
@@ -113,7 +130,10 @@ export class AuthService {
       throw new Error('Failed to load user profile');
     }
     
-    localStorage.setItem('user', JSON.stringify(user));
+    // Determine which storage to use based on where the accessToken is stored
+    const storage = localStorage.getItem('accessToken') ? localStorage : sessionStorage;
+    storage.setItem('user', JSON.stringify(user));
+    
     return user;
   }
 

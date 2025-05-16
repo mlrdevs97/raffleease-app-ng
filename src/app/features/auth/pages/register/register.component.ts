@@ -31,6 +31,10 @@ export class RegisterComponent implements OnInit {
   // Field-specific validation errors from backend
   fieldErrors = signal<Record<string, string>>({});
   
+  // Password visibility toggles
+  showPassword = signal(false);
+  showConfirmPassword = signal(false);
+  
   // Address suggestion handling
   addressQuery = signal('');
   showAddressSuggestions = signal(false);
@@ -138,6 +142,16 @@ export class RegisterComponent implements OnInit {
 
   ngOnInit() {
     this.resetErrors();
+  }
+  
+  // Toggle password visibility
+  togglePasswordVisibility(): void {
+    this.showPassword.update(value => !value);
+  }
+  
+  // Toggle confirm password visibility
+  toggleConfirmPasswordVisibility(): void {
+    this.showConfirmPassword.update(value => !value);
   }
   
   // Reset all error messages

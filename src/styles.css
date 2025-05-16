@@ -5,3 +5,6 @@
 /* You can add global styles to this file, and also import other style files */
 
 /* Your custom styles below */
+html, body {
+  font-family: 'Geist Sans', sans-serif;
+}

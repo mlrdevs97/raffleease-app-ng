@@ -17,6 +17,7 @@ export class LoginComponent {
   isLoading = signal(false);
   errorMessage = signal<string | null>(null);
   fieldErrors = signal<Record<string, string>>({});
+  showPassword = signal(false);
   returnUrl: string = '/dashboard';
   
   constructor(
@@ -27,7 +28,8 @@ export class LoginComponent {
   ) {
     this.loginForm = this.fb.group({
       email: ['', [Validators.required, Validators.email]],
-      password: ['', [Validators.required]]
+      password: ['', [Validators.required]],
+      rememberMe: [false]
     });
 
     // Get the return URL from route parameters or default to '/dashboard'
@@ -40,6 +42,11 @@ export class LoginComponent {
   resetErrors(): void {
     this.errorMessage.set(null);
     this.fieldErrors.set({});
+  }
+
+  // Toggle password visibility
+  togglePasswordVisibility(): void {
+    this.showPassword.update(value => !value);
   }
 
   // Process backend validation errors and apply them to form fields
@@ -86,12 +93,12 @@ export class LoginComponent {
       return;
     }
     
-    const { email, password } = this.loginForm.value;
+    const { email, password, rememberMe } = this.loginForm.value;
     
     this.isLoading.set(true);
     this.resetErrors();
     
-    this.authService.login(email, password)
+    this.authService.login(email, password, rememberMe)
       .catch((error: unknown) => {
         this.errorMessage.set(this.errorHandler.getErrorMessage(error));
 

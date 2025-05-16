@@ -1,0 +1,136 @@
+---
+description: 
+globs: 
+alwaysApply: false
+---
+## 🧭 Cursor's Role and Context
+
+You're an experienced app designer and layout builder working with me to create the UI for my app. The app already implements a solid client logic, but currently uses a mock layout. Your role is to help me design and implement a clean, responsive, and production-ready UI.
+
+## 🧭 Cursor Layout Rules for Angular App (Tailwind CSS)
+
+This document defines the layout and design rules for building a **friendly, professional, and minimalist** Angular application UI using **Tailwind CSS**.
+
+---
+
+## 🎨 Color Palette
+
+| Purpose        | Color Name  | Hex Code | Notes                                            |
+| -------------- | ----------- | -------- | ------------------------------------------------ |
+| Primary        | Blue 500    | #3b82f6  | Main action color (buttons, highlights)          |
+| Primary Hover  | Blue 600    | #2563eb  | Hover state for primary elements                 |
+| Background     | Gray 50     | #f9fafb  | Clean, soft background                           |
+| Surface        | White       | #ffffff  | Cards, modals, inputs                            |
+| Text Primary   | Gray 900    | #111827  | For high contrast, readable text                 |
+| Text Secondary | Gray 600    | #4b5563  | For muted or less important text                 |
+| Border/Stroke  | Gray 200    | #e5e7eb  | Subtle dividers and borders                      |
+| Accent         | Emerald 400 | #34d399  | Friendly accent for success states or highlights |
+| Error          | Rose 500    | #f43f5e  | For validation or error states                   |
+
+---
+
+## ✅ Design Guidelines
+
+* Use **plenty of white space** for a minimalist feel.
+* Limit use of accent colors to highlight important elements.
+* Keep UI components **simple and clean**, with soft or no shadows.
+* Apply `#3b82f6` sparingly to **guide user attention**.
+
+---
+
+## 📱 Responsive Design Rules
+
+* The design **must be fully responsive** across devices.
+* Follow a **mobile-first approach**, using Tailwind’s responsive prefixes (`sm:`, `md:`, `lg:`, `xl:`).
+* Components should stack vertically on small screens and align horizontally on larger ones.
+* Use `w-full`, `max-w-screen-sm|md|lg`, `px-4`, `py-6`, `lg:px-8` to manage layout width and spacing.
+
+---
+
+## 🧱 Component Rules
+
+### 🧾 Forms
+
+* Labels go **above inputs**, left-aligned:
+
+  ```html
+  <label class="block text-sm font-medium text-gray-700 mb-1">Label</label>
+  <input class="w-full border border-gray-200 rounded-md px-3 py-2 text-sm focus:outline-none focus:ring-2 focus:ring-blue-500" />
+  ```
+* Group form fields with:
+
+  ```html
+  <div class="space-y-4"></div>
+  ```
+* For wider groups or sections:
+
+  ```html
+  <div class="space-y-6"></div>
+  ```
+
+### 🔘 Buttons
+
+* Primary buttons:
+
+  ```html
+  <button class="bg-blue-500 hover:bg-blue-600 text-white font-medium rounded-md px-4 py-2 transition-colors duration-200">
+    Save
+  </button>
+  ```
+
+### 🧩 Cards & Panels
+
+* Use for grouped content:
+
+  ```html
+  <div class="bg-white rounded-xl shadow-sm p-6"></div>
+  ```
+* Use vertical spacing or dividers between sections:
+
+  ```html
+  <hr class="border-t border-gray-200 my-6" />
+  ```
+
+  or
+
+  ```html
+  <div class="divide-y divide-gray-200"></div>
+  ```
+
+### 💬 Typography
+
+* Headings:
+
+  * Primary: `text-2xl font-semibold text-gray-900`
+  * Secondary: `text-lg font-medium text-gray-900`
+* Body:
+
+  * Regular text: `text-sm text-gray-600`, `leading-relaxed`
+
+### 📦 Modals
+
+* Centered with overlay and max-width constraints:
+
+  ```html
+  <div class="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center">
+    <div class="bg-white rounded-xl shadow-lg p-6 w-full max-w-md">
+      <!-- Modal Content -->
+    </div>
+  </div>
+  ```
+
+### 🧭 Navigation
+
+* Use sidebar or topbar depending on app structure.
+* Keep nav **minimal** with icon + label.
+* Suggested styles:
+
+  * `bg-white`, `border-b border-gray-200`, `text-blue-500` for active links.
+
+---
+
+## 📸 Screenshot Adaptation
+
+* Cursor must **not copy layouts pixel-for-pixel**.
+* Instead, **adapt the structure and feel** using these rules.
+* Preserve **design consistency** across all views.
