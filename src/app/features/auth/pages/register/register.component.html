@@ -39,14 +39,11 @@
             type="text" 
             formControlName="firstName"
             class="w-full px-3 py-3 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent"
+            [ngClass]="{'border-red-500': userForm.controls['firstName'].invalid && userForm.controls['firstName'].touched}"
             placeholder="Enter your first name">
-          @if (userForm.controls['firstName'].invalid && userForm.controls['firstName'].touched) {
+          @if (getFieldErrorMessage('user', 'firstName')) {
             <div class="text-red-600 text-sm mt-1">
-              @if (userForm.controls['firstName'].errors?.['required']) {
-                First name is required
-              } @else if (userForm.controls['firstName'].errors?.['minlength'] || userForm.controls['firstName'].errors?.['maxlength']) {
-                First name must be between 2 and 50 characters
-              }
+              {{ getFieldErrorMessage('user', 'firstName') }}
             </div>
           }
         </div>
@@ -58,14 +55,11 @@
             type="text" 
             formControlName="lastName"
             class="w-full px-3 py-3 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent"
+            [ngClass]="{'border-red-500': userForm.controls['lastName'].invalid && userForm.controls['lastName'].touched}"
             placeholder="Enter your last name">
-          @if (userForm.controls['lastName'].invalid && userForm.controls['lastName'].touched) {
+          @if (getFieldErrorMessage('user', 'lastName')) {
             <div class="text-red-600 text-sm mt-1">
-              @if (userForm.controls['lastName'].errors?.['required']) {
-                Last name is required
-              } @else if (userForm.controls['lastName'].errors?.['minlength'] || userForm.controls['lastName'].errors?.['maxlength']) {
-                Last name must be between 2 and 50 characters
-              }
+              {{ getFieldErrorMessage('user', 'lastName') }}
             </div>
           }
         </div>
@@ -78,14 +72,11 @@
           type="text" 
           formControlName="userName"
           class="w-full px-3 py-3 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent"
+          [ngClass]="{'border-red-500': userForm.controls['userName'].invalid && userForm.controls['userName'].touched}"
           placeholder="Choose a username">
-        @if (userForm.controls['userName'].invalid && userForm.controls['userName'].touched) {
+        @if (getFieldErrorMessage('user', 'userName')) {
           <div class="text-red-600 text-sm mt-1">
-            @if (userForm.controls['userName'].errors?.['required']) {
-              Username is required
-            } @else if (userForm.controls['userName'].errors?.['minlength'] || userForm.controls['userName'].errors?.['maxlength']) {
-              Username must be between 2 and 25 characters
-            }
+            {{ getFieldErrorMessage('user', 'userName') }}
           </div>
         }
       </div>
@@ -97,14 +88,11 @@
           type="email" 
           formControlName="email"
           class="w-full px-3 py-3 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent"
+          [ngClass]="{'border-red-500': userForm.controls['email'].invalid && userForm.controls['email'].touched}"
           placeholder="Enter your email">
-        @if (userForm.controls['email'].invalid && userForm.controls['email'].touched) {
+        @if (getFieldErrorMessage('user', 'email')) {
           <div class="text-red-600 text-sm mt-1">
-            @if (userForm.controls['email'].errors?.['required']) {
-              Email is required
-            } @else if (userForm.controls['email'].errors?.['email']) {
-              Please enter a valid email
-            }
+            {{ getFieldErrorMessage('user', 'email') }}
           </div>
         }
       </div>
@@ -117,6 +105,7 @@
               type="text" 
               formControlName="prefix"
               class="w-full px-3 py-3 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent"
+              [ngClass]="{'border-red-500': userForm.get('phoneNumber.prefix')?.invalid && userForm.get('phoneNumber.prefix')?.touched}"
               placeholder="+1">
             @if (userForm.get('phoneNumber.prefix')?.invalid && userForm.get('phoneNumber.prefix')?.touched) {
               <div class="text-red-600 text-sm mt-1">
@@ -129,6 +118,7 @@
               type="text" 
               formControlName="nationalNumber"
               class="w-full px-3 py-3 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent"
+              [ngClass]="{'border-red-500': userForm.get('phoneNumber.nationalNumber')?.invalid && userForm.get('phoneNumber.nationalNumber')?.touched}"
               placeholder="1234567890">
             @if (userForm.get('phoneNumber.nationalNumber')?.invalid && userForm.get('phoneNumber.nationalNumber')?.touched) {
               <div class="text-red-600 text-sm mt-1">
@@ -146,14 +136,11 @@
           type="password" 
           formControlName="password"
           class="w-full px-3 py-3 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent"
+          [ngClass]="{'border-red-500': userForm.controls['password'].invalid && userForm.controls['password'].touched}"
           placeholder="Create a password">
-        @if (userForm.controls['password'].invalid && userForm.controls['password'].touched) {
+        @if (getFieldErrorMessage('user', 'password')) {
           <div class="text-red-600 text-sm mt-1">
-            @if (userForm.controls['password'].errors?.['required']) {
-              Password is required
-            } @else if (userForm.controls['password'].errors?.['pattern']) {
-              Password must be 8-32 characters and include: uppercase, lowercase, number, and special character
-            }
+            {{ getFieldErrorMessage('user', 'password') }}
           </div>
         }
       </div>
@@ -165,14 +152,11 @@
           type="password" 
           formControlName="confirmPassword"
           class="w-full px-3 py-3 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent"
+          [ngClass]="{'border-red-500': userForm.controls['confirmPassword'].invalid && userForm.controls['confirmPassword'].touched}"
           placeholder="Confirm your password">
-        @if (userForm.controls['confirmPassword'].invalid && userForm.controls['confirmPassword'].touched) {
+        @if (getFieldErrorMessage('user', 'confirmPassword')) {
           <div class="text-red-600 text-sm mt-1">
-            @if (userForm.controls['confirmPassword'].errors?.['required']) {
-              Please confirm your password
-            } @else if (userForm.controls['confirmPassword'].errors?.['mismatch']) {
-              Passwords don't match
-            }
+            {{ getFieldErrorMessage('user', 'confirmPassword') }}
           </div>
         }
       </div>
@@ -196,14 +180,11 @@
           type="text" 
           formControlName="associationName"
           class="w-full px-3 py-3 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent"
+          [ngClass]="{'border-red-500': associationForm.controls['associationName'].invalid && associationForm.controls['associationName'].touched}"
           placeholder="Enter association name">
-        @if (associationForm.controls['associationName'].invalid && associationForm.controls['associationName'].touched) {
+        @if (getFieldErrorMessage('association', 'associationName')) {
           <div class="text-red-600 text-sm mt-1">
-            @if (associationForm.controls['associationName'].errors?.['required']) {
-              Association name is required
-            } @else if (associationForm.controls['associationName'].errors?.['minlength'] || associationForm.controls['associationName'].errors?.['maxlength']) {
-              Association name must be between 2 and 100 characters
-            }
+            {{ getFieldErrorMessage('association', 'associationName') }}
           </div>
         }
       </div>
@@ -215,10 +196,11 @@
           formControlName="description"
           rows="3"
           class="w-full px-3 py-3 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent"
+          [ngClass]="{'border-red-500': associationForm.controls['description'].invalid && associationForm.controls['description'].touched}"
           placeholder="Describe your association"></textarea>
-        @if (associationForm.controls['description'].invalid && associationForm.controls['description'].touched) {
+        @if (getFieldErrorMessage('association', 'description')) {
           <div class="text-red-600 text-sm mt-1">
-            Description must not exceed 500 characters
+            {{ getFieldErrorMessage('association', 'description') }}
           </div>
         }
       </div>
@@ -230,10 +212,11 @@
           type="email" 
           formControlName="email"
           class="w-full px-3 py-3 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent"
+          [ngClass]="{'border-red-500': associationForm.controls['email'].invalid && associationForm.controls['email'].touched}"
           placeholder="Enter association email">
-        @if (associationForm.controls['email'].invalid && associationForm.controls['email'].touched) {
+        @if (getFieldErrorMessage('association', 'email')) {
           <div class="text-red-600 text-sm mt-1">
-            Please enter a valid email
+            {{ getFieldErrorMessage('association', 'email') }}
           </div>
         }
       </div>
@@ -246,6 +229,7 @@
               type="text" 
               formControlName="prefix"
               class="w-full px-3 py-3 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent"
+              [ngClass]="{'border-red-500': associationForm.get('phoneNumber.prefix')?.invalid && associationForm.get('phoneNumber.prefix')?.touched}"
               placeholder="+1">
             @if (associationForm.get('phoneNumber.prefix')?.invalid && associationForm.get('phoneNumber.prefix')?.touched) {
               <div class="text-red-600 text-sm mt-1">
@@ -258,6 +242,7 @@
               type="text" 
               formControlName="nationalNumber"
               class="w-full px-3 py-3 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent"
+              [ngClass]="{'border-red-500': associationForm.get('phoneNumber.nationalNumber')?.invalid && associationForm.get('phoneNumber.nationalNumber')?.touched}"
               placeholder="1234567890">
             @if (associationForm.get('phoneNumber.nationalNumber')?.invalid && associationForm.get('phoneNumber.nationalNumber')?.touched) {
               <div class="text-red-600 text-sm mt-1">
@@ -280,13 +265,14 @@
             type="text" 
             formControlName="addressInput"
             class="w-full px-3 py-3 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent"
+            [ngClass]="{'border-red-500': associationForm.get('addressData.addressInput')?.invalid && associationForm.get('addressData.addressInput')?.touched}"
             placeholder="Start typing an address..."
             (input)="onAddressInputChange($event)"
             (focus)="focusAddressInput($event)">
           
-          @if (associationForm.get('addressData.addressInput')?.invalid && associationForm.get('addressData.addressInput')?.touched) {
+          @if (getFieldErrorMessage('association', 'addressData.addressInput')) {
             <div class="text-red-600 text-sm mt-1">
-              Please enter a valid address
+              {{ getFieldErrorMessage('association', 'addressData.addressInput') }}
             </div>
           }
           

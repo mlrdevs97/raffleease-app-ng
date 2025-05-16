@@ -1,9 +1,10 @@
 import { Injectable, signal } from '@angular/core';
 import { Router } from '@angular/router';
-import { User, AuthState, LoginRequest, RegisterRequest, RegisterEmailVerificationRequest, AuthResponse } from '../models/auth.model';
-import { HttpClient, HttpErrorResponse } from '@angular/common/http';
+import { User, AuthState, LoginRequest, RegisterRequest, AuthResponse } from '../models/auth.model';
+import { HttpClient } from '@angular/common/http';
 import { environment } from '../../../../environments/environment';
-import { firstValueFrom, catchError, throwError } from 'rxjs';
+import { firstValueFrom } from 'rxjs';
+import {SuccessResponse } from '../../../core/models/api-response.model';
 
 @Injectable({
   providedIn: 'root'
@@ -55,108 +56,70 @@ export class AuthService {
     localStorage.removeItem('associationId');
   }
 
-  private handleError(error: HttpErrorResponse) {
-    let errorMessage = 'An unknown error occurred';
-    
-    if (error.error instanceof ErrorEvent) {
-      // Client-side error
-      errorMessage = `Error: ${error.error.message}`;
-    } else {
-      // Server-side error
-      errorMessage = error.error?.message || `Error Code: ${error.status}, Message: ${error.message}`;
-    }
-    
-    return throwError(() => new Error(errorMessage));
-  }
-
   async register(registerData: RegisterRequest): Promise<void> {
-    try {
-      await firstValueFrom(
-        this.http.post<any>(`${this.apiUrl}/auth/register`, registerData)
-          .pipe(catchError(error => this.handleError(error)))
-      );
-      
-      this.router.navigate(['/auth/verify-email']);
-    } catch (error) {
-      throw error;
-    }
+    const response = await firstValueFrom(
+      this.http.post<SuccessResponse>(`${this.apiUrl}/auth/register`, registerData)
+    );
+    
+    console.log(response);
+
+    this.router.navigate(['/auth/verify-email']);
   }
 
   async verifyEmail(token: string): Promise<void> {
-    try {
-      await firstValueFrom(
-        this.http.post<any>(`${this.apiUrl}/auth/verify`, { verificationToken: token })
-          .pipe(catchError(error => this.handleError(error)))
-      );
-      
-      this.router.navigate(['/auth/login']);
-    } catch (error) {
-      throw error;
-    }
+    await firstValueFrom(
+      this.http.post<SuccessResponse>(`${this.apiUrl}/auth/verify`, { verificationToken: token })
+    );
+    
+    this.router.navigate(['/auth/login']);
   }
 
   async login(email: string, password: string): Promise<void> {
     const loginRequest: LoginRequest = { email, password };
     
-    try {
-      const response = await firstValueFrom(
-        this.http.post<{ data: AuthResponse }>(`${this.apiUrl}/auth/login`, loginRequest)
-          .pipe(catchError(error => this.handleError(error)))
-      );
-      
-      const authResponse = response?.data;
-      
-      if (!authResponse) {
-        throw new Error('Invalid server response');
-      }
-      
-      localStorage.setItem('accessToken', authResponse.accessToken);
-      localStorage.setItem('associationId', authResponse.associationId.toString());
-      
-      const user = await this.fetchUserProfile();
-      
-      this.authState.update(state => ({
-        ...state,
-        user,
-        associationId: authResponse.associationId,
-        isAuthenticated: true
-      }));
-      
-      this.router.navigate(['/dashboard']);
-    } catch (error) {
-      throw error;
+    const response = await firstValueFrom(
+      this.http.post<SuccessResponse<AuthResponse>>(`${this.apiUrl}/auth/login`, loginRequest)
+    );
+    
+    const authResponse = response?.data;
+    
+    if (!authResponse) {
+      throw new Error('Invalid server response');
     }
+    
+    localStorage.setItem('accessToken', authResponse.accessToken);
+    localStorage.setItem('associationId', authResponse.associationId.toString());
+    
+    const user = await this.fetchUserProfile();
+    
+    this.authState.update(state => ({
+      ...state,
+      user,
+      associationId: authResponse.associationId,
+      isAuthenticated: true
+    }));
+    
+    this.router.navigate(['/dashboard']);
   }
-  
+
   private async fetchUserProfile(): Promise<User> {
-    try {
-      const response = await firstValueFrom(
-        this.http.get<{ data: User }>(`${this.apiUrl}/users/me`)
-          .pipe(catchError(error => this.handleError(error)))
-      );
-      
-      const user = response?.data;
-      
-      if (!user) {
-        throw new Error('Failed to load user profile');
-      }
-      
-      localStorage.setItem('user', JSON.stringify(user));
-      return user;
-    } catch (error) {
-      throw error;
+    const response = await firstValueFrom(
+      this.http.get<SuccessResponse<User>>(`${this.apiUrl}/users/me`)
+    );
+    
+    const user = response?.data;
+    
+    if (!user) {
+      throw new Error('Failed to load user profile');
     }
+    
+    localStorage.setItem('user', JSON.stringify(user));
+    return user;
   }
 
   async logout(): Promise<void> {
     try {
-      await firstValueFrom(
-        this.http.post<any>(`${this.apiUrl}/auth/logout`, {})
-          .pipe(catchError(() => {
-            // Even if the API call fails, we'll log out the user locally
-            return throwError(() => new Error('Logout failed, but local state cleared'));
-          }))
-      );
+      await firstValueFrom(this.http.post<any>(`${this.apiUrl}/auth/logout`, {}));
     } catch (error) {
       console.warn('Logout error:', error);
     } finally {

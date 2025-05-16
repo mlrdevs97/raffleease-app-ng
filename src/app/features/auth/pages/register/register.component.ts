@@ -3,6 +3,9 @@ import { CommonModule } from '@angular/common';
 import { ReactiveFormsModule, FormBuilder, FormGroup, Validators, FormControl } from '@angular/forms';
 import { RouterLink } from '@angular/router';
 import { AuthService } from '../../services/auth.service';
+import { ValidationErrorMessages } from '../../../../core/constants/validation-error-codes';
+import { ErrorHandlerService } from '../../../../core/services/error-handler.service';
+import { passwordMatchValidator } from '../../../../core/validators';
 
 interface AddressSuggestion {
   placeId: string;
@@ -24,6 +27,9 @@ export class RegisterComponent implements OnInit {
   isLoading = signal(false);
   errorMessage = signal<string | null>(null);
   currentStep = signal<'user' | 'association'>('user');
+  
+  // Field-specific validation errors from backend
+  fieldErrors = signal<Record<string, string>>({});
   
   // Address suggestion handling
   addressQuery = signal('');
@@ -88,9 +94,9 @@ export class RegisterComponent implements OnInit {
   constructor(
     private fb: FormBuilder, 
     private authService: AuthService,
+    private errorHandler: ErrorHandlerService,
     private elementRef: ElementRef
   ) {
-    // Initialize user form
     this.userForm = this.fb.group({
       firstName: ['', [Validators.required, Validators.minLength(2), Validators.maxLength(50)]],
       lastName: ['', [Validators.required, Validators.minLength(2), Validators.maxLength(50)]],
@@ -106,10 +112,9 @@ export class RegisterComponent implements OnInit {
       ]],
       confirmPassword: ['', [Validators.required]]
     }, { 
-      validators: this.passwordMatchValidator 
+      validators: passwordMatchValidator() 
     });
     
-    // Initialize association form with simplified address
     this.associationForm = this.fb.group({
       associationName: ['', [Validators.required, Validators.minLength(2), Validators.maxLength(100)]],
       description: ['', [Validators.maxLength(500)]],
@@ -132,7 +137,58 @@ export class RegisterComponent implements OnInit {
   }
 
   ngOnInit() {
-    // Set up initial states
+    this.resetErrors();
+  }
+  
+  // Reset all error messages
+  resetErrors(): void {
+    this.errorMessage.set(null);
+    this.fieldErrors.set({});
+  }
+
+  // Process backend validation errors and apply them to form fields
+  applyFieldErrors(errors: Record<string, string>): void {
+    // Set field-specific errors for display
+    this.fieldErrors.set(errors);
+    
+    // Mark fields as touched and with errors
+    Object.keys(errors).forEach(fieldPath => {
+      const parts = fieldPath.split('.');
+      
+      if (parts.length === 1) {
+        // Top-level field, check both forms
+        if (this.userForm.get(fieldPath)) {
+          const control = this.userForm.get(fieldPath);
+          control?.markAsTouched();
+          control?.setErrors({ serverError: errors[fieldPath] });
+        } else if (this.associationForm.get(fieldPath)) {
+          const control = this.associationForm.get(fieldPath);
+          control?.markAsTouched();
+          control?.setErrors({ serverError: errors[fieldPath] });
+        }
+      } else {
+        // Nested field, determine which form to update
+        const formName = parts[0];
+        
+        if (formName === 'userData') {
+          // User form fields
+          const userFieldPath = parts.slice(1).join('.');
+          const control = this.userForm.get(userFieldPath);
+          if (control) {
+            control.markAsTouched();
+            control.setErrors({ serverError: errors[fieldPath] });
+          }
+        } else if (formName === 'associationData') {
+          // Association form fields
+          const assocFieldPath = parts.slice(1).join('.');
+          const control = this.associationForm.get(assocFieldPath);
+          if (control) {
+            control.markAsTouched();
+            control.setErrors({ serverError: errors[fieldPath] });
+          }
+        }
+      }
+    });
   }
 
   // Close suggestions when clicking outside
@@ -145,23 +201,10 @@ export class RegisterComponent implements OnInit {
     }
   }
 
-  // Custom validator for password matching
-  passwordMatchValidator(form: FormGroup) {
-    const password = form.get('password')?.value;
-    const confirmPassword = form.get('confirmPassword')?.value;
-    
-    if (password === confirmPassword) {
-      form.get('confirmPassword')?.setErrors(null);
-      return null;
-    } else {
-      form.get('confirmPassword')?.setErrors({ mismatch: true });
-      return { passwordMismatch: true };
-    }
-  }
-  
   // Navigate to next step
   nextStep(): void {
     if (this.userForm.valid) {
+      this.resetErrors();
       this.currentStep.set('association');
     } else {
       this.userForm.markAllAsTouched();
@@ -170,6 +213,7 @@ export class RegisterComponent implements OnInit {
   
   // Go back to user information step
   previousStep(): void {
+    this.resetErrors();
     this.currentStep.set('user');
   }
 
@@ -223,6 +267,41 @@ export class RegisterComponent implements OnInit {
     this.showAddressSuggestions.set(false);
   }
 
+  // Get field error message (combines client and server validation)
+  getFieldErrorMessage(formName: 'user' | 'association', fieldName: string): string | null {
+    const form = formName === 'user' ? this.userForm : this.associationForm;
+    const control = form.get(fieldName);
+    
+    if (!control || !control.touched || !control.errors) {
+      return null;
+    }
+    
+    // Look for server-specific error first
+    if (control.errors['serverError']) {
+      return control.errors['serverError'];
+    }
+    
+    // Return appropriate client-side validation error
+    if (control.errors['required']) {
+      return ValidationErrorMessages.REQUIRED;
+    } else if (control.errors['email']) {
+      return ValidationErrorMessages.INVALID_EMAIL;
+    } else if (control.errors['minlength']) {
+      return `Minimum length is ${control.errors['minlength'].requiredLength} characters`;
+    } else if (control.errors['maxlength']) {
+      return `Maximum length is ${control.errors['maxlength'].requiredLength} characters`;
+    } else if (control.errors['pattern']) {
+      if (fieldName === 'password') {
+        return 'Password must be 8-32 characters and include: uppercase, lowercase, number, and special character';
+      }
+      return ValidationErrorMessages.INVALID_FORMAT;
+    } else if (control.errors['mismatch']) {
+      return 'Passwords do not match';
+    }
+    
+    return ValidationErrorMessages.INVALID_FIELD;
+  }
+
   onSubmit(): void {
     if (!this.userForm.valid || !this.associationForm.valid) {
       this.userForm.markAllAsTouched();
@@ -236,23 +315,29 @@ export class RegisterComponent implements OnInit {
     };
     
     // Clean up empty phone number if not provided
-    if (!registerData.userData.phoneNumber.prefix && !registerData.userData.phoneNumber.nationalNumber) {
-      registerData.userData.phoneNumber = undefined;
-    }
-    
-    if (!registerData.associationData.phoneNumber.prefix && !registerData.associationData.phoneNumber.nationalNumber) {
-      registerData.associationData.phoneNumber = undefined;
-    }
+    this.cleanEmptyPhoneNumber(registerData.userData);
+    this.cleanEmptyPhoneNumber(registerData.associationData);
     
     this.isLoading.set(true);
-    this.errorMessage.set(null);
+    this.resetErrors();
     
     this.authService.register(registerData)
-      .catch(error => {
-        this.errorMessage.set(error.message || 'Registration failed. Please try again.');
+      .catch((error: unknown) => {
+        this.errorMessage.set(this.errorHandler.getErrorMessage(error));
+
+        if (this.errorHandler.isValidationError(error)) {
+          const validationErrors = this.errorHandler.getValidationErrors(error);
+          this.applyFieldErrors(validationErrors);
+        }       
       })
       .finally(() => {
         this.isLoading.set(false);
       });
   }
+
+  cleanEmptyPhoneNumber(data: any): void {
+    if (!data.phoneNumber.prefix && !data.phoneNumber.nationalNumber) {
+      data.phoneNumber = undefined;
+    }
+  }  
 } 

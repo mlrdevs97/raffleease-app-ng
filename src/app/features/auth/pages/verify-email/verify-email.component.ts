@@ -2,6 +2,7 @@ import { Component, OnInit, signal } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { ActivatedRoute, RouterLink } from '@angular/router';
 import { AuthService } from '../../services/auth.service';
+import { HttpErrorResponse } from '@angular/common/http';
 
 @Component({
   selector: 'app-verify-email',
@@ -38,8 +39,8 @@ export class VerifyEmailComponent implements OnInit {
       .then(() => {
         this.isVerified.set(true);
       })
-      .catch(error => {
-        this.errorMessage.set(error.message || 'Verification failed. Please try again.');
+      .catch((error: Error | HttpErrorResponse) => {
+        this.errorMessage.set(error instanceof Error ? error.message : 'Verification failed. Please try again.');
       })
       .finally(() => {
         this.isLoading.set(false);

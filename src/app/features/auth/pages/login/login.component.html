@@ -18,11 +18,7 @@
         placeholder="Enter your email">
       @if (loginForm.controls['email'].invalid && loginForm.controls['email'].touched) {
         <div class="text-red-600 text-sm mt-1">
-          @if (loginForm.controls['email'].errors?.['required']) {
-            Email is required
-          } @else if (loginForm.controls['email'].errors?.['email']) {
-            Please enter a valid email
-          }
+          {{ getFieldErrorMessage('email') }}
         </div>
       }
     </div>
@@ -37,7 +33,7 @@
         placeholder="Enter your password">
       @if (loginForm.controls['password'].invalid && loginForm.controls['password'].touched) {
         <div class="text-red-600 text-sm mt-1">
-          Password is required
+          {{ getFieldErrorMessage('password') }}
         </div>
       }
     </div>
