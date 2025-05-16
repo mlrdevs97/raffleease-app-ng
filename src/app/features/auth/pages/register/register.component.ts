@@ -5,7 +5,7 @@ import { RouterLink } from '@angular/router';
 import { AuthService } from '../../services/auth.service';
 import { ValidationErrorMessages } from '../../../../core/constants/validation-error-codes';
 import { ErrorHandlerService } from '../../../../core/services/error-handler.service';
-import { passwordMatchValidator } from '../../../../core/validators';
+import { passwordMatchValidator } from '../../../../core/validators/password.validators';
 
 interface AddressSuggestion {
   placeId: string;
