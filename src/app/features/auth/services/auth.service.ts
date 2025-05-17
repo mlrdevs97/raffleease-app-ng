@@ -87,11 +87,10 @@ export class AuthService {
     return this.http.post<SuccessResponse>(`${this.apiUrl}/auth/verify`, { verificationToken: token });
   }
 
-  login(email: string, password: string, rememberMe: boolean = false): Observable<void> {
-    const loginRequest: LoginRequest = { email, password, rememberMe };
+  login(identifier: string, password: string, rememberMe: boolean = false): Observable<void> {
+    const loginRequest: LoginRequest = { identifier, password, rememberMe };
     return this.http.post<SuccessResponse<AuthResponse>>(`${this.apiUrl}/auth/login`, loginRequest).pipe(
       tap((response) => {
-        console.log('login response', response);
         const authResponse = response?.data;
         if (!authResponse) {
           throw new Error('Invalid server response');

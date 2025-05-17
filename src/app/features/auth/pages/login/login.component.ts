@@ -27,7 +27,7 @@ export class LoginComponent {
     private route: ActivatedRoute
   ) {
     this.loginForm = this.fb.group({
-      email: ['', [Validators.required, Validators.email]],
+      identifier: ['', [Validators.required]],
       password: ['', [Validators.required]],
       rememberMe: [false]
     });
@@ -80,8 +80,6 @@ export class LoginComponent {
     // Return appropriate client-side validation error
     if (control.errors['required']) {
       return ValidationErrorMessages.REQUIRED;
-    } else if (control.errors['email']) {
-      return ValidationErrorMessages.INVALID_EMAIL;
     }
     
     return ValidationErrorMessages.INVALID_FIELD;
@@ -92,10 +90,10 @@ export class LoginComponent {
       this.loginForm.markAllAsTouched();
       return;
     }
-    const { email, password, rememberMe } = this.loginForm.value;
+    const { identifier, password, rememberMe } = this.loginForm.value;
     this.isLoading.set(true);
     this.resetErrors();
-    this.authService.login(email, password, rememberMe).subscribe({
+    this.authService.login(identifier, password, rememberMe).subscribe({
       next: () => {},
       error: (error: unknown) => {
         this.errorMessage.set(this.errorHandler.getErrorMessage(error));

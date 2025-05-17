@@ -13,7 +13,7 @@ export interface AuthState {
 }
 
 export interface LoginRequest {
-  email: string;
+  identifier: string;
   password: string;
   rememberMe?: boolean;
 }

@@ -18,14 +18,14 @@
 
       <form [formGroup]="loginForm" (ngSubmit)="onSubmit()" class="space-y-6">
         <div class="space-y-2">
-          <label for="email" class="text-sm font-medium">Email</label>
-          <input id="email" type="email" formControlName="email"
+          <label for="identifier" class="text-sm font-medium">Identifier</label>
+          <input id="identifier" type="text" formControlName="identifier"
             class="w-full px-3 py-2 text-sm border border-gray-200 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent"
-            [ngClass]="{'border-rose-500 ring-1 ring-rose-500': loginForm.controls['email'].invalid && loginForm.controls['email'].touched}"
-            placeholder="Enter your email">
-          @if (loginForm.controls['email'].invalid && loginForm.controls['email'].touched) {
+            [ngClass]="{'border-rose-500 ring-1 ring-rose-500': loginForm.controls['identifier'].invalid && loginForm.controls['identifier'].touched}"
+            placeholder="Enter your email or username">
+          @if (loginForm.controls['identifier'].invalid && loginForm.controls['identifier'].touched) {
           <div class="text-rose-600 text-xs mt-1">
-            {{ getFieldErrorMessage('email') }}
+            {{ getFieldErrorMessage('identifier') }}
           </div>
           }
         </div>
