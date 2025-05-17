@@ -92,23 +92,22 @@ export class LoginComponent {
       this.loginForm.markAllAsTouched();
       return;
     }
-    
     const { email, password, rememberMe } = this.loginForm.value;
-    
     this.isLoading.set(true);
     this.resetErrors();
-    
-    this.authService.login(email, password, rememberMe)
-      .catch((error: unknown) => {
+    this.authService.login(email, password, rememberMe).subscribe({
+      next: () => {},
+      error: (error: unknown) => {
         this.errorMessage.set(this.errorHandler.getErrorMessage(error));
-
         if (this.errorHandler.isValidationError(error)) {
           const validationErrors = this.errorHandler.getValidationErrors(error);
           this.applyFieldErrors(validationErrors);
-        }       
-      })
-      .finally(() => {
+        }
         this.isLoading.set(false);
-      });    
+      },
+      complete: () => {
+        this.isLoading.set(false);
+      }
+    });
   }
 } 

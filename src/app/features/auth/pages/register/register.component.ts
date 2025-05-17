@@ -322,31 +322,28 @@ export class RegisterComponent implements OnInit {
       this.associationForm.markAllAsTouched();
       return;
     }
-    
     const registerData = {
       userData: this.userForm.value,
       associationData: this.associationForm.value
     };
-    
-    // Clean up empty phone number if not provided
     this.cleanEmptyPhoneNumber(registerData.userData);
     this.cleanEmptyPhoneNumber(registerData.associationData);
-    
     this.isLoading.set(true);
     this.resetErrors();
-    
-    this.authService.register(registerData)
-      .catch((error: unknown) => {
+    this.authService.register(registerData).subscribe({
+      next: () => {},
+      error: (error: unknown) => {
         this.errorMessage.set(this.errorHandler.getErrorMessage(error));
-
         if (this.errorHandler.isValidationError(error)) {
           const validationErrors = this.errorHandler.getValidationErrors(error);
           this.applyFieldErrors(validationErrors);
-        }       
-      })
-      .finally(() => {
+        }
         this.isLoading.set(false);
-      });
+      },
+      complete: () => {
+        this.isLoading.set(false);
+      }
+    });
   }
 
   cleanEmptyPhoneNumber(data: any): void {
