@@ -1,7 +1,10 @@
 <div class="flex flex-col gap-4 sm:flex-row sm:items-center sm:max-w-xl">
-    <!-- Search input -->
-    <app-raffles-search></app-raffles-search>
+    <div class="flex-1">
+        <app-raffles-search></app-raffles-search>
+    </div>
 
-    <!-- Sort dropdown -->
-    <app-raffles-sort></app-raffles-sort>
+    <div class="grid grid-cols-2 gap-4">
+        <app-raffles-status></app-raffles-status>
+        <app-raffles-sort></app-raffles-sort>
+    </div>
 </div>
