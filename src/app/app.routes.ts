@@ -17,7 +17,7 @@ export const routes: Routes = [
       {
         path: 'raffles',
         loadChildren: () => import('./features/raffles/raffles.routes').then(m => m.RAFFLES_ROUTES)
-      },
+      }
     ]
   }
 ];

@@ -1,7 +1,7 @@
 import { Component } from '@angular/core';
 import { CommonModule } from '@angular/common';
-import { RafflesHeaderComponent } from '../components/raffles-header/raffles-header.component';
-import { RaffleCardListComponent } from '../components/raffle-card-list/raffle-card-list.component';
+import { RafflesHeaderComponent } from '../../components/raffles-header/raffles-header.component';
+import { RaffleCardListComponent } from '../../components/raffle-card-list/raffle-card-list.component';
 
 @Component({
   selector: 'app-raffles-page',
