@@ -1,0 +1,9 @@
+<div>
+  <ul>
+    @for (raffle of raffles; track raffle.id) {
+    <li>
+      <app-raffle-card [raffle]="raffle"></app-raffle-card>
+    </li>
+    }
+  </ul>
+</div> 
