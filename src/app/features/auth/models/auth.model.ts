@@ -63,4 +63,9 @@ export interface RegisterEmailVerificationRequest {
 export interface AuthResponse {
   accessToken: string;
   associationId: number;
+}
+
+export interface RegisterResponse {
+  id: string;
+  email: string;
 } 

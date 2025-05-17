@@ -1,7 +1,7 @@
 import { Component, signal, OnInit, HostListener, ElementRef } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { ReactiveFormsModule, FormBuilder, FormGroup, Validators, FormControl } from '@angular/forms';
-import { RouterLink } from '@angular/router';
+import { Router, RouterLink } from '@angular/router';
 import { AuthService } from '../../services/auth.service';
 import { ValidationErrorMessages } from '../../../../core/constants/validation-error-codes';
 import { ErrorHandlerService } from '../../../../core/services/error-handler.service';
@@ -99,7 +99,8 @@ export class RegisterComponent implements OnInit {
     private fb: FormBuilder, 
     private authService: AuthService,
     private errorHandler: ErrorHandlerService,
-    private elementRef: ElementRef
+    private elementRef: ElementRef,
+    private router: Router
   ) {
     this.userForm = this.fb.group({
       firstName: ['', [Validators.required, Validators.minLength(2), Validators.maxLength(50)]],
@@ -331,7 +332,9 @@ export class RegisterComponent implements OnInit {
     this.isLoading.set(true);
     this.resetErrors();
     this.authService.register(registerData).subscribe({
-      next: () => {},
+      next: (registerResponse) => {
+        this.router.navigate(['/raffles']);
+      },
       error: (error: unknown) => {
         this.errorMessage.set(this.errorHandler.getErrorMessage(error));
         if (this.errorHandler.isValidationError(error)) {

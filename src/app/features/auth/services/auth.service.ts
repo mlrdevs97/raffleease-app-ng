@@ -1,6 +1,6 @@
 import { Injectable, signal } from '@angular/core';
 import { Router } from '@angular/router';
-import { User, AuthState, LoginRequest, RegisterRequest, AuthResponse } from '../models/auth.model';
+import { User, AuthState, LoginRequest, RegisterRequest, AuthResponse, RegisterResponse, RegisterEmailVerificationRequest } from '../models/auth.model';
 import { HttpClient } from '@angular/common/http';
 import { environment } from '../../../../environments/environment';
 import { Observable, tap, map, of } from 'rxjs';
@@ -61,38 +61,37 @@ export class AuthService {
   }
   
   private clearStoredAuth(): void {
-    // Clear both storage types to be safe
-    localStorage.removeItem('user');
+    // localStorage.removeItem('user');
     localStorage.removeItem('accessToken');
     localStorage.removeItem('associationId');
     
-    sessionStorage.removeItem('user');
+    // sessionStorage.removeItem('user');
     sessionStorage.removeItem('accessToken');
     sessionStorage.removeItem('associationId');
   }
 
-  register(registerData: RegisterRequest): Observable<void> {
-    return this.http.post<SuccessResponse>(`${this.apiUrl}/auth/register`, registerData).pipe(
-      tap(() => {
-        this.router.navigate(['/auth/verify-email']);
+  register(registerData: RegisterRequest): Observable<RegisterResponse> {
+    return this.http.post<SuccessResponse<RegisterResponse>>(`${this.apiUrl}/auth/register`, registerData).pipe(
+      tap((response) => {
+        if (response?.data?.email) {
+          this.router.navigate(['/auth/verify-email'], { state: { email: response.data.email } });
+        } else {
+          this.router.navigate(['/auth/verify-email']);
+        }
       }),
-      map(() => void 0)
+      map((response) => response?.data as RegisterResponse)
     );
   }
 
-  verifyEmail(token: string): Observable<void> {
-    return this.http.post<SuccessResponse>(`${this.apiUrl}/auth/verify`, { verificationToken: token }).pipe(
-      tap(() => {
-        this.router.navigate(['/auth/login']);
-      }),
-      map(() => void 0)
-    );
+  verifyEmail(token: string): Observable<SuccessResponse<void>> {
+    return this.http.post<SuccessResponse>(`${this.apiUrl}/auth/verify`, { verificationToken: token });
   }
 
   login(email: string, password: string, rememberMe: boolean = false): Observable<void> {
     const loginRequest: LoginRequest = { email, password, rememberMe };
     return this.http.post<SuccessResponse<AuthResponse>>(`${this.apiUrl}/auth/login`, loginRequest).pipe(
       tap((response) => {
+        console.log('login response', response);
         const authResponse = response?.data;
         if (!authResponse) {
           throw new Error('Invalid server response');
@@ -104,6 +103,7 @@ export class AuthService {
       map((response) => response?.data?.associationId),
       // Fetch user profile and update state
       tap(async (associationId) => {
+        /*
         const user$ = this.fetchUserProfile();
         user$.subscribe(user => {
           this.authState.update(state => ({
@@ -114,6 +114,13 @@ export class AuthService {
           }));
           this.router.navigate(['/raffles']);
         });
+        */
+        this.authState.update(state => ({
+            ...state,
+            associationId,
+            isAuthenticated: true
+          }));
+        this.router.navigate(['/raffles']);
       }),
       map(() => void 0)
     );
