@@ -3,7 +3,7 @@ import { Router } from '@angular/router';
 import { User, AuthState, LoginRequest, RegisterRequest, AuthResponse } from '../models/auth.model';
 import { HttpClient } from '@angular/common/http';
 import { environment } from '../../../../environments/environment';
-import { Observable, tap, map } from 'rxjs';
+import { Observable, tap, map, of } from 'rxjs';
 import { SuccessResponse } from '../../../core/models/api-response.model';
 
 @Injectable({
@@ -112,14 +112,16 @@ export class AuthService {
             associationId,
             isAuthenticated: true
           }));
-          this.router.navigate(['/dashboard']);
+          this.router.navigate(['/raffles']);
         });
       }),
       map(() => void 0)
     );
   }
 
-  fetchUserProfile(): Observable<User> {
+  // TODO: add feature to fetch the user andassociation profile
+  fetchUserProfile(): Observable<User | null> {
+    return of(null);
     return this.http.get<SuccessResponse<User>>(`${this.apiUrl}/users/me`).pipe(
       map(response => {
         const user = response?.data;
