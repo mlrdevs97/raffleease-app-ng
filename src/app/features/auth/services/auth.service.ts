@@ -3,8 +3,13 @@ import { Router } from '@angular/router';
 import { User, AuthState, LoginRequest, RegisterRequest, AuthResponse, RegisterResponse, RegisterEmailVerificationRequest } from '../models/auth.model';
 import { HttpClient } from '@angular/common/http';
 import { environment } from '../../../../environments/environment';
-import { Observable, tap, map, of } from 'rxjs';
+import { Observable, tap, map } from 'rxjs';
 import { SuccessResponse } from '../../../core/models/api-response.model';
+import { jwtDecode } from 'jwt-decode';
+
+interface DecodedToken {
+  exp: number; // Expiration time in seconds since the epoch
+}
 
 @Injectable({
   providedIn: 'root'
@@ -15,9 +20,9 @@ export class AuthService {
     isAuthenticated: false,
     token: null
   });
-
-  user = this.authState.asReadonly();
   
+  private tokenRefreshTimeout: any;
+
   constructor(
     private router: Router,
     private http: HttpClient
@@ -98,6 +103,8 @@ export class AuthService {
           ...state,
           token: authResponse.accessToken
         }));
+
+        this.setTokenRefreshTimer(authResponse.accessToken);
       }),
       map((response) => response?.data?.associationId),
       tap(async (associationId) => {
@@ -123,6 +130,7 @@ export class AuthService {
           token: null
         }));
         this.router.navigate(['/auth/login']);
+        clearTimeout(this.tokenRefreshTimeout);
       }),
       map(() => void 0)
     );
@@ -134,5 +142,36 @@ export class AuthService {
   
   getAssociationId(): number | undefined {
     return this.authState().associationId;
+  }
+
+  private setTokenRefreshTimer(token: string): void {
+    const decodedToken: DecodedToken = jwtDecode(token);
+    const expiresIn = decodedToken.exp * 1000 - Date.now() - 60000;
+
+    if (expiresIn > 0) {
+      this.tokenRefreshTimeout = setTimeout(() => {
+        this.refreshToken();
+      }, expiresIn);
+    }
+  }
+
+  private refreshToken(): void {
+    this.http.post<SuccessResponse<AuthResponse>>(`${this.apiUrl}/tokens/refresh`, {}).subscribe({
+      next: (response) => {
+        const authResponse = response?.data;
+        if (authResponse) {
+          localStorage.setItem('accessToken', authResponse.accessToken);
+          this.authState.update(state => ({
+            ...state,
+            token: authResponse.accessToken
+          }));
+          this.setTokenRefreshTimer(authResponse.accessToken);
+        }
+      },
+      error: (error) => {
+        console.error('Failed to refresh token', error);
+        this.logout();
+      }
+    });
   }
 } 
