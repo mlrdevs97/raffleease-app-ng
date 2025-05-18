@@ -22,7 +22,7 @@ import { AuthService } from '../../features/auth/services/auth.service';
  * Processes errors from the server
  */
 @Injectable()
-export class ApiResponseInterceptor implements HttpInterceptor {
+export class ApiInterceptor implements HttpInterceptor {
   constructor(private authService: AuthService) {}
 
   intercept(request: HttpRequest<unknown>, next: HttpHandler): Observable<HttpEvent<unknown>> {
