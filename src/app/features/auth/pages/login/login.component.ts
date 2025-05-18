@@ -4,7 +4,8 @@ import { ReactiveFormsModule, FormBuilder, FormGroup, Validators } from '@angula
 import { RouterLink, ActivatedRoute } from '@angular/router';
 import { AuthService } from '../../services/auth.service';
 import { ErrorHandlerService } from '../../../../core/services/error-handler.service';
-import { ValidationErrorMessages } from '../../../../core/constants/validation-error-codes';
+import { ValidationErrorCodes } from '../../../../core/constants/error-codes';
+import { ErrorMessages } from '../../../../core/constants/error-messages';
 
 @Component({
   selector: 'app-login',
@@ -79,10 +80,10 @@ export class LoginComponent {
     
     // Return appropriate client-side validation error
     if (control.errors['required']) {
-      return ValidationErrorMessages.REQUIRED;
+      return ErrorMessages.validation.REQUIRED ?? null;
     }
     
-    return ValidationErrorMessages.INVALID_FIELD;
+    return ErrorMessages.validation.INVALID_FIELD ?? null;
   }
 
   onSubmit(): void {

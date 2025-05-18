@@ -2,7 +2,7 @@ import { TestBed } from '@angular/core/testing';
 import { HttpErrorResponse } from '@angular/common/http';
 import { ErrorHandlerService } from './error-handler.service';
 import { ErrorCodes } from '../constants/error-codes';
-import { ValidationErrorMessages } from '../constants/validation-error-codes';
+import { ValidationErrorMessages } from '../constants/error-codes';
 
 describe('ErrorHandlerService', () => {
   let service: ErrorHandlerService;

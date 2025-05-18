@@ -11,17 +11,17 @@ import { catchError } from 'rxjs/operators';
 import { 
   ErrorResponse, 
   isValidationErrorResponse, 
-  isErrorResponse
+  isErrorResponse,
 } from '../models/api-response.model';
-import { ValidationErrorMessages, ValidationErrorCode } from '../constants/validation-error-codes';
-import { ConstraintFieldMessages } from '../constants/constraint-name-mapper';
+import { ValidationErrorCode } from '../constants/error-codes';
+import { ErrorMessages } from '../constants/error-messages';
 
 /**
  * Interceptor that handles API responses
- * Processes errors from the server to provide consistent and user-friendly formats
+ * Processes errors from the server
  */
 @Injectable()
-export class ApiResponseInterceptor implements HttpInterceptor {
+export class ApiInterceptor implements HttpInterceptor {
   intercept(request: HttpRequest<unknown>, next: HttpHandler): Observable<HttpEvent<unknown>> {
     return next.handle(request).pipe(
       catchError((error: HttpErrorResponse) => {
@@ -40,15 +40,13 @@ export class ApiResponseInterceptor implements HttpInterceptor {
         if (serverError && isErrorResponse(serverError)) {          
           // Handle validation errors          
           if (isValidationErrorResponse(serverError)) {
-            const friendlyErrors: Record<string, string> = {};
-          
+            const friendlyErrors: Record<string, string> = {};          
+
             Object.entries(serverError.errors).forEach(([field, code]) => {
-              // Check if the field has a constraint message
-              const constraintMessage = ConstraintFieldMessages[field] || 'This value already exists';
-              // Get a default user-friendly message for the validation code
-              const validationMessage = ValidationErrorMessages[code as ValidationErrorCode] || 'Invalid value';
-          
-              friendlyErrors[field] = constraintMessage || validationMessage;
+              const fieldErrors = ErrorMessages.dedicated[field];
+              const dedicatedMessage = fieldErrors?.[code];
+              const fallbackMessage = ErrorMessages.validation[code as ValidationErrorCode];
+              friendlyErrors[field] = dedicatedMessage || fallbackMessage || 'Invalid value';
             });
           
             const enrichedError = {

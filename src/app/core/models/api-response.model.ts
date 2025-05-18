@@ -1,6 +1,6 @@
 import { HttpStatusCode } from '@angular/common/http';
 import { ErrorCode, ErrorCodes } from '../constants/error-codes';
-import { ValidationErrorCode } from '../constants/validation-error-codes';
+import { ValidationErrorCode } from '../constants/error-codes';
 
 /**
  * Base ApiResponse interface matching the backend's ApiResponse class

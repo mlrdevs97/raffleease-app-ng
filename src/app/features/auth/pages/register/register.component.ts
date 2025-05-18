@@ -1,11 +1,12 @@
 import { Component, signal, OnInit, HostListener, ElementRef } from '@angular/core';
 import { CommonModule } from '@angular/common';
-import { ReactiveFormsModule, FormBuilder, FormGroup, Validators, FormControl } from '@angular/forms';
+import { ReactiveFormsModule, FormBuilder, FormGroup, Validators, FormControl, AbstractControl } from '@angular/forms';
 import { Router, RouterLink } from '@angular/router';
 import { AuthService } from '../../services/auth.service';
-import { ValidationErrorMessages } from '../../../../core/constants/validation-error-codes';
+import { ValidationErrorCodes } from '../../../../core/constants/error-codes';
 import { ErrorHandlerService } from '../../../../core/services/error-handler.service';
 import { passwordMatchValidator } from '../../../../core/validators/password.validators';
+import { ErrorMessages } from '../../../../core/constants/error-messages';
 
 interface AddressSuggestion {
   placeId: string;
@@ -171,18 +172,10 @@ export class RegisterComponent implements OnInit {
       const parts = fieldPath.split('.');
       
       if (parts.length === 1) {
-        // Top-level field, check both forms
-        if (this.userForm.get(fieldPath)) {
-          const control = this.userForm.get(fieldPath);
-          control?.markAsTouched();
-          control?.setErrors({ serverError: errors[fieldPath] });
-        } else if (this.associationForm.get(fieldPath)) {
-          const control = this.associationForm.get(fieldPath);
-          control?.markAsTouched();
-          control?.setErrors({ serverError: errors[fieldPath] });
-        }
+        const control: AbstractControl | null = this.userForm.get(fieldPath) || this.associationForm.get(fieldPath);
+        control?.markAsTouched();
+        control?.setErrors({ serverError: errors[fieldPath] });
       } else {
-        // Nested field, determine which form to update
         const formName = parts[0];
         
         if (formName === 'userData') {
@@ -298,9 +291,9 @@ export class RegisterComponent implements OnInit {
     
     // Return appropriate client-side validation error
     if (control.errors['required']) {
-      return ValidationErrorMessages.REQUIRED;
+      return ErrorMessages.validation.REQUIRED ?? null;
     } else if (control.errors['email']) {
-      return ValidationErrorMessages.INVALID_EMAIL;
+      return ErrorMessages.validation.INVALID_EMAIL ?? null;
     } else if (control.errors['minlength']) {
       return `Minimum length is ${control.errors['minlength'].requiredLength} characters`;
     } else if (control.errors['maxlength']) {
@@ -309,12 +302,12 @@ export class RegisterComponent implements OnInit {
       if (fieldName === 'password') {
         return 'Password must be 8-32 characters and include: uppercase, lowercase, number, and special character';
       }
-      return ValidationErrorMessages.INVALID_FORMAT;
+      return ValidationErrorCodes.INVALID_FORMAT;
     } else if (control.errors['mismatch']) {
       return 'Passwords do not match';
     }
     
-    return ValidationErrorMessages.INVALID_FIELD;
+    return ValidationErrorCodes.INVALID_FIELD;
   }
 
   onSubmit(): void {
@@ -337,6 +330,7 @@ export class RegisterComponent implements OnInit {
       },
       error: (error: unknown) => {
         this.errorMessage.set(this.errorHandler.getErrorMessage(error));
+
         if (this.errorHandler.isValidationError(error)) {
           const validationErrors = this.errorHandler.getValidationErrors(error);
           this.applyFieldErrors(validationErrors);
