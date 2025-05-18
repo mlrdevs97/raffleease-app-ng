@@ -15,14 +15,29 @@ import {
 } from '../models/api-response.model';
 import { ValidationErrorCode } from '../constants/error-codes';
 import { ErrorMessages } from '../constants/error-messages';
+import { AuthService } from '../../features/auth/services/auth.service';
 
 /**
  * Interceptor that handles API responses
  * Processes errors from the server
  */
 @Injectable()
-export class ApiInterceptor implements HttpInterceptor {
+export class ApiResponseInterceptor implements HttpInterceptor {
+  constructor(private authService: AuthService) {}
+
   intercept(request: HttpRequest<unknown>, next: HttpHandler): Observable<HttpEvent<unknown>> {
+    // Exclude auth-related requests
+    if (!request.url.includes('/auth/')) {
+      const token = this.authService.getToken();
+      if (token) {
+        request = request.clone({
+          setHeaders: {
+            Authorization: `Bearer ${token}`
+          }
+        });
+      }
+    }    
+    
     return next.handle(request).pipe(
       catchError((error: HttpErrorResponse) => {
         if (error.error instanceof ErrorEvent) {
