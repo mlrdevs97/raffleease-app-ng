@@ -1,6 +1,6 @@
 import { Component, Input } from '@angular/core';
 import { CommonModule } from '@angular/common';
-import { RaffleCardComponent } from '../raffle-card/raffle-card.component';
+import { RaffleCardComponent } from '../../raffle-card/raffle-card.component';
 
 interface Raffle {
   id: number | string;

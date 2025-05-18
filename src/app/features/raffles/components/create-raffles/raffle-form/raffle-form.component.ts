@@ -1,13 +1,13 @@
 import { Component } from '@angular/core';
-import { RaffleDetailsComponent } from '../raffle-details/raffle-details.component';
+import { RaffleDetailsComponent } from '../../../pages/raffle-details/raffle-details.component';
 import { RaffleTicketsComponent } from '../raffle-tickets/raffle-tickets.component';
 import { RaffleImagesUploadComponent } from '../raffle-images-upload/raffle-images-upload.component';
 import { FormBuilder, FormControl, FormGroup, ReactiveFormsModule, Validators } from '@angular/forms';
 import { signal } from '@angular/core';
-import { RaffleService } from '../../services/raffle.service';
-import { RaffleCreate } from '../../models/raffle-create.model';
-import { ErrorHandlerService } from '../../../../core/services/error-handler.service';
-import { AuthService } from '../../../auth/services/auth.service';
+import { RaffleService } from '../../../services/raffle.service';
+import { RaffleCreate } from '../../../models/raffle-create.model';
+import { ErrorHandlerService } from '../../../../../core/services/error-handler.service';
+import { AuthService } from '../../../../auth/services/auth.service';
 
 @Component({
   selector: 'app-raffle-form',

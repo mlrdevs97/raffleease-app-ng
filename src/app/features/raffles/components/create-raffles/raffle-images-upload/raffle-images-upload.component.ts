@@ -1,10 +1,10 @@
 import { Component, signal, Input } from '@angular/core';
-import { RaffleImagesUploadService } from '../../services/raffle-images-upload.service';
-import { ImageDTO } from '../../models/image.model';
-import { ErrorHandlerService } from '../../../../core/services/error-handler.service';
-import { AuthService } from '../../../auth/services/auth.service';
-import { ImageResponse } from '../../models/image-response.model';
-import { SuccessResponse } from '../../../../core/models/api-response.model';
+import { RaffleImagesUploadService } from '../../../services/raffle-images-upload.service';
+import { ImageDTO } from '../../../models/image.model';
+import { ErrorHandlerService } from '../../../../../core/services/error-handler.service';
+import { AuthService } from '../../../../auth/services/auth.service';
+import { ImageResponse } from '../../../models/image-response.model';
+import { SuccessResponse } from '../../../../../core/models/api-response.model';
 import { FormControl } from '@angular/forms';
 
 @Component({

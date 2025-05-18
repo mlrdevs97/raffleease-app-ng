@@ -1,5 +1,5 @@
 import { Component } from '@angular/core';
-import { RaffleFormComponent } from '../../components/raffle-form/raffle-form.component';
+import { RaffleFormComponent } from '../../components/create-raffles/raffle-form/raffle-form.component';
 import { RouterLink } from '@angular/router';
 
 @Component({
