@@ -7,15 +7,14 @@ export interface User {
 }
 
 export interface AuthState {
-  user: User | null;
   isAuthenticated: boolean;
   associationId?: number;
+  token: string | null;
 }
 
 export interface LoginRequest {
   identifier: string;
   password: string;
-  rememberMe?: boolean;
 }
 
 export interface PhoneNumberData {

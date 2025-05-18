@@ -12,8 +12,8 @@ import { SuccessResponse } from '../../../core/models/api-response.model';
 export class AuthService {
   private apiUrl = environment.apiUrl;
   private authState = signal<AuthState>({
-    user: null,
-    isAuthenticated: false
+    isAuthenticated: false,
+    token: null
   });
 
   user = this.authState.asReadonly();
@@ -26,33 +26,28 @@ export class AuthService {
   }
 
   private checkAuthState(): void {
-    // Check localStorage first (for "remember me" users)
-    let storedUser = localStorage.getItem('user');
     let storedToken = localStorage.getItem('accessToken');
     let storedAssociationId = localStorage.getItem('associationId');
     let storageType = localStorage;
     
-    // If not found in localStorage, check sessionStorage (for regular users)
     if (!storedToken) {
-      storedUser = sessionStorage.getItem('user');
       storedToken = sessionStorage.getItem('accessToken');
       storedAssociationId = sessionStorage.getItem('associationId');
       storageType = sessionStorage;
     }
-    
+
     if (!storedToken) {
       return;
     }
     
     try {
-      const user = storedUser ? JSON.parse(storedUser) : null;
       const associationId = storedAssociationId ? Number(storedAssociationId) : undefined;
       
       this.authState.update(state => ({
         ...state,
-        user,
         associationId,
-        isAuthenticated: !!storedToken
+        isAuthenticated: !!storedToken,
+        token: storedToken
       }));
     } catch (error) {
       console.error('Error parsing stored auth data:', error);
@@ -64,10 +59,10 @@ export class AuthService {
     // localStorage.removeItem('user');
     localStorage.removeItem('accessToken');
     localStorage.removeItem('associationId');
-    
-    // sessionStorage.removeItem('user');
-    sessionStorage.removeItem('accessToken');
-    sessionStorage.removeItem('associationId');
+  }
+
+  getToken(): string | null {
+    return this.authState().token;
   }
 
   register(registerData: RegisterRequest): Observable<RegisterResponse> {
@@ -88,32 +83,24 @@ export class AuthService {
   }
 
   login(identifier: string, password: string, rememberMe: boolean = false): Observable<void> {
-    const loginRequest: LoginRequest = { identifier, password, rememberMe };
+    const loginRequest: LoginRequest = { identifier, password };
     return this.http.post<SuccessResponse<AuthResponse>>(`${this.apiUrl}/auth/login`, loginRequest).pipe(
       tap((response) => {
         const authResponse = response?.data;
         if (!authResponse) {
           throw new Error('Invalid server response');
         }
-        const storage = rememberMe ? localStorage : sessionStorage;
-        storage.setItem('accessToken', authResponse.accessToken);
-        storage.setItem('associationId', authResponse.associationId.toString());
+
+        localStorage.setItem('accessToken', authResponse.accessToken);
+        localStorage.setItem('associationId', authResponse.associationId.toString());
+        
+        this.authState.update(state => ({
+          ...state,
+          token: authResponse.accessToken
+        }));
       }),
       map((response) => response?.data?.associationId),
-      // Fetch user profile and update state
       tap(async (associationId) => {
-        /*
-        const user$ = this.fetchUserProfile();
-        user$.subscribe(user => {
-          this.authState.update(state => ({
-            ...state,
-            user,
-            associationId,
-            isAuthenticated: true
-          }));
-          this.router.navigate(['/raffles']);
-        });
-        */
         this.authState.update(state => ({
             ...state,
             associationId,
@@ -125,31 +112,15 @@ export class AuthService {
     );
   }
 
-  // TODO: add feature to fetch the user andassociation profile
-  fetchUserProfile(): Observable<User | null> {
-    return of(null);
-    return this.http.get<SuccessResponse<User>>(`${this.apiUrl}/users/me`).pipe(
-      map(response => {
-        const user = response?.data;
-        if (!user) {
-          throw new Error('Failed to load user profile');
-        }
-        const storage = localStorage.getItem('accessToken') ? localStorage : sessionStorage;
-        storage.setItem('user', JSON.stringify(user));
-        return user;
-      })
-    );
-  }
-
   logout(): Observable<void> {
     return this.http.post<any>(`${this.apiUrl}/auth/logout`, {}).pipe(
       tap(() => {
         this.clearStoredAuth();
         this.authState.update(state => ({
           ...state,
-          user: null,
           associationId: undefined,
-          isAuthenticated: false
+          isAuthenticated: false,
+          token: null
         }));
         this.router.navigate(['/auth/login']);
       }),
