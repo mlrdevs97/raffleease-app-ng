@@ -14,4 +14,8 @@ export class RaffleImagesUploadService {
     files.forEach(file => formData.append('files', file));
     return this.http.post<SuccessResponse<ImageResponse>>(`${this.baseUrl}/${associationId}/images`, formData);
   }
+
+  deleteImage(associationId: number, imageId: number): Observable<void> {
+    return this.http.delete<void>(`${this.baseUrl}/${associationId}/images/${imageId}`);
+  }
 } 

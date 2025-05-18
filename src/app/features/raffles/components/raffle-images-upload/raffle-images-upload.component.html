@@ -28,7 +28,10 @@
         <div class="grid grid-cols-2 gap-4 sm:grid-cols-3 md:grid-cols-4">
             @for (image of images; track image.id) {
             <div class="group relative aspect-square cursor-pointer rounded-lg border border-gray-200 bg-white"
-                draggable="true">
+                draggable="true"
+                (dragstart)="onDragStart($event, $index)"
+                (dragover)="onDragOver($event)"
+                (drop)="onDrop($event, $index)">
                 <div class="absolute inset-0 flex items-center justify-center rounded-lg overflow-hidden">
                     <img [src]="image.url" alt="Uploaded image" class="object-cover transition-all duration-200"
                         style="position: absolute; height: 100%; width: 100%; inset: 0px;" />
@@ -37,7 +40,7 @@
                     </div>
                 </div>
 
-                <button type="button" (click)="removeImage($index)"
+                <button type="button" (click)="deleteImage($index, image.id)"
                     class="absolute right-1 top-1 rounded-full bg-white p-1 text-gray-500 shadow-sm hover:text-gray-700 focus:outline-none focus:ring-2 focus:ring-blue-500"><svg
                         xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none"
                         stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"

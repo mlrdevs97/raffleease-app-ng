@@ -15,6 +15,7 @@ export class RaffleImagesUploadComponent {
   images: ImageDTO[] = [];
   isLoading = signal(false);
   errorMessage = signal<string | null>(null);
+  private draggedIndex: number | null = null;
 
   constructor(
     private readonly authService: AuthService,
@@ -45,7 +46,6 @@ export class RaffleImagesUploadComponent {
         console.log(error);
         if (this.errorHandler.isValidationError(error)) {
           const validationErrors = this.errorHandler.getValidationErrors(error);
-          console.log(validationErrors);
           this.errorMessage.set(validationErrors['files']);
         } else {
           this.errorMessage.set(this.errorHandler.getErrorMessage(error));
@@ -57,5 +57,57 @@ export class RaffleImagesUploadComponent {
 
   removeImage(index: number): void {
     this.images.splice(index, 1);
+  }
+
+  deleteImage(index: number, imageId: number): void {
+    const associationId = this.authService.getAssociationId();
+    if (!associationId) {
+      this.authService.logout();
+      return;
+    }
+
+    this.isLoading.set(true);
+    this.errorMessage.set(null);
+
+    this.uploadService.deleteImage(associationId, imageId).subscribe({
+      next: () => {
+        this.images.splice(index, 1);
+        // Update imageOrder for each image based on its new index
+        this.images.forEach((image, idx) => {
+          image.imageOrder = idx;
+        });
+        this.isLoading.set(false);
+      },
+      error: (error: unknown) => {
+        console.log(error);
+        this.errorMessage.set(this.errorHandler.getErrorMessage(error));
+        this.isLoading.set(false);
+      }
+    });
+  }
+
+  onDragStart(event: DragEvent, index: number): void {
+    this.draggedIndex = index;
+    event.dataTransfer?.setData('text/plain', index.toString());
+  }
+
+  onDragOver(event: DragEvent): void {
+    event.preventDefault();
+  }
+
+  onDrop(event: DragEvent, index: number): void {
+    event.preventDefault();
+    const draggedIndex = this.draggedIndex;
+    if (draggedIndex === null || draggedIndex === index) return;
+
+    const draggedImage = this.images[draggedIndex];
+    this.images.splice(draggedIndex, 1);
+    this.images.splice(index, 0, draggedImage);
+
+    this.images.forEach((image, idx) => {
+      image.imageOrder = idx;
+    });
+
+    this.draggedIndex = null;
   }
 }
