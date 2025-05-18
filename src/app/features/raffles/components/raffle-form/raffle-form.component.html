@@ -6,7 +6,12 @@
         <app-raffle-tickets />
     </div>
     <div>
-        <app-raffle-images-upload />
+        @if (imageUploadComponent.errorMessage()) {
+        <div class="text-red-500 text-sm mb-4">
+            {{ imageUploadComponent.errorMessage() }}
+        </div>
+        }
+        <app-raffle-images-upload #imageUploadComponent />
     </div>
 
     <div class="flex items-center justify-end space-x-4 pt-4">
