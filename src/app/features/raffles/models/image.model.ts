@@ -1,4 +1,4 @@
-export interface Image {
+export interface ImageDTO {
   id: number;
   fileName: string;
   filePath: string;

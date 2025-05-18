@@ -1,17 +1,18 @@
-<form class="space-y-8">
+<form class="space-y-8" (ngSubmit)="onSubmit()" [formGroup]="raffleForm">
+    <!-- Global Error Message -->
+    @if (errorMessage()) {
+    <div class="text-red-500 text-sm mb-4">
+        {{ errorMessage() }}
+    </div>
+    }
     <div>
-        <app-raffle-details />
+        <app-raffle-details [formGroup]="raffleForm" [fieldErrors]="fieldErrors()"></app-raffle-details>
     </div>
     <div>
-        <app-raffle-tickets />
+        <app-raffle-tickets [formGroup]="ticketsInfoFormGroup" [fieldErrors]="fieldErrors()"></app-raffle-tickets>
     </div>
     <div>
-        @if (imageUploadComponent.errorMessage()) {
-        <div class="text-red-500 text-sm mb-4">
-            {{ imageUploadComponent.errorMessage() }}
-        </div>
-        }
-        <app-raffle-images-upload #imageUploadComponent />
+        <app-raffle-images-upload [control]="imagesControl" [fieldErrors]="fieldErrors()"></app-raffle-images-upload>
     </div>
 
     <div class="flex items-center justify-end space-x-4 pt-4">
@@ -22,8 +23,12 @@
         </button>
         <button
             class="inline-flex items-center justify-center gap-2 whitespace-nowrap rounded-md text-sm font-medium ring-offset-background transition-colors focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2 disabled:pointer-events-none disabled:opacity-50 h-10 px-4 py-2 bg-black text-white hover:bg-black/90"
-            type="submit">
-            Create Raffle
+            type="submit" [disabled]="isLoading()">
+            @if (isLoading()) {
+            <span>Loading...</span>
+            } @else {
+            <span>Create Raffle</span>
+            }
         </button>
     </div>
 </form>

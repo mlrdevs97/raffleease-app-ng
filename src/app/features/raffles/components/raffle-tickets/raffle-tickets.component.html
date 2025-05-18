@@ -1,25 +1,40 @@
-<div class="space-y-4">
+<div class="space-y-4" [formGroup]="formGroup">
     <h3 class="text-lg font-semibold border-b border-gray-200 pb-4 mb-4">Tickets Information</h3>
 
     <div class="grid gap-4 sm:grid-cols-3">
         <div class="space-y-2">
-            <label class="text-sm font-medium leading-none" for="ticketsInfo.amount">Number of Tickets</label>
+            <label class="text-sm font-medium leading-none" for="amount">Number of Tickets</label>
             <input class="flex h-10 w-full rounded-md border border-input bg-background px-3 py-2 text-sm"
-                id="ticketsInfo.amount" min="1" required type="number" name="ticketsInfo.amount" />
+                id="amount" min="1" required type="number" formControlName="amount" />
+            @if (getErrorMessage('amount')) {
+            <div class="text-red-500 text-sm">
+                {{ getErrorMessage('amount') }}
+            </div>
+            }
         </div>
 
         <div class="space-y-2">
-            <label class="text-sm font-medium leading-none" for="ticketsInfo.price">Ticket Price ($)</label>
+            <label class="text-sm font-medium leading-none" for="price">Ticket Price ($)</label>
             <input class="flex h-10 w-full rounded-md border border-input bg-background px-3 py-2 text-sm"
-                id="ticketsInfo.price" min="0" step="0.01" required type="number" name="ticketsInfo.price" />
+                id="price" min="0" step="0.01" required type="number" formControlName="price" />
+            @if (getErrorMessage('price')) {
+            <div class="text-red-500 text-sm">
+                {{ getErrorMessage('price') }}
+            </div>
+            }
         </div>
 
         <div class="space-y-2">
-            <label class="text-sm font-medium leading-none" for="ticketsInfo.firstTicketAvailable">First Ticket
+            <label class="text-sm font-medium leading-none" for="lowerLimit">First Ticket
                 Available</label>
             <input class="flex h-10 w-full rounded-md border border-input bg-background px-3 py-2 text-sm"
-                id="ticketsInfo.firstTicketAvailable" min="1" required type="number"
-                name="ticketsInfo.firstTicketAvailable" />
+                id="lowerLimit" min="1" required type="number"
+                formControlName="lowerLimit" />
+            @if (getErrorMessage('lowerLimit')) {
+            <div class="text-red-500 text-sm">
+                {{ getErrorMessage('lowerLimit') }}
+            </div>
+            }
         </div>
     </div>
 </div>

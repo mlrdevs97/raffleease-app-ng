@@ -1,10 +1,11 @@
-import { Component, inject, signal } from '@angular/core';
+import { Component, signal, Input } from '@angular/core';
 import { RaffleImagesUploadService } from '../../services/raffle-images-upload.service';
-import { ImageDTO } from '../../models/image-dto.model';
+import { ImageDTO } from '../../models/image.model';
 import { ErrorHandlerService } from '../../../../core/services/error-handler.service';
 import { AuthService } from '../../../auth/services/auth.service';
 import { ImageResponse } from '../../models/image-response.model';
 import { SuccessResponse } from '../../../../core/models/api-response.model';
+import { FormControl } from '@angular/forms';
 
 @Component({
   selector: 'app-raffle-images-upload',
@@ -12,6 +13,8 @@ import { SuccessResponse } from '../../../../core/models/api-response.model';
   templateUrl: './raffle-images-upload.component.html'
 })
 export class RaffleImagesUploadComponent {
+  @Input() control!: FormControl;
+  @Input() fieldErrors: Record<string, string> = {};
   images: ImageDTO[] = [];
   isLoading = signal(false);
   errorMessage = signal<string | null>(null);
@@ -22,6 +25,10 @@ export class RaffleImagesUploadComponent {
     private readonly uploadService: RaffleImagesUploadService,
     private readonly errorHandler: ErrorHandlerService
   ) {}
+
+  getErrorMessage(): string | null {
+    return this.errorMessage() || this.fieldErrors['images'] || null;
+  }
 
   onFileSelected(event: Event): void {
     const input = event.target as HTMLInputElement;
@@ -40,6 +47,7 @@ export class RaffleImagesUploadComponent {
     this.uploadService.uploadImages(associationId, files).subscribe({
       next: (response: SuccessResponse<ImageResponse>) => {
         this.images = [...this.images, ...response.data!.images];
+        this.control.setValue(this.images);
         this.isLoading.set(false);
       },
       error: (error: unknown) => {
@@ -54,11 +62,7 @@ export class RaffleImagesUploadComponent {
       }
     });
   }
-
-  removeImage(index: number): void {
-    this.images.splice(index, 1);
-  }
-
+  
   deleteImage(index: number, imageId: number): void {
     const associationId = this.authService.getAssociationId();
     if (!associationId) {
@@ -76,6 +80,7 @@ export class RaffleImagesUploadComponent {
         this.images.forEach((image, idx) => {
           image.imageOrder = idx;
         });
+        this.control.setValue(this.images);
         this.isLoading.set(false);
       },
       error: (error: unknown) => {
@@ -108,6 +113,7 @@ export class RaffleImagesUploadComponent {
       image.imageOrder = idx;
     });
 
+    this.control.setValue(this.images);
     this.draggedIndex = null;
   }
 }

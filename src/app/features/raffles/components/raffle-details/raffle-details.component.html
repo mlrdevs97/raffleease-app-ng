@@ -1,21 +1,59 @@
-<div class="space-y-4">
+<div class="space-y-4" [formGroup]="formGroup">
     <h3 class="text-lg font-semibold border-b border-gray-200 pb-4 mb-4">Raffle Details</h3>
 
     <div class="space-y-2">
         <label class="text-sm font-medium leading-none" for="title">Raffle Title</label>
         <input class="flex h-10 w-full rounded-md border border-input bg-background px-3 py-2 text-sm" id="title"
-            placeholder="Enter event title" required name="title" />
+            placeholder="Enter event title" required formControlName="title" />
+        @if (getErrorMessage('title')) {
+        <div class="text-red-500 text-sm">
+            {{ getErrorMessage('title') }}
+        </div>
+        }
     </div>
 
     <div class="space-y-2">
         <label class="text-sm font-medium leading-none" for="description">Description</label>
         <textarea class="flex min-h-[80px] w-full rounded-md border border-input bg-background px-3 py-2 text-sm"
-            id="description" name="description" placeholder="Enter event description" rows="4" required></textarea>
+            id="description" formControlName="description" placeholder="Enter event description" rows="4"
+            required></textarea>
+        @if (getErrorMessage('description')) {
+        <div class="text-red-500 text-sm">
+            {{ getErrorMessage('description') }}
+        </div>
+        }
     </div>
 
-    <div class="space-y-2">
-        <label class="text-sm font-medium leading-none" for="endDate">End Date</label>
-        <input class="flex h-10 w-full rounded-md border border-input bg-background px-3 py-2 text-sm" id="endDate"
-            required type="date" name="endDate" />
+    <div class="space-y-2"><label
+            class="text-sm font-medium leading-none p-0 peer-disabled:cursor-not-allowed peer-disabled:opacity-70">Raffle
+            Dates</label>
+        <div class="grid gap-4 sm:grid-cols-2">
+            <div class="space-y-2">
+                <label
+                    class="font-medium p-0 peer-disabled:cursor-not-allowed peer-disabled:opacity-70 text-sm text-gray-500"
+                    for="startDate">Start Date (Optional)</label>
+                <input
+                    class="flex h-10 rounded-md border border-input bg-background px-3 py-2 text-sm ring-offset-background file:border-0 file:bg-transparent file:text-sm file:font-medium file:text-foreground placeholder:text-muted-foreground focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2 disabled:cursor-not-allowed disabled:opacity-50 w-full"
+                    id="startDate" type="date">
+                @if (getErrorMessage('startDate')) {
+                <div class="text-red-500 text-sm">
+                    {{ getErrorMessage('startDate') }}
+                </div>
+                }
+            </div>
+            <div class="space-y-2">
+                <label
+                    class="font-medium p-0 peer-disabled:cursor-not-allowed peer-disabled:opacity-70 text-sm text-gray-500"
+                    for="endDate">End Date</label>
+                <input
+                    class="flex h-10 rounded-md border border-input bg-background px-3 py-2 text-sm ring-offset-background file:border-0 file:bg-transparent file:text-sm file:font-medium file:text-foreground placeholder:text-muted-foreground focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2 disabled:cursor-not-allowed disabled:opacity-50 w-full"
+                    id="endDate" required type="date" formControlName="endDate">
+                @if (getErrorMessage('endDate')) {
+                <div class="text-red-500 text-sm">
+                    {{ getErrorMessage('endDate') }}
+                </div>
+                }
+            </div>
+        </div>
     </div>
 </div>
