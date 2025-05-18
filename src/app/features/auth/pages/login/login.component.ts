@@ -4,7 +4,6 @@ import { ReactiveFormsModule, FormBuilder, FormGroup, Validators } from '@angula
 import { RouterLink, ActivatedRoute } from '@angular/router';
 import { AuthService } from '../../services/auth.service';
 import { ErrorHandlerService } from '../../../../core/services/error-handler.service';
-import { ValidationErrorCodes } from '../../../../core/constants/error-codes';
 import { ErrorMessages } from '../../../../core/constants/error-messages';
 
 @Component({
@@ -91,10 +90,10 @@ export class LoginComponent {
       this.loginForm.markAllAsTouched();
       return;
     }
-    const { identifier, password, rememberMe } = this.loginForm.value;
+    const { identifier, password } = this.loginForm.value;
     this.isLoading.set(true);
     this.resetErrors();
-    this.authService.login(identifier, password, rememberMe).subscribe({
+    this.authService.login(identifier, password).subscribe({
       next: () => {},
       error: (error: unknown) => {
         this.errorMessage.set(this.errorHandler.getErrorMessage(error));
