@@ -8,7 +8,7 @@ import { SuccessResponse } from '../../../core/models/api-response.model';
 import { jwtDecode } from 'jwt-decode';
 
 interface DecodedToken {
-  exp: number; // Expiration time in seconds since the epoch
+  exp: number; 
 }
 
 @Injectable({
@@ -20,8 +20,8 @@ export class AuthService {
     isAuthenticated: false,
     token: null
   });
-  
-  private tokenRefreshTimeout: any;
+
+  private tokenRefreshTimeout: ReturnType<typeof setTimeout> | null = null;
 
   constructor(
     private router: Router,
@@ -33,35 +33,36 @@ export class AuthService {
   private checkAuthState(): void {
     let storedToken = localStorage.getItem('accessToken');
     let storedAssociationId = localStorage.getItem('associationId');
-    let storageType = localStorage;
-    
-    if (!storedToken) {
-      storedToken = sessionStorage.getItem('accessToken');
-      storedAssociationId = sessionStorage.getItem('associationId');
-      storageType = sessionStorage;
-    }
 
     if (!storedToken) {
+      this.closeSession();
       return;
     }
-    
+
     try {
+      const decodedToken: DecodedToken = jwtDecode(storedToken);
+      if (decodedToken.exp * 1000 < Date.now()) {
+        this.closeSession();
+        return;
+      }
+
       const associationId = storedAssociationId ? Number(storedAssociationId) : undefined;
-      
+
       this.authState.update(state => ({
         ...state,
         associationId,
         isAuthenticated: !!storedToken,
         token: storedToken
       }));
+
+      this.setTokenRefreshTimer(storedToken);
     } catch (error) {
       console.error('Error parsing stored auth data:', error);
       this.clearStoredAuth();
     }
   }
-  
+
   private clearStoredAuth(): void {
-    // localStorage.removeItem('user');
     localStorage.removeItem('accessToken');
     localStorage.removeItem('associationId');
   }
@@ -84,7 +85,7 @@ export class AuthService {
   }
 
   verifyEmail(token: string): Observable<SuccessResponse<void>> {
-    return this.http.post<SuccessResponse>(`${this.apiUrl}/auth/verify`, { verificationToken: token });
+    return this.http.post<SuccessResponse<void>>(`${this.apiUrl}/auth/verify`, { verificationToken: token });
   }
 
   login(identifier: string, password: string, rememberMe: boolean = false): Observable<void> {
@@ -98,7 +99,7 @@ export class AuthService {
 
         localStorage.setItem('accessToken', authResponse.accessToken);
         localStorage.setItem('associationId', authResponse.associationId.toString());
-        
+
         this.authState.update(state => ({
           ...state,
           token: authResponse.accessToken
@@ -109,10 +110,10 @@ export class AuthService {
       map((response) => response?.data?.associationId),
       tap(async (associationId) => {
         this.authState.update(state => ({
-            ...state,
-            associationId,
-            isAuthenticated: true
-          }));
+          ...state,
+          associationId,
+          isAuthenticated: true
+        }));
         this.router.navigate(['/raffles']);
       }),
       map(() => void 0)
@@ -122,15 +123,7 @@ export class AuthService {
   logout(): Observable<void> {
     return this.http.post<any>(`${this.apiUrl}/auth/logout`, {}).pipe(
       tap(() => {
-        this.clearStoredAuth();
-        this.authState.update(state => ({
-          ...state,
-          associationId: undefined,
-          isAuthenticated: false,
-          token: null
-        }));
-        this.router.navigate(['/auth/login']);
-        clearTimeout(this.tokenRefreshTimeout);
+        this.closeSession();
       }),
       map(() => void 0)
     );
@@ -139,7 +132,7 @@ export class AuthService {
   isLoggedIn(): boolean {
     return this.authState().isAuthenticated;
   }
-  
+
   getAssociationId(): number | undefined {
     return this.authState().associationId;
   }
@@ -148,17 +141,20 @@ export class AuthService {
     const decodedToken: DecodedToken = jwtDecode(token);
     const expiresIn = decodedToken.exp * 1000 - Date.now() - 60000;
 
-    if (expiresIn > 0) {
-      this.tokenRefreshTimeout = setTimeout(() => {
-        this.refreshToken();
-      }, expiresIn);
+    if (expiresIn <= 0) {
+      this.closeSession();
+      return;
     }
+
+    this.tokenRefreshTimeout = setTimeout(() => {
+      this.refreshToken();
+    }, expiresIn);
   }
 
   private refreshToken(): void {
     this.http.post<SuccessResponse<AuthResponse>>(`${this.apiUrl}/tokens/refresh`, {}).subscribe({
-      next: (response) => {
-        const authResponse = response?.data;
+      next: (response: SuccessResponse<AuthResponse>) => {
+        const authResponse: AuthResponse | null = response?.data;
         if (authResponse) {
           localStorage.setItem('accessToken', authResponse.accessToken);
           this.authState.update(state => ({
@@ -170,8 +166,22 @@ export class AuthService {
       },
       error: (error) => {
         console.error('Failed to refresh token', error);
-        this.logout();
+        this.closeSession();
       }
     });
+  }
+
+  private closeSession(): void {
+    this.clearStoredAuth();    
+    this.authState.update(state => ({
+      ...state,
+      associationId: undefined,
+      isAuthenticated: false,
+      token: null 
+    }));
+    if (this.tokenRefreshTimeout) {
+      clearTimeout(this.tokenRefreshTimeout);
+    }    
+    this.router.navigate(['/auth/login']);    
   }
 } 
