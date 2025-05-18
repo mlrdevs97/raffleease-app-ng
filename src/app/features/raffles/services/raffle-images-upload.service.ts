@@ -11,7 +11,7 @@ export class RaffleImagesUploadService {
 
   uploadImages(associationId: number, files: File[]): Observable<SuccessResponse<ImageResponse>> {
     const formData = new FormData();
-    files.forEach(file => formData.append('iamges', file));
+    files.forEach(file => formData.append('files', file));
     return this.http.post<SuccessResponse<ImageResponse>>(`${this.baseUrl}/${associationId}/images`, formData);
   }
 } 
