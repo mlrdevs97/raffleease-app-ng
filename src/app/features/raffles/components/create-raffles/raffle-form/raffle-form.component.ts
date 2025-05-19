@@ -1,5 +1,5 @@
 import { Component } from '@angular/core';
-import { RaffleDetailsComponent } from '../../../pages/raffle-details/raffle-details.component';
+import { RaffleDetailsComponent } from '../raffle-details/raffle-details.component';
 import { RaffleTicketsComponent } from '../raffle-tickets/raffle-tickets.component';
 import { RaffleImagesUploadComponent } from '../raffle-images-upload/raffle-images-upload.component';
 import { FormBuilder, FormControl, FormGroup, ReactiveFormsModule, Validators } from '@angular/forms';
