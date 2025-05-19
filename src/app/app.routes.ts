@@ -19,6 +19,11 @@ export const routes: Routes = [
         path: 'raffles',
         loadChildren: () => import('./features/raffles/raffles.routes').then(m => m.RAFFLES_ROUTES),
         canActivate: [authGuard]
+      },
+      {
+        path: 'raffles/:id',
+        loadComponent: () => import('./features/raffles/pages/raffle-details-page/raffle-details-page.component').then(c => c.RaffleDetailsPageComponent),
+        canActivate: [authGuard]
       }
     ]
   }
