@@ -1,5 +1,5 @@
-import { ImageDTO } from "./image.model";
+import { Image } from './image.model';
 
 export interface ImageResponse {
-  images: ImageDTO[];
+  images: Image[];
 } 

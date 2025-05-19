@@ -1,6 +1,6 @@
 import { Component, signal, Input } from '@angular/core';
 import { RaffleImagesUploadService } from '../../../services/raffle-images-upload.service';
-import { ImageDTO } from '../../../models/image.model';
+import { Image } from '../../../models/image.model';
 import { ErrorHandlerService } from '../../../../../core/services/error-handler.service';
 import { AuthService } from '../../../../auth/services/auth.service';
 import { ImageResponse } from '../../../models/image-response.model';
@@ -15,7 +15,7 @@ import { FormControl } from '@angular/forms';
 export class RaffleImagesUploadComponent {
   @Input() control!: FormControl;
   @Input() fieldErrors: Record<string, string> = {};
-  images: ImageDTO[] = [];
+  images: Image[] = [];
   isLoading = signal(false);
   errorMessage = signal<string | null>(null);
   private draggedIndex: number | null = null;
