@@ -31,4 +31,10 @@ export class RafflesStatusComponent {
   toggleDropdown() {
     this.isOpen.update(open => !open);
   }
+
+  selectStatus(option: string) {
+    this.selectedStatus.set(option);
+    this.statusChange.emit(option);
+    this.isOpen.set(false);
+  }
 }

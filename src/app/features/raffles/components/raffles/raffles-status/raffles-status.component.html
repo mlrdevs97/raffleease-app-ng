@@ -17,6 +17,7 @@
         @for (option of statusOptions; track option) {
           <li>
             <button type="button"
+              (click)="selectStatus(option)"
               [class.bg-zinc-100]="selectedStatus() === option"
               class="w-full px-4 py-2 text-left hover:bg-zinc-100 focus:bg-zinc-200"
               [attr.aria-selected]="selectedStatus() === option">
