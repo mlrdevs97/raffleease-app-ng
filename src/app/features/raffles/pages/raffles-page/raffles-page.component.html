@@ -1,5 +1,34 @@
-<div>
+<div class="container mx-auto px-4 py-8">
   <app-raffles-header></app-raffles-header>
-  <hr class="w-full border-t border-zinc-950/10 dark:border-white/10">
-  <app-raffle-card-list [raffles]="raffles"></app-raffle-card-list>
+
+  @if (errorMessage()) {
+    <div class="bg-rose-100 text-rose-700 p-3 mb-6 rounded-md border border-rose-200 text-sm">
+      {{ errorMessage() }}
+    </div>
+  }
+
+  @if (raffleQueryService.isLoading$()) {
+    <div class="flex justify-center items-center py-8">
+      <div class="animate-spin rounded-full h-8 w-8 border-b-2 border-gray-900"></div>
+    </div>
+  } @else {
+    <app-raffle-card-list [raffles]="raffles()"></app-raffle-card-list>
+
+    @if (totalElements() > pageSize) {
+      <div class="flex justify-center mt-8">
+        <nav class="flex items-center gap-2">
+          @for (page of [].constructor(Math.ceil(totalElements() / pageSize)); track page) {
+            <button
+              (click)="onPageChange($index)"
+              [class.bg-black]="currentPage() === $index"
+              [class.text-white]="currentPage() === $index"
+              class="px-4 py-2 rounded-md border border-gray-300 hover:bg-gray-100"
+            >
+              {{ $index + 1 }}
+            </button>
+          }
+        </nav>
+      </div>
+    }
+  }
 </div>
