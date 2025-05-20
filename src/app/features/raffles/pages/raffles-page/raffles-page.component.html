@@ -1,5 +1,14 @@
 <div class="container mx-auto px-4 py-8">
-  <app-raffles-header></app-raffles-header>
+  <app-raffles-header 
+    [suggestions]="suggestions()"
+    [isSearchLoading]="isSearchLoading()"
+    [noSearchResults]="noSearchResults()"
+    (searchChange)="onSearchChange($event)"
+    (enterPressed)="onSearchEnterPressed($event)"
+    (suggestionSelected)="onSuggestionSelected($event)"
+    (statusChange)="onStatusChange($event)"
+    (sortChange)="onSortChange($event)">
+  </app-raffles-header>
 
   @if (errorMessage()) {
     <div class="bg-rose-100 text-rose-700 p-3 mb-6 rounded-md border border-rose-200 text-sm">

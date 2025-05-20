@@ -1,4 +1,10 @@
-import { Component, ElementRef, HostListener } from '@angular/core';
+import { Component, ElementRef, EventEmitter, HostListener, Output, signal } from '@angular/core';
+
+interface SortOption {
+  label: string;
+  value: string;
+  direction: 'asc' | 'desc';
+}
 
 @Component({
   selector: 'app-raffles-sort',
@@ -6,30 +12,42 @@ import { Component, ElementRef, HostListener } from '@angular/core';
   standalone: true
 })
 export class RafflesSortComponent {
-  isOpen = false;
-  selectedSortOption = 'Sort by name';
+  isOpen = signal(false);
+  selectedSortOption = signal<SortOption>({
+    label: 'Sort by name',
+    value: 'title',
+    direction: 'asc'
+  });
   
-  sortOptions = [
-    'Sort by name',
-    'Sort by Date',
-    'Sort by status'
+  sortOptions: SortOption[] = [
+    { label: 'Sort by name', value: 'title', direction: 'asc' },
+    { label: 'Sort by name (Z-A)', value: 'title', direction: 'desc' },
+    { label: 'Sort by date (newest)', value: 'createdAt', direction: 'desc' },
+    { label: 'Sort by date (oldest)', value: 'createdAt', direction: 'asc' },
+    { label: 'Sort by status', value: 'status', direction: 'asc' }
   ];
+  
+  @Output() sortChange = new EventEmitter<{sortBy: string, sortDirection: 'asc' | 'desc'}>();
   
   constructor(private elementRef: ElementRef) {}
   
   @HostListener('document:click', ['$event'])
   onDocumentClick(event: MouseEvent) {
     if (!this.elementRef.nativeElement.contains(event.target)) {
-      this.isOpen = false;
+      this.isOpen.set(false);
     }
   }
   
   toggleDropdown() {
-    this.isOpen = !this.isOpen;
+    this.isOpen.update(state => !state);
   }
   
-  selectOption(option: string) {
-    this.selectedSortOption = option;
-    this.isOpen = false;
+  selectOption(option: SortOption) {
+    this.selectedSortOption.set(option);
+    this.sortChange.emit({
+      sortBy: option.value,
+      sortDirection: option.direction
+    });
+    this.isOpen.set(false);
   }
 } 

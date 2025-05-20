@@ -3,7 +3,17 @@
     <div class="w-full sm:flex-1">
         <h1 class="text-2xl font-semibold text-zinc-950 sm:text-xl mb-4">Raffles</h1>
 
-        <app-raffles-toolbar class="mt-4"></app-raffles-toolbar>
+        <app-raffles-toolbar 
+            class="mt-4"
+            [suggestions]="suggestions"
+            [isSearchLoading]="isSearchLoading"
+            [noSearchResults]="noSearchResults"
+            (searchChange)="onSearchChange($event)"
+            (enterPressed)="onEnterPressed($event)"
+            (suggestionSelected)="onSuggestionSelected($event)"
+            (statusChange)="onStatusChange($event)"
+            (sortChange)="onSortChange($event)">
+        </app-raffles-toolbar>
     </div>
 
     <!-- Right: Create button -->

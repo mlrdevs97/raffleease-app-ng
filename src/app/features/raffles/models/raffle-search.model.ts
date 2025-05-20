@@ -2,7 +2,7 @@ import { Raffle } from './raffle.model';
 
 export interface RaffleSearchFilters {
   status?: string;
-  searchTerm?: string;
+  title?: string;
   sortBy?: string;
   sortDirection?: 'asc' | 'desc';
 }

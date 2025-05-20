@@ -1,10 +1,17 @@
 <div class="flex flex-col gap-4 sm:flex-row sm:items-center sm:max-w-xl">
     <div class="flex-1">
-        <app-raffles-search></app-raffles-search>
+        <app-raffles-search 
+            [suggestions]="suggestions"
+            [isLoading]="isSearchLoading"
+            [noResults]="noSearchResults"
+            (searchChange)="onSearchChange($event)"
+            (enterPressed)="onEnterPressed($event)"
+            (suggestionSelected)="onSuggestionSelected($event)">
+        </app-raffles-search>
     </div>
 
     <div class="grid grid-cols-2 gap-4">
-        <app-raffles-status></app-raffles-status>
-        <app-raffles-sort></app-raffles-sort>
+        <app-raffles-status (statusChange)="onStatusChange($event)"></app-raffles-status>
+        <app-raffles-sort (sortChange)="onSortChange($event)"></app-raffles-sort>
     </div>
 </div>

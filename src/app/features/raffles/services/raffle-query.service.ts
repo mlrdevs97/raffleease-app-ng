@@ -45,8 +45,8 @@ export class RaffleQueryService {
         if (filters?.status) {
             params = params.set('status', filters.status);
         }
-        if (filters?.searchTerm) {
-            params = params.set('search', filters.searchTerm);
+        if (filters?.title) {
+            params = params.set('title', filters.title);
         }
         if (filters?.sortBy) {
             params = params.set('sort', `${filters.sortBy},${filters.sortDirection || 'asc'}`);
@@ -84,7 +84,7 @@ export class RaffleQueryService {
             `page=${page}`,
             `size=${size}`,
             filters?.status ? `status=${filters.status}` : '',
-            filters?.searchTerm ? `search=${filters.searchTerm}` : '',
+            filters?.title ? `title=${filters.title}` : '',
             filters?.sortBy ? `sort=${filters.sortBy},${filters.sortDirection || 'asc'}` : ''
         ];
         return parts.filter(Boolean).join('&');
