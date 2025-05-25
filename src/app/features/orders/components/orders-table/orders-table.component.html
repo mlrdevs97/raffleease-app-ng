@@ -1,0 +1,28 @@
+<div class="flow-root">
+    <div class="mt-8 overflow-x-auto whitespace-nowrap">
+        <div class="inline-block min-w-full align-middle">
+            <table class="min-w-full text-left text-sm/6 text-zinc-950">
+                <thead class="text-zinc-500">
+                    <th class="border-b border-b-zinc-950/10 px-4 py-2 font-medium sm:first:pl-1 sm:last:pr-1">
+                        Order reference</th>
+                    <th class="border-b border-b-zinc-950/10 px-4 py-2 font-medium sm:first:pl-1 sm:last:pr-1">
+                        Purchase date</th>
+                    <th class="border-b border-b-zinc-950/10 px-4 py-2 font-medium sm:first:pl-1 sm:last:pr-1">
+                        Customer</th>
+                    <th class="border-b border-b-zinc-950/10 px-4 py-2 font-medium sm:first:pl-1 sm:last:pr-1">
+                        Event</th>
+                    <th class="border-b border-b-zinc-950/10 px-4 py-2 font-medium sm:first:pl-1 sm:last:pr-1">
+                        Status</th>
+                    <th
+                        class="text-right border-b border-b-zinc-950/10 px-4 py-2 font-medium sm:first:pl-1 sm:last:pr-1">
+                        Amount</th>
+                </thead>
+                <tbody>
+                    @for (order of orders; track order.id) {
+                        <app-orders-table-row [order]="order" class="table-row hover:bg-zinc-950/[2.5%]"></app-orders-table-row>
+                    }
+                </tbody>
+            </table>
+        </div>
+    </div>
+</div>

@@ -1,0 +1,37 @@
+<td
+    class="relative break-words px-4 first:pl-[--gutter,theme(spacing.2)] last:pr-[--gutter,theme(spacing.2)] border-b border-zinc-950/5 dark:border-white/5 py-4 sm:first:pl-1 sm:last:pr-1">
+    <a [routerLink]="['/orders', order.id]" data-row-link="true" [attr.aria-label]="'Order ' + order.orderReference"
+        tabindex="0" class="absolute inset-0 focus:outline-hidden"></a>
+    {{ order.orderReference }}
+</td>
+<td
+    class="text-zinc-500 relative break-words px-4 first:pl-[--gutter,theme(spacing.2)] last:pr-[--gutter,theme(spacing.2)] border-b border-zinc-950/5 dark:border-white/5 py-4 sm:first:pl-1 sm:last:pr-1">
+    <a [routerLink]="['/orders', order.id]" data-row-link="true" [attr.aria-label]="'Order ' + order.orderReference"
+        tabindex="-1" class="absolute inset-0 focus:outline-hidden"></a>
+    {{ order.createdAt | date:'mediumDate' }}
+</td>
+<td
+    class="relative break-words px-4 first:pl-[--gutter,theme(spacing.2)] last:pr-[--gutter,theme(spacing.2)] border-b border-zinc-950/5 dark:border-white/5 py-4 sm:first:pl-1 sm:last:pr-1">
+    <a [routerLink]="['/orders', order.id]" data-row-link="true" [attr.aria-label]="'Order ' + order.orderReference"
+        tabindex="-1" class="absolute inset-0 focus:outline-hidden"></a>
+    {{ order.customer.fullName }}
+</td>
+<td
+    class="relative break-words px-4 first:pl-[--gutter,theme(spacing.2)] last:pr-[--gutter,theme(spacing.2)] border-b border-zinc-950/5 dark:border-white/5 py-4 sm:first:pl-1 sm:last:pr-1">
+    <a [routerLink]="getRaffleLink()" data-row-link="true" [attr.aria-label]="'Raffle ' + raffleDisplaySummary.title"
+        tabindex="-1" class="absolute inset-0 focus:outline-hidden"></a>
+        <app-order-raffle-preview [imageUrl]="raffleDisplaySummary.imageURL"
+        [eventName]="raffleDisplaySummary.title"> </app-order-raffle-preview>
+</td>
+<td
+    class="relative break-words px-4 first:pl-[--gutter,theme(spacing.2)] last:pr-[--gutter,theme(spacing.2)] border-b border-zinc-950/5 dark:border-white/5 py-4 sm:first:pl-1 sm:last:pr-1">
+    <a [routerLink]="['/orders', order.id]" data-row-link="true" [attr.aria-label]="'Order ' + order.orderReference"
+        tabindex="-1" class="absolute inset-0 focus:outline-hidden"></a>
+    <div [ngClass]="getStatusClass(order.status)">{{ order.status | titlecase }}</div>
+</td>
+<td
+    class="text-right relative break-words px-4 first:pl-[--gutter,theme(spacing.2)] last:pr-[--gutter,theme(spacing.2)] border-b border-zinc-950/5 dark:border-white/5 py-4 sm:first:pl-1 sm:last:pr-1">
+    <a [routerLink]="['/orders', order.id]" data-row-link="true" [attr.aria-label]="'Order ' + order.orderReference"
+        tabindex="-1" class="absolute inset-0 focus:outline-hidden"></a>
+    {{ order.payment.total | currency:(order.payment.currencyCode || 'EUR') }}
+</td>

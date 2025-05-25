@@ -1,0 +1,8 @@
+<div class="flex items-center gap-2">
+    <span data-slot="avatar"
+        class="size-6 inline-grid shrink-0 align-middle [--avatar-radius:20%] *:col-start-1 *:row-start-1 outline -outline-offset-1 outline-black/10 dark:outline-white/10 rounded-full *:rounded-full">
+        <img [alt]="eventName" loading="lazy" width="24" height="24" decoding="async" data-nimg="1" class="size-full"
+            [src]="imageUrl" style="color: transparent;">
+    </span>
+    <span>{{ eventName }}</span>
+</div>
