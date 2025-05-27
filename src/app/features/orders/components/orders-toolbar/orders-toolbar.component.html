@@ -2,7 +2,8 @@
     <h1 class="text-2xl font-semibold">Orders</h1>
     <div class="flex flex-row gap-3">
         <button
-            class="justify-center whitespace-nowrap ring-offset-background transition-colors focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2 disabled:pointer-events-none disabled:opacity-50 [&_svg]:pointer-events-none [&_svg]:size-4 [&_svg]:shrink-0 bg-background hover:bg-accent hover:text-accent-foreground h-10 flex items-center gap-2 rounded-lg border border-zinc-200 text-sm font-semibold px-3 py-2 relative">
+            class="justify-center whitespace-nowrap ring-offset-background transition-colors focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2 disabled:pointer-events-none disabled:opacity-50 bg-background hover:bg-slate-100 hover:text-slate-950 h-10 flex items-center gap-2 rounded-lg border border-zinc-200 text-sm font-semibold px-3 py-2 relative"
+            (click)="toggleSearchDialog()">
             <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none"
                 stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"
                 class="lucide lucide-search h-4 w-4">
@@ -13,7 +14,7 @@
         </button>
         <a routerLink="/orders/create">
             <button
-                class="inline-flex items-center justify-center gap-2 ring-offset-background transition-colors focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2 disabled:pointer-events-none disabled:opacity-50 [&_svg]:pointer-events-none [&_svg]:size-4 [&_svg]:shrink-0 hover:bg-primary/90 h-10 whitespace-nowrap rounded-lg border border-transparent bg-zinc-900 text-white text-sm font-semibold px-3 py-2 relative before:absolute before:inset-0 before:-z-10 before:rounded-lg before:bg-zinc-900 before:shadow-sm after:absolute after:inset-0 after:-z-10 after:rounded-lg after:shadow-[inset_0_1px_theme(colors.white/15%)] hover:after:bg-white/10 dark:border-white/5 dark:bg-zinc-600 dark:hover:after:bg-white/5">
+                class="inline-flex items-center justify-center gap-2 ring-offset-background transition-colors focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2 disabled:pointer-events-none disabled:opacity-50 hover:bg-slate-100 h-10 whitespace-nowrap rounded-lg border border-transparent bg-zinc-900 text-white text-sm font-semibold px-3 py-2 relative before:absolute before:inset-0 before:-z-10 before:rounded-lg before:bg-zinc-900 before:shadow-sm after:absolute after:inset-0 after:-z-10 after:rounded-lg after:shadow-[inset_0_1px_theme(colors.white/15%)] hover:after:bg-white/10 hover:bg-slate-800">
                 <span
                     class="absolute top-1/2 left-1/2 size-[max(100%,2.75rem)] -translate-x-1/2 -translate-y-1/2 pointer-fine:hidden"
                     aria-hidden="true"></span>
@@ -22,3 +23,8 @@
         </a>
     </div>
 </div>
+
+<app-orders-search-dialog 
+    [isOpen]="isSearchDialogOpen" 
+    (closeDialog)="toggleSearchDialog()">
+</app-orders-search-dialog>

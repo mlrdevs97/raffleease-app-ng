@@ -18,6 +18,14 @@ export enum PaymentStatus {
     CANCELLED = 'CANCELLED'
 }
 
+export enum PaymentMethods {
+    CARD = 'CARD',
+    PAYPAL = 'PAYPAL',
+    BIZUM = 'BIZUM',
+    BANK_TRANSFER = 'BANK_TRANSFER',
+    CASH = 'CASH',
+}
+
 export enum CustomerSourceType {
     STRIPE = 'STRIPE',
     INTERNAL = 'ADMIN'

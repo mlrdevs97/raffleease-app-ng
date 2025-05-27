@@ -1,0 +1,40 @@
+<form class="space-y-4">
+  <div class="space-y-2">
+    <label class="text-sm font-semibold leading-none p-0 peer-disabled:cursor-not-allowed peer-disabled:opacity-70"
+      for="paymentStatus">Payment Status</label>
+    <div class="relative">
+      <app-dropdown-select [options]="paymentStatusOptions" placeholder="Select payment status"
+        formControlName="paymentStatus">
+      </app-dropdown-select>
+    </div>
+  </div>
+  <div class="space-y-2">
+    <label class="text-sm font-semibold leading-none p-0 peer-disabled:cursor-not-allowed peer-disabled:opacity-70"
+      for="paymentMethod">Payment Method</label>
+    <div class="relative">
+        <app-dropdown-select [options]="paymentMethodOptions" placeholder="Select payment method"
+        formControlName="paymentMethod">
+        </app-dropdown-select>        
+    </div>
+  </div>
+  <div class="grid grid-cols-2 gap-4">
+    <div class="space-y-2">
+      <label class="text-sm font-semibold leading-none p-0 peer-disabled:cursor-not-allowed peer-disabled:opacity-70"
+        for="minAmount">Min Amount</label>
+      <div class="relative">
+      <input
+        class="flex h-10 w-full rounded-md border border-input bg-background px-3 py-2 text-sm ring-offset-background file:border-0 file:bg-transparent file:text-sm file:font-medium file:text-foreground placeholder:text-muted-foreground focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2 disabled:cursor-not-allowed disabled:opacity-50"
+        id="minAmount" type="number" placeholder="Min amount" formControlName="minAmount">
+      </div>
+    </div>
+    <div class="space-y-2">
+      <label class="text-sm font-semibold leading-none p-0 peer-disabled:cursor-not-allowed peer-disabled:opacity-70"
+        for="maxAmount">Max Amount</label>
+      <div class="relative">
+      <input
+        class="flex h-10 w-full rounded-md border border-input bg-background px-3 py-2 text-sm ring-offset-background file:border-0 file:bg-transparent file:text-sm file:font-medium file:text-foreground placeholder:text-muted-foreground focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2 disabled:cursor-not-allowed disabled:opacity-50"
+        id="maxAmount" type="number" placeholder="Max amount" formControlName="maxAmount">
+      </div>
+    </div>
+  </div>
+</form>
