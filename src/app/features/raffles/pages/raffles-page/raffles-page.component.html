@@ -21,7 +21,11 @@
       <div class="animate-spin rounded-full h-8 w-8 border-b-2 border-gray-900"></div>
     </div>
   } @else {
-    <app-raffle-card-list [raffles]="raffles()"></app-raffle-card-list>
+    <app-raffle-card-list 
+      [raffles]="raffles()" 
+      [associationId]="associationId()"
+      (raffleDeleted)="onRaffleDeleted($event)">
+    </app-raffle-card-list>
 
     @if (totalElements() > pageSize) {
       <div class="flex justify-center mt-8">

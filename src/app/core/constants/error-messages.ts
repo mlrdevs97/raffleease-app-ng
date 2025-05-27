@@ -17,7 +17,8 @@ export const ErrorMessages: {
         USER_NOT_FOUND: 'User not found.',
         EMAIL_VERIFICATION_FAILED: 'Email verification failed. The token may be invalid or expired.',
         NOT_FOUND: 'The requested resource was not found.',
-        CONFLICT: 'A conflict occurred. The operation could not be completed.'
+        CONFLICT: 'A conflict occurred. The operation could not be completed.',
+        BUSINESS_ERROR: 'The operation could not be completed due to a business rule violation.'
     },
     validation: {
         REQUIRED: 'This field is required',
@@ -70,6 +71,9 @@ export const ErrorMessages: {
         },
         'files': {
             REQUIRED: 'You must upload at least one image'
+        },
+        'raffle': {
+            CANNOT_DELETE: 'Only raffles with PENDING status can be deleted'
         }
     }
 };

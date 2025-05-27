@@ -15,4 +15,8 @@ export class RaffleService {
   createRaffle(associationId: number, raffleData: RaffleCreate): Observable<any> {
     return this.http.post(`${this.apiUrl}/${associationId}/raffles`, raffleData);
   }
+  
+  deleteRaffle(associationId: number, raffleId: number): Observable<void> {
+    return this.http.delete<void>(`${this.apiUrl}/${associationId}/raffles/${raffleId}`);
+  }
 } 

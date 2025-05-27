@@ -1,4 +1,4 @@
-import { Component, Input } from '@angular/core';
+import { Component, Input, Output, EventEmitter } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { RaffleCardComponent } from '../raffle-card/raffle-card.component';
 import { Raffle } from '../../../models/raffle.model';
@@ -10,4 +10,10 @@ import { Raffle } from '../../../models/raffle.model';
 })
 export class RaffleCardListComponent {
   @Input() raffles: Raffle[] = [];
+  @Input() associationId!: number;
+  @Output() raffleDeleted = new EventEmitter<number>();
+
+  onRaffleDeleted(raffleId: number): void {
+    this.raffleDeleted.emit(raffleId);
+  }
 } 

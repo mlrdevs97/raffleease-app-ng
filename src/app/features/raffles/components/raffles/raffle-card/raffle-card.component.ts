@@ -1,8 +1,12 @@
-import { Component, Input, ElementRef, HostListener } from '@angular/core';
+import { Component, Input, ElementRef, HostListener, Output, EventEmitter, OnDestroy } from '@angular/core';
 import { RouterLink, Router } from '@angular/router';
 import { DatePipe } from '@angular/common';
-import { Raffle } from '../../../models/raffle.model';
+import { Raffle, RaffleStatus } from '../../../models/raffle.model';
 import { RaffleStatusLabelComponent } from '../../shared/raffle-status-label/raffle-status-label.component';
+import { RaffleService } from '../../../services/raffle.service';
+import { ErrorHandlerService } from '../../../../../core/services/error-handler.service';
+import { ErrorCodes } from '../../../../../core/constants/error-codes';
+import { ErrorMessages } from '../../../../../core/constants/error-messages';
 
 @Component({
   selector: 'app-raffle-card',
@@ -10,13 +14,21 @@ import { RaffleStatusLabelComponent } from '../../shared/raffle-status-label/raf
   imports: [RouterLink, RaffleStatusLabelComponent, DatePipe],
   templateUrl: './raffle-card.component.html'
 })
-export class RaffleCardComponent {
+export class RaffleCardComponent implements OnDestroy {
   @Input() raffle!: Raffle;
+  @Input() associationId!: number;
+  @Output() deleted = new EventEmitter<number>();
+  
   menuOpen = false;
+  isDeleting = false;
+  errorMessage: string | null = null;
+  private errorTimeout: ReturnType<typeof setTimeout> | null = null;
   
   constructor(
     private elementRef: ElementRef,
-    private router: Router
+    private router: Router,
+    private raffleService: RaffleService,
+    private errorHandler: ErrorHandlerService
   ) {}
   
   @HostListener('document:click', ['$event'])
@@ -41,5 +53,41 @@ export class RaffleCardComponent {
 
   deleteRaffle() {
     this.menuOpen = false;
+    this.clearErrorMessage();
+    this.isDeleting = true;
+    
+    this.raffleService.deleteRaffle(this.associationId, this.raffle.id).subscribe({
+      next: () => {
+        this.isDeleting = false;
+        this.deleted.emit(this.raffle.id);
+      },
+      error: (error) => {
+        this.isDeleting = false;
+        this.errorMessage = this.errorHandler.getErrorMessage(error);
+        
+        if (this.errorHandler.isErrorOfType(error, ErrorCodes.BUSINESS_ERROR)) {
+          const cannotDeleteMessage = ErrorMessages.dedicated['raffle']?.['CANNOT_DELETE'];
+          const businessErrorMessage = ErrorMessages.general['BUSINESS_ERROR'];
+          this.errorMessage = cannotDeleteMessage || businessErrorMessage || 'Operation failed';
+        }
+        
+        // Auto-close error message after 3 seconds
+        this.errorTimeout = setTimeout(() => {
+          this.clearErrorMessage();
+        }, 3000);
+      }
+    });
+  }
+  
+  clearErrorMessage(): void {
+    if (this.errorTimeout) {
+      clearTimeout(this.errorTimeout);
+      this.errorTimeout = null;
+    }
+    this.errorMessage = null;
+  }
+  
+  ngOnDestroy(): void {
+    this.clearErrorMessage();
   }
 }

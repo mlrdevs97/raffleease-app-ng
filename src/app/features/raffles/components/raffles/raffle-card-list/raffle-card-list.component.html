@@ -2,7 +2,11 @@
   <ul>
     @for (raffle of raffles; track raffle.id) {
     <li>
-      <app-raffle-card [raffle]="raffle"></app-raffle-card>
+      <app-raffle-card 
+        [raffle]="raffle" 
+        [associationId]="associationId"
+        (deleted)="onRaffleDeleted($event)">
+      </app-raffle-card>
     </li>
     }
   </ul>

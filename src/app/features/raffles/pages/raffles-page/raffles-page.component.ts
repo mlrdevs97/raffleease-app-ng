@@ -8,6 +8,7 @@ import { RaffleSearchResponse } from '../../models/raffle-search.model';
 import { ErrorHandlerService } from '../../../../core/services/error-handler.service';
 import { EMPTY, Subject, Subscription, catchError, switchMap, tap } from 'rxjs';
 import { RaffleSearchFilters } from '../../models/raffle-search.model';
+import { AuthService } from '../../../auth/services/auth.service';
 
 @Component({
   selector: 'app-raffles-page',
@@ -22,6 +23,7 @@ export class RafflesPageComponent implements OnInit {
   currentPage = signal(0);
   pageSize = 20;
   errorMessage = signal<string | null>(null);
+  associationId = signal<number>(0);
   
   // Search, filter, sort signals
   searchTerm = signal<string>('');
@@ -42,7 +44,8 @@ export class RafflesPageComponent implements OnInit {
 
   constructor(
     public raffleQueryService: RaffleQueryService,
-    private errorHandler: ErrorHandlerService
+    private errorHandler: ErrorHandlerService,
+    private authService: AuthService
   ) {}
 
   // Computed filter object
@@ -66,6 +69,12 @@ export class RafflesPageComponent implements OnInit {
   });
 
   ngOnInit(): void {
+    // Get the association ID from auth service
+    const associationId = this.authService.getAssociationId();
+    if (associationId) {
+      this.associationId.set(associationId);
+    }
+    
     // Setup search subscription with switchMap to cancel previous requests
     this.searchSubscription = this.searchSubject.pipe(
       tap(() => {
@@ -166,6 +175,21 @@ export class RafflesPageComponent implements OnInit {
     this.sortBy.set(sortData.sortBy);
     this.sortDirection.set(sortData.sortDirection);
     this.loadRaffles(0);
+  }
+  
+  // Handle raffle deletion
+  onRaffleDeleted(raffleId: number): void {
+    // Update the raffles list by filtering out the deleted raffle
+    const updatedRaffles = this.raffles().filter(raffle => raffle.id !== raffleId);
+    this.raffles.set(updatedRaffles);
+    
+    // Update total count
+    this.totalElements.update(count => count - 1);
+    
+    // If the page is now empty and it's not the first page, go to previous page
+    if (updatedRaffles.length === 0 && this.currentPage() > 0) {
+      this.loadRaffles(this.currentPage() - 1);
+    }
   }
   
   ngOnDestroy(): void {
