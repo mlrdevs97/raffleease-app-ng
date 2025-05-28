@@ -4,14 +4,16 @@ import { Observable, map, of, tap } from 'rxjs';
 import { environment } from '../../../../environments/environment';
 import { AuthService } from '../../auth/services/auth.service';
 import { SuccessResponse } from '../../../core/models/api-response.model';
-import { RaffleSearchFilters, RaffleSearchResponse } from '../models/raffle-search.model';
+import { RaffleSearchFilters } from '../models/raffle-search.model';
+import { PageResponse } from '../../../core/models/pagination.model';
+import { Raffle } from '../models/raffle.model';
 
 @Injectable({
     providedIn: 'root'
 })
 export class RaffleQueryService {
     private readonly apiUrl = `${environment.apiUrl}/associations`;
-    private readonly cache = signal<Map<string, RaffleSearchResponse>>(new Map());
+    private readonly cache = signal<Map<string, PageResponse<Raffle>>>(new Map());
     private readonly isLoading = signal(false);
 
     constructor(
@@ -28,9 +30,9 @@ export class RaffleQueryService {
         page: number = 0,
         size: number = 10,
         sort: string = 'createdAt,desc'
-    ): Observable<RaffleSearchResponse> {
+    ): Observable<PageResponse<Raffle>> {
         const associationId = this.authService.getAssociationId();
-        const cacheKey = this.generateCacheKey(page, size, filters);
+        const cacheKey = this.generateCacheKey(filters, page, size, sort);
         const cachedData = this.cache().get(cacheKey);
 
         if (cachedData) {
@@ -50,10 +52,10 @@ export class RaffleQueryService {
             }
         });
 
-        return this.http.get<SuccessResponse<RaffleSearchResponse>>(`${this.apiUrl}/${associationId}/raffles`, { params })
+        return this.http.get<SuccessResponse<PageResponse<Raffle>>>(`${this.apiUrl}/${associationId}/raffles`, { params })
             .pipe(
-                tap((response: SuccessResponse<RaffleSearchResponse>) => {
-                    this.cache.update((cache: Map<string, RaffleSearchResponse>) => {
+                tap((response: SuccessResponse<PageResponse<Raffle>>) => {
+                    this.cache.update((cache: Map<string, PageResponse<Raffle>>) => {
                         const newCache = new Map(cache);
                         newCache.set(cacheKey, response.data!);
                         return newCache;
@@ -74,16 +76,17 @@ export class RaffleQueryService {
     }
 
     private generateCacheKey(
+        filters: RaffleSearchFilters,
         page: number,
         size: number,
-        filters?: RaffleSearchFilters
+        sort: string
     ): string {
         const parts = [
             `page=${page}`,
             `size=${size}`,
             filters?.status ? `status=${filters.status}` : '',
             filters?.title ? `title=${filters.title}` : '',
-            filters?.sortBy ? `sort=${filters.sortBy},${filters.sortDirection || 'asc'}` : ''
+            sort ? `sort=${sort}` : ''
         ];
         return parts.filter(Boolean).join('&');
     }
