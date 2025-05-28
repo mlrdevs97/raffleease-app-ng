@@ -1,18 +1,106 @@
-import { Component, Input, Output, EventEmitter } from '@angular/core';
+import { Component, Input, Output, EventEmitter, OnInit, OnChanges, SimpleChanges, ChangeDetectorRef } from '@angular/core';
 import { CommonModule } from '@angular/common';
+import { FormBuilder, FormGroup, ReactiveFormsModule } from '@angular/forms';
+import { OrderSearchFilters } from '../../../models/order.model';
 
 @Component({
   selector: 'app-orders-search-dates',
   standalone: true,
-  imports: [CommonModule],
+  imports: [CommonModule, ReactiveFormsModule],
   templateUrl: './orders-search-dates.component.html',
 })
-export class OrdersSearchDatesComponent {
-  @Input() criteria: any = {};
-  @Output() criteriaChange = new EventEmitter<any>();
+export class OrdersSearchDatesComponent implements OnInit, OnChanges {
+  @Input() criteria: OrderSearchFilters = {};
+  @Output() criteriaChange = new EventEmitter<Partial<OrderSearchFilters>>();
   
-  updateCriteria(data: any): void {
-    const updatedCriteria = { ...this.criteria, ...data };
-    this.criteriaChange.emit(updatedCriteria);
+  searchForm: FormGroup;
+
+  constructor(
+    private fb: FormBuilder,
+    private cdr: ChangeDetectorRef
+  ) {
+    this.searchForm = this.fb.group({
+      createdFrom: [null],
+      createdTo: [null],
+      completedFrom: [null],
+      completedTo: [null],
+      cancelledFrom: [null],
+      cancelledTo: [null]
+    });
+  }
+
+  ngOnInit(): void {
+    // Initialize form with criteria if any
+    this.updateFormFromCriteria();
+    
+    // React to form changes
+    this.searchForm.valueChanges.subscribe(formValues => {
+      // Filter out null values to prevent them from being added to criteria
+      const cleanValues = Object.entries(formValues)
+        .filter(([_, value]) => value !== null && value !== '')
+        .reduce((acc, [key, value]) => ({...acc, [key]: value}), {} as Partial<OrderSearchFilters>);
+        
+      this.updateCriteria(cleanValues);
+    });
+  }
+
+  ngOnChanges(changes: SimpleChanges): void {
+    // Detect when criteria is reset to an empty object or changes
+    if (changes['criteria']) {
+      this.updateFormFromCriteria();
+      
+      // Force reset when criteria is empty (happens when reset button is clicked)
+      if (Object.keys(this.criteria || {}).length === 0) {
+        this.resetForm();
+      }
+    }
+  }
+
+  resetForm(): void {
+    // Reset all date controls to null (more reliable for date inputs)
+    this.searchForm.reset({
+      createdFrom: null,
+      createdTo: null,
+      completedFrom: null,
+      completedTo: null,
+      cancelledFrom: null,
+      cancelledTo: null
+    }, { emitEvent: false });
+    
+    // Force DOM update by clearing the actual input elements
+    setTimeout(() => {
+      const dateInputs = document.querySelectorAll('input[type="date"]');
+      dateInputs.forEach((element: Element) => {
+        // Type assertion to HTMLInputElement
+        const input = element as HTMLInputElement;
+        input.value = '';
+      });
+      
+      // Force Angular to detect changes and update the view
+      this.cdr.detectChanges();
+    });
+  }
+
+  updateFormFromCriteria(): void {
+    // Reset form when criteria is empty or update with existing values
+    if (Object.keys(this.criteria || {}).length === 0) {
+      this.resetForm();
+    } else {
+      this.searchForm.patchValue({
+        createdFrom: this.criteria?.createdFrom || null,
+        createdTo: this.criteria?.createdTo || null,
+        completedFrom: this.criteria?.completedFrom || null,
+        completedTo: this.criteria?.completedTo || null,
+        cancelledFrom: this.criteria?.cancelledFrom || null,
+        cancelledTo: this.criteria?.cancelledTo || null
+      }, { emitEvent: false }); // Prevent triggering valueChanges subscription
+      
+      // Force change detection
+      this.cdr.detectChanges();
+    }
+  }
+  
+  updateCriteria(data: Partial<OrderSearchFilters>): void {
+    this.criteriaChange.emit(data);
   }
 } 

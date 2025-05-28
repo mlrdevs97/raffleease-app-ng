@@ -1,3 +1,7 @@
+import { Customer } from "../../../core/models/customer.model";
+import { Payment } from "../../../core/models/payment.model";
+import { PaymentMethods, PaymentStatus } from "../../../core/models/payment.model";
+
 export enum OrderSource {
     CUSTOMER = 'CUSTOMER',
     ADMIN = 'ADMIN'
@@ -9,56 +13,12 @@ export enum OrderStatus {
     COMPLETED = 'COMPLETED'
 }
 
-export enum PaymentStatus {
-    PENDING = 'PENDING',
-    SUCCEEDED = 'SUCCEEDED',
-    FAILED = 'FAILED',
-    REFUNDED = 'REFUNDED',
-    UNPAID = 'UNPAID',
-    CANCELLED = 'CANCELLED'
-}
-
-export enum PaymentMethods {
-    CARD = 'CARD',
-    PAYPAL = 'PAYPAL',
-    BIZUM = 'BIZUM',
-    BANK_TRANSFER = 'BANK_TRANSFER',
-    CASH = 'CASH',
-}
-
-export enum CustomerSourceType {
-    STRIPE = 'STRIPE',
-    INTERNAL = 'ADMIN'
-}
-
 export interface OrderItem {
     id: number;
     ticketNumber: string;
     priceAtPurchase: number;
     ticketId: number;
     raffleId: number;
-}
-
-export interface Payment {
-    status: PaymentStatus;
-    paymentMethod: string;
-    total: number;
-    currencyCode?: string;
-    paymentIntentId: string;
-    createdAt: string;
-    updatedAt: string;
-    completedAt?: string | null;
-    cancelledAt?: string | null;
-}
-
-export interface Customer {
-    stripeId?: string | null;
-    sourceType: CustomerSourceType;
-    fullName: string;
-    email: string;
-    phoneNumber?: string | null;
-    createdAt: string; 
-    updatedAt: string;
 }
 
 export interface Order {
@@ -86,4 +46,24 @@ export interface OrderRaffleSummary {
 export interface EventDisplayDetails {
     name: string;
     imageUrl: string;
+}
+
+export interface OrderSearchFilters {
+    status?: OrderStatus;
+    paymentStatus?: PaymentStatus;
+    paymentMethod?: PaymentMethods;
+    orderSource?: OrderSource;
+    orderReference?: string;
+    customerName?: string;
+    customerEmail?: string;
+    customerPhone?: string;
+    raffleId?: number;
+    minTotal?: number;
+    maxTotal?: number;
+    createdFrom?: string;
+    createdTo?: string;
+    completedFrom?: string;
+    completedTo?: string;
+    cancelledFrom?: string;
+    cancelledTo?: string;
 }

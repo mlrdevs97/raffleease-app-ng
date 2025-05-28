@@ -60,12 +60,11 @@ export class RafflesPageComponent implements OnInit {
       filters.status = this.selectedStatus()!.toUpperCase();
     }
     
-    if (this.sortBy()) {
-      filters.sortBy = this.sortBy()!;
-      filters.sortDirection = this.sortDirection();
-    }
-    
     return filters;
+  });
+
+  private sort = computed(() => {
+    return `${this.sortBy()},${this.sortDirection()}`;
   });
 
   ngOnInit(): void {
@@ -92,12 +91,9 @@ export class RafflesPageComponent implements OnInit {
           ...this.filters(),
           title: term
         };
-
-        console.log('filters', filters);
         
-        return this.raffleQueryService.search(0, 10, filters).pipe(
+        return this.raffleQueryService.search(filters, 0, 10, this.sort()).pipe(
           tap((response: RaffleSearchResponse) => {
-            console.log('response', response);
             this.suggestions.set(response.content);
             this.noSearchResults.set(response.content.length === 0);
             this.isSearchLoading.set(false);
@@ -106,7 +102,6 @@ export class RafflesPageComponent implements OnInit {
             this.isSearchLoading.set(false);
             this.suggestions.set([]);
             this.noSearchResults.set(true);
-            console.error('Error fetching suggestions:', error);
             return EMPTY;
           })
         );
@@ -121,7 +116,7 @@ export class RafflesPageComponent implements OnInit {
     this.currentPage.set(page);
     this.errorMessage.set(null);
     
-    this.raffleQueryService.search(page, this.pageSize, this.filters()).subscribe({
+    this.raffleQueryService.search(this.filters(), page, this.pageSize, this.sort()).subscribe({
       next: (response: RaffleSearchResponse) => {
         this.raffles.set(response.content);
         this.totalElements.set(response.totalElements);

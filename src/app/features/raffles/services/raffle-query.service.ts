@@ -24,9 +24,10 @@ export class RaffleQueryService {
     }
 
     search(
+        filters: RaffleSearchFilters = {},
         page: number = 0,
-        size: number = 20,
-        filters?: RaffleSearchFilters
+        size: number = 10,
+        sort: string = 'createdAt,desc'
     ): Observable<RaffleSearchResponse> {
         const associationId = this.authService.getAssociationId();
         const cacheKey = this.generateCacheKey(page, size, filters);
@@ -40,17 +41,14 @@ export class RaffleQueryService {
 
         let params = new HttpParams()
             .set('page', page.toString())
-            .set('size', size.toString());
+            .set('size', size.toString())
+            .set('sort', sort);
 
-        if (filters?.status) {
-            params = params.set('status', filters.status);
-        }
-        if (filters?.title) {
-            params = params.set('title', filters.title);
-        }
-        if (filters?.sortBy) {
-            params = params.set('sort', `${filters.sortBy},${filters.sortDirection || 'asc'}`);
-        }
+        Object.entries(filters).forEach(([key, value]) => {
+            if (value !== null && value !== undefined && value !== '') {
+                params = params.set(key, value.toString());
+            }
+        });
 
         return this.http.get<SuccessResponse<RaffleSearchResponse>>(`${this.apiUrl}/${associationId}/raffles`, { params })
             .pipe(
