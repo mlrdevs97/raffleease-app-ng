@@ -1,7 +1,7 @@
 /**
  * Client-side validation error messages used across the application
  */
-export const ClientErrorMessages = {
+export const ClientValidationMessages = {
   /**
    * Common validation error messages
    */
