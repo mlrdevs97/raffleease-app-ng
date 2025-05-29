@@ -19,7 +19,6 @@ export class RaffleFormComponent {
   isLoading = signal(false);
   errorMessage = signal<string | null>(null);
   fieldErrors = signal<Record<string, string>>({});
-
   raffleForm: FormGroup;
 
   constructor(
@@ -72,7 +71,6 @@ export class RaffleFormComponent {
     this.resetErrors();
     this.raffleService.createRaffle(associationId, raffleData).subscribe({
       next: (response) => {
-        // Handle success
         console.log('Raffle created successfully', response);
       },
       error: (error: unknown) => {

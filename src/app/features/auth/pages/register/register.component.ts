@@ -6,7 +6,7 @@ import { AuthService } from '../../services/auth.service';
 import { ValidationErrorCodes } from '../../../../core/constants/error-codes';
 import { ErrorHandlerService } from '../../../../core/services/error-handler.service';
 import { passwordMatchValidator } from '../../../../core/validators/password.validators';
-import { ErrorMessages } from '../../../../core/constants/error-messages';
+import { ValidationMessages } from '../../../../core/constants/client-validation-messages';
 
 interface AddressSuggestion {
   placeId: string;
@@ -40,6 +40,9 @@ export class RegisterComponent implements OnInit {
   addressQuery = signal('');
   showAddressSuggestions = signal(false);
   addressSuggestions = signal<AddressSuggestion[]>([]);
+  
+  // Validation messages
+  validationMessages = ValidationMessages;
   
   // User registration form
   userForm: FormGroup;
@@ -114,7 +117,7 @@ export class RegisterComponent implements OnInit {
       }),
       password: ['', [
         Validators.required, 
-        Validators.pattern(/^(?=.*[a-z])(?=.*[A-Z])(?=.*\d)(?=.*[!@#$%^&*(),.?":{}|<>]).{8,32}$/)
+        Validators.pattern(/^(?=.*[a-z])(?=.*[A-Z])(?=.*\d)(?=.*[!@#-$_%^&*(),.?":{}|<>]).{8,32}$/)
       ]],
       confirmPassword: ['', [Validators.required]]
     }, { 
@@ -289,22 +292,22 @@ export class RegisterComponent implements OnInit {
       return control.errors['serverError'];
     }
     
-    // Return appropriate client-side validation error
+    // Return client-side validation error
     if (control.errors['required']) {
-      return ErrorMessages.validation.REQUIRED ?? null;
+      return this.validationMessages.common.required;
     } else if (control.errors['email']) {
-      return ErrorMessages.validation.INVALID_EMAIL ?? null;
+      return this.validationMessages.common.email;
     } else if (control.errors['minlength']) {
-      return `Minimum length is ${control.errors['minlength'].requiredLength} characters`;
+      return this.validationMessages.common.minlength(control.errors['minlength'].requiredLength);
     } else if (control.errors['maxlength']) {
-      return `Maximum length is ${control.errors['maxlength'].requiredLength} characters`;
+      return this.validationMessages.common.maxlength(control.errors['maxlength'].requiredLength);
     } else if (control.errors['pattern']) {
       if (fieldName === 'password') {
-        return 'Password must be 8-32 characters and include: uppercase, lowercase, number, and special character';
+        return this.validationMessages.password.complexity;
       }
-      return ValidationErrorCodes.INVALID_FORMAT;
+      return this.validationMessages.common.pattern;
     } else if (control.errors['mismatch']) {
-      return 'Passwords do not match';
+      return this.validationMessages.password.mismatch;
     }
     
     return ValidationErrorCodes.INVALID_FIELD;
@@ -325,12 +328,8 @@ export class RegisterComponent implements OnInit {
     this.isLoading.set(true);
     this.resetErrors();
     this.authService.register(registerData).subscribe({
-      next: (registerResponse) => {
-        this.router.navigate(['/raffles']);
-      },
       error: (error: unknown) => {
         this.errorMessage.set(this.errorHandler.getErrorMessage(error));
-
         if (this.errorHandler.isValidationError(error)) {
           const validationErrors = this.errorHandler.getValidationErrors(error);
           this.applyFieldErrors(validationErrors);

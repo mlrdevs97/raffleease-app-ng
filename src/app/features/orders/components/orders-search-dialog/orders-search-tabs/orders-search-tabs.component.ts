@@ -22,6 +22,7 @@ import { Subscription } from 'rxjs';
 export class OrdersSearchTabsComponent implements OnChanges, OnInit, OnDestroy {
     @Input() criteria: OrderSearchFilters = {};
     @Input() resetEvent!: EventEmitter<void>;
+    @Input() fieldErrors: Record<string, string> = {};
     @Output() criteriaChange = new EventEmitter<OrderSearchFilters>();
     
     activeTab: 'order' | 'payment' | 'customer' | 'dates' = 'order';
@@ -55,6 +56,23 @@ export class OrdersSearchTabsComponent implements OnChanges, OnInit, OnDestroy {
             
             // Reset activeTab to default
             this.activeTab = 'order';
+        }
+        
+        // If field errors appear, switch to the tab containing the error
+        if (changes['fieldErrors'] && this.fieldErrors) {
+            const errorFields = Object.keys(this.fieldErrors);
+            if (errorFields.length > 0) {
+                // Determine which tab to activate based on field names with errors
+                if (errorFields.some(field => field.startsWith('order.') || field === 'raffleId')) {
+                    this.activeTab = 'order';
+                } else if (errorFields.some(field => field.startsWith('payment.') || field.includes('amount'))) {
+                    this.activeTab = 'payment';
+                } else if (errorFields.some(field => field.startsWith('customer.'))) {
+                    this.activeTab = 'customer';
+                } else if (errorFields.some(field => field.includes('date') || field.includes('Date'))) {
+                    this.activeTab = 'dates';
+                }
+            }
         }
     }
 
