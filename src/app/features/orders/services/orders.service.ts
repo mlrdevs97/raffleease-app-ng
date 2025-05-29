@@ -1,6 +1,6 @@
-import { Injectable } from '@angular/core';
+import { Injectable, signal, computed } from '@angular/core';
 import { HttpClient, HttpParams } from '@angular/common/http';
-import { Observable } from 'rxjs';
+import { Observable, map, of, tap } from 'rxjs';
 import { OrderSearchFilters, Order } from '../models/order.model';
 import { SuccessResponse } from '../../../core/models/api-response.model';
 import { PageResponse } from '../../../core/models/pagination.model';
@@ -12,15 +12,24 @@ import { AuthService } from '../../auth/services/auth.service';
 })
 export class OrdersService {
     private baseUrl = `${environment.apiUrl}/admin/api/v1/associations`;
+    private readonly cache = signal<Map<string, PageResponse<Order>>>(new Map());
+    private readonly isLoading = signal(false);
 
     constructor(
         private http: HttpClient,
         private authService: AuthService
     ) { }
 
+    /**
+     * Returns a readonly signal indicating if a search request is in progress
+     */
+    get isLoading$() {
+        return this.isLoading.asReadonly();
+    }
 
     /**
      * Search orders using filters and pagination
+     * 
      * @param filters The search filters
      * @param page The page number (0-based)
      * @param size The page size
@@ -28,12 +37,21 @@ export class OrdersService {
      * @returns Observable with paged orders data
      */
     searchOrders(
-        filters: OrderSearchFilters,
+        filters: OrderSearchFilters = {},
         page = 0,
         size = 10,
         sort = 'createdAt,desc'
-    ): Observable<SuccessResponse<PageResponse<Order>>> {
-        // Convert filters to HttpParams
+    ): Observable<PageResponse<Order>> {
+        const cacheKey = this.generateCacheKey(filters, page, size, sort);
+        const cachedData = this.cache().get(cacheKey);
+
+        // Return cached data if available
+        if (cachedData) {
+            return of(cachedData);
+        }
+
+        this.isLoading.set(true);
+
         let params = new HttpParams()
             .set('page', page.toString())
             .set('size', size.toString())
@@ -49,6 +67,22 @@ export class OrdersService {
         return this.http.get<SuccessResponse<PageResponse<Order>>>(
             `${this.baseUrl}/${this.getAssociationId()}/orders`,
             { params }
+        ).pipe(
+            tap((response: SuccessResponse<PageResponse<Order>>) => {
+                // Update cache with new data
+                this.cache.update((cache: Map<string, PageResponse<Order>>) => {
+                    const newCache = new Map(cache);
+                    newCache.set(cacheKey, response.data!);
+                    return newCache;
+                });
+                this.isLoading.set(false);
+            }),
+            map(response => response.data!),
+            tap({
+                error: () => {
+                    this.isLoading.set(false);
+                }
+            })
         );
     }
 
@@ -57,17 +91,54 @@ export class OrdersService {
      * @param orderId The order ID
      * @returns Observable with the order details
      */
-    getOrder(orderId: number): Observable<SuccessResponse<Order>> {
+    getOrder(orderId: number): Observable<Order> {
         return this.http.get<SuccessResponse<Order>>(
             `${this.baseUrl}/${this.getAssociationId()}/orders/${orderId}`
+        ).pipe(
+            map(response => response.data!)
         );
     }
 
+    /**
+     * Clear the search cache, forcing the next search to fetch fresh data
+     */
+    clearCache(): void {
+        this.cache.set(new Map());
+    }
+
+    /**
+     * Get the current association ID
+     */
     private getAssociationId(): number {
         const associationId = this.authService.getAssociationId();
         if (!associationId) {
             throw new Error('Association ID not found');
         }
         return associationId;
+    }
+
+    /**
+     * Generate a cache key based on search parameters
+     */
+    private generateCacheKey(
+        filters: OrderSearchFilters,
+        page: number,
+        size: number,
+        sort: string
+    ): string {
+        const parts = [
+            `page=${page}`,
+            `size=${size}`,
+            `sort=${sort}`
+        ];
+
+        // Add non-empty filter values to the cache key
+        Object.entries(filters).forEach(([key, value]) => {
+            if (value !== null && value !== undefined && value !== '') {
+                parts.push(`${key}=${value}`);
+            }
+        });
+
+        return parts.join('&');
     }
 } 

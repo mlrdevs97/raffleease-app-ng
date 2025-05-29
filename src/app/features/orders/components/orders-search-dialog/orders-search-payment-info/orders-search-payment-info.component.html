@@ -6,6 +6,9 @@
       <app-dropdown-select [options]="paymentStatusOptions" placeholder="Select payment status"
         formControlName="paymentStatus">
       </app-dropdown-select>
+      @if (getErrorMessage('paymentStatus')) {
+        <div class="text-xs text-red-500 mt-1">{{ getErrorMessage('paymentStatus') }}</div>
+      }
     </div>
   </div>
   <div class="space-y-2">
@@ -14,27 +17,42 @@
     <div class="relative">
         <app-dropdown-select [options]="paymentMethodOptions" placeholder="Select payment method"
         formControlName="paymentMethod">
-        </app-dropdown-select>        
+        </app-dropdown-select>    
+        @if (getErrorMessage('paymentMethod')) {
+          <div class="text-xs text-red-500 mt-1">{{ getErrorMessage('paymentMethod') }}</div>
+        }    
     </div>
   </div>
   <div class="grid grid-cols-2 gap-4">
     <div class="space-y-2">
       <label class="text-sm font-semibold leading-none p-0 peer-disabled:cursor-not-allowed peer-disabled:opacity-70"
-        for="minAmount">Min Amount</label>
+        for="minTotal">Min Amount</label>
       <div class="relative">
-      <input
-        class="flex h-10 w-full rounded-md border border-input bg-background px-3 py-2 text-sm ring-offset-background file:border-0 file:bg-transparent file:text-sm file:font-medium file:text-foreground placeholder:text-muted-foreground focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2 disabled:cursor-not-allowed disabled:opacity-50"
-        id="minAmount" type="number" placeholder="Min amount" formControlName="minAmount">
+        <input
+          class="flex h-10 w-full rounded-md border border-input bg-background px-3 py-2 text-sm ring-offset-background file:border-0 file:bg-transparent file:text-sm file:font-medium file:text-foreground placeholder:text-muted-foreground focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2 disabled:cursor-not-allowed disabled:opacity-50"
+          [ngClass]="{'border-red-500': getErrorMessage('minTotal')}"
+          id="minTotal" type="number" placeholder="Min amount" formControlName="minTotal">
+        @if (getErrorMessage('minTotal')) {
+          <div class="text-xs text-red-500 mt-1">{{ getErrorMessage('minTotal') }}</div>
+        }
       </div>
     </div>
     <div class="space-y-2">
       <label class="text-sm font-semibold leading-none p-0 peer-disabled:cursor-not-allowed peer-disabled:opacity-70"
-        for="maxAmount">Max Amount</label>
+        for="maxTotal">Max Amount</label>
       <div class="relative">
-      <input
-        class="flex h-10 w-full rounded-md border border-input bg-background px-3 py-2 text-sm ring-offset-background file:border-0 file:bg-transparent file:text-sm file:font-medium file:text-foreground placeholder:text-muted-foreground focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2 disabled:cursor-not-allowed disabled:opacity-50"
-        id="maxAmount" type="number" placeholder="Max amount" formControlName="maxAmount">
+        <input
+          class="flex h-10 w-full rounded-md border border-input bg-background px-3 py-2 text-sm ring-offset-background file:border-0 file:bg-transparent file:text-sm file:font-medium file:text-foreground placeholder:text-muted-foreground focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2 disabled:cursor-not-allowed disabled:opacity-50"
+          [ngClass]="{'border-red-500': getErrorMessage('maxTotal')}"
+          id="maxTotal" type="number" placeholder="Max amount" formControlName="maxTotal">
+        @if (getErrorMessage('maxTotal')) {
+          <div class="text-xs text-red-500 mt-1">{{ getErrorMessage('maxTotal') }}</div>
+        }
       </div>
     </div>
   </div>
+  
+  @if (getFormErrorMessage()) {
+    <div class="text-xs text-red-500 mt-1">{{ getFormErrorMessage() }}</div>
+  }
 </form>

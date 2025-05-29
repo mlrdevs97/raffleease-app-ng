@@ -8,11 +8,6 @@
   } @else if (error()) {
     <div class="bg-red-50 border border-red-200 text-red-700 px-4 py-3 rounded-md my-4">
       <p>{{ error() }}</p>
-      <button 
-        (click)="loadOrders()" 
-        class="mt-2 text-sm font-medium text-red-700 hover:text-red-800">
-        Try Again
-      </button>
     </div>
   } @else if (orders().length === 0) {
     <div class="text-center py-8">
@@ -52,7 +47,6 @@
   
   <app-orders-search-dialog
     [isOpen]="isSearchDialogOpen()"
-    [associationId]="associationId"
     (closeDialog)="closeSearchDialog()"
     (searchResults)="handleSearchResults($event)">
   </app-orders-search-dialog>

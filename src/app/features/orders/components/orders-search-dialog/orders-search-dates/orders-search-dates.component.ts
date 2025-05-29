@@ -2,6 +2,8 @@ import { Component, Input, Output, EventEmitter, OnInit, OnChanges, SimpleChange
 import { CommonModule } from '@angular/common';
 import { FormBuilder, FormGroup, ReactiveFormsModule } from '@angular/forms';
 import { OrderSearchFilters } from '../../../models/order.model';
+import { dateRangeValidator } from '../../../../../core/validators/date.validators';
+import { ClientValidationMessages } from '../../../../../core/constants/client-validation-messages';
 
 @Component({
   selector: 'app-orders-search-dates',
@@ -11,9 +13,11 @@ import { OrderSearchFilters } from '../../../models/order.model';
 })
 export class OrdersSearchDatesComponent implements OnInit, OnChanges {
   @Input() criteria: OrderSearchFilters = {};
+  @Input() fieldErrors: Record<string, string> = {};
   @Output() criteriaChange = new EventEmitter<Partial<OrderSearchFilters>>();
   
   searchForm: FormGroup;
+  validationMessages = ClientValidationMessages;
 
   constructor(
     private fb: FormBuilder,
@@ -26,6 +30,12 @@ export class OrdersSearchDatesComponent implements OnInit, OnChanges {
       completedTo: [null],
       cancelledFrom: [null],
       cancelledTo: [null]
+    }, { 
+      validators: [
+        dateRangeValidator('createdFrom', 'createdTo'),
+        dateRangeValidator('completedFrom', 'completedTo'),
+        dateRangeValidator('cancelledFrom', 'cancelledTo')
+      ] 
     });
   }
 
@@ -35,12 +45,15 @@ export class OrdersSearchDatesComponent implements OnInit, OnChanges {
     
     // React to form changes
     this.searchForm.valueChanges.subscribe(formValues => {
-      // Filter out null values to prevent them from being added to criteria
-      const cleanValues = Object.entries(formValues)
-        .filter(([_, value]) => value !== null && value !== '')
-        .reduce((acc, [key, value]) => ({...acc, [key]: value}), {} as Partial<OrderSearchFilters>);
-        
-      this.updateCriteria(cleanValues);
+      // Only emit if the form is valid
+      if (this.searchForm.valid) {
+        // Filter out null values to prevent them from being added to criteria
+        const cleanValues = Object.entries(formValues)
+          .filter(([_, value]) => value !== null && value !== '')
+          .reduce((acc, [key, value]) => ({...acc, [key]: value}), {} as Partial<OrderSearchFilters>);
+          
+        this.updateCriteria(cleanValues);
+      }
     });
   }
 
@@ -53,6 +66,11 @@ export class OrdersSearchDatesComponent implements OnInit, OnChanges {
       if (Object.keys(this.criteria || {}).length === 0) {
         this.resetForm();
       }
+    }
+    
+    // Apply server validation errors if any
+    if (changes['fieldErrors'] && this.fieldErrors) {
+      this.applyFieldErrors();
     }
   }
 
@@ -102,5 +120,44 @@ export class OrdersSearchDatesComponent implements OnInit, OnChanges {
   
   updateCriteria(data: Partial<OrderSearchFilters>): void {
     this.criteriaChange.emit(data);
+  }
+  
+  applyFieldErrors(): void {
+    const dateErrorFields = Object.keys(this.fieldErrors).filter(
+      field => field.includes('date') || field.includes('Date') || 
+              field.includes('created') || field.includes('completed') || field.includes('cancelled')
+    );
+    
+    dateErrorFields.forEach(fieldPath => {
+      const control = this.searchForm.get(fieldPath);
+      if (control) {
+        control.markAsTouched();
+        control.setErrors({ serverError: this.fieldErrors[fieldPath] });
+      }
+    });
+  }
+  
+  // Helper method to get error message for a control
+  getErrorMessage(controlName: string): string | null {
+    const control = this.searchForm.get(controlName);
+    if (!control?.touched || !control.errors) return null;
+    
+    // Check for server error first
+    if (control.errors['serverError']) {
+      return control.errors['serverError'];
+    }
+    
+    return null;
+  }
+  
+  // Helper method to check for date range errors
+  getDateRangeErrorMessage(fromField: string, toField: string): string | null {
+    if (this.searchForm.hasError('dateRange')) {
+      const error = this.searchForm.getError('dateRange');
+      if (error.from === fromField && error.to === toField) {
+        return this.validationMessages.date.dateRange;
+      }
+    }
+    return null;
   }
 } 

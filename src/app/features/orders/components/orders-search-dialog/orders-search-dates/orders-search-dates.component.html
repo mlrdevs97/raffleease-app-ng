@@ -6,21 +6,32 @@
         <label class="text-sm font-medium leading-none p-0 peer-disabled:cursor-not-allowed peer-disabled:opacity-70"
           for="createdFrom">From</label>
         <div class="relative">
-        <input
-          class="flex h-10 w-full rounded-md border border-input bg-background px-3 py-2 text-sm ring-offset-background file:border-0 file:bg-transparent file:text-sm file:font-medium file:text-foreground placeholder:text-muted-foreground focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2 disabled:cursor-not-allowed disabled:opacity-50"
-          id="createdFrom" type="date" formControlName="createdFrom" [value]="searchForm.get('createdFrom')?.value || ''">
+          <input
+            class="flex h-10 w-full rounded-md border border-input bg-background px-3 py-2 text-sm ring-offset-background file:border-0 file:bg-transparent file:text-sm file:font-medium file:text-foreground placeholder:text-muted-foreground focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2 disabled:cursor-not-allowed disabled:opacity-50"
+            [ngClass]="{'border-red-500': getErrorMessage('createdFrom') || getDateRangeErrorMessage('createdFrom', 'createdTo')}"
+            id="createdFrom" type="date" formControlName="createdFrom" [value]="searchForm.get('createdFrom')?.value || ''">
+          @if (getErrorMessage('createdFrom')) {
+            <div class="text-xs text-red-500 mt-1">{{ getErrorMessage('createdFrom') }}</div>
+          }
         </div>
       </div>
       <div class="space-y-2">
         <label class="text-sm font-medium leading-none p-0 peer-disabled:cursor-not-allowed peer-disabled:opacity-70"
           for="createdTo">To</label>
         <div class="relative">
-        <input
-          class="flex h-10 w-full rounded-md border border-input bg-background px-3 py-2 text-sm ring-offset-background file:border-0 file:bg-transparent file:text-sm file:font-medium file:text-foreground placeholder:text-muted-foreground focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2 disabled:cursor-not-allowed disabled:opacity-50"
-          id="createdTo" type="date" formControlName="createdTo" [value]="searchForm.get('createdTo')?.value || ''">
+          <input
+            class="flex h-10 w-full rounded-md border border-input bg-background px-3 py-2 text-sm ring-offset-background file:border-0 file:bg-transparent file:text-sm file:font-medium file:text-foreground placeholder:text-muted-foreground focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2 disabled:cursor-not-allowed disabled:opacity-50"
+            [ngClass]="{'border-red-500': getErrorMessage('createdTo') || getDateRangeErrorMessage('createdFrom', 'createdTo')}"
+            id="createdTo" type="date" formControlName="createdTo" [value]="searchForm.get('createdTo')?.value || ''">
+          @if (getErrorMessage('createdTo')) {
+            <div class="text-xs text-red-500 mt-1">{{ getErrorMessage('createdTo') }}</div>
+          }
         </div>
       </div>
     </div>
+    @if (getDateRangeErrorMessage('createdFrom', 'createdTo')) {
+      <div class="text-xs text-red-500 mt-1">{{ getDateRangeErrorMessage('createdFrom', 'createdTo') }}</div>
+    }
   </div>
 
   <div data-orientation="horizontal" role="none" class="shrink-0 bg-border h-[1px] w-full"></div>
@@ -31,18 +42,33 @@
       <div class="space-y-2">
         <label class="text-sm font-medium leading-none p-0 peer-disabled:cursor-not-allowed peer-disabled:opacity-70"
           for="completedFrom">From</label>
-        <input
-          class="flex h-10 w-full rounded-md border border-input bg-background px-3 py-2 text-sm ring-offset-background file:border-0 file:bg-transparent file:text-sm file:font-medium file:text-foreground placeholder:text-muted-foreground focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2 disabled:cursor-not-allowed disabled:opacity-50"
-          id="completedFrom" type="date" formControlName="completedFrom" [value]="searchForm.get('completedFrom')?.value || ''">
+        <div class="relative">
+          <input
+            class="flex h-10 w-full rounded-md border border-input bg-background px-3 py-2 text-sm ring-offset-background file:border-0 file:bg-transparent file:text-sm file:font-medium file:text-foreground placeholder:text-muted-foreground focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2 disabled:cursor-not-allowed disabled:opacity-50"
+            [ngClass]="{'border-red-500': getErrorMessage('completedFrom') || getDateRangeErrorMessage('completedFrom', 'completedTo')}"
+            id="completedFrom" type="date" formControlName="completedFrom" [value]="searchForm.get('completedFrom')?.value || ''">
+          @if (getErrorMessage('completedFrom')) {
+            <div class="text-xs text-red-500 mt-1">{{ getErrorMessage('completedFrom') }}</div>
+          }
+        </div>
       </div>
       <div class="space-y-2">
         <label class="text-sm font-medium leading-none p-0 peer-disabled:cursor-not-allowed peer-disabled:opacity-70"
           for="completedTo">To</label>
-        <input
-          class="flex h-10 w-full rounded-md border border-input bg-background px-3 py-2 text-sm ring-offset-background file:border-0 file:bg-transparent file:text-sm file:font-medium file:text-foreground placeholder:text-muted-foreground focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2 disabled:cursor-not-allowed disabled:opacity-50"
-          id="completedTo" type="date" formControlName="completedTo" [value]="searchForm.get('completedTo')?.value || ''">
+        <div class="relative">
+          <input
+            class="flex h-10 w-full rounded-md border border-input bg-background px-3 py-2 text-sm ring-offset-background file:border-0 file:bg-transparent file:text-sm file:font-medium file:text-foreground placeholder:text-muted-foreground focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2 disabled:cursor-not-allowed disabled:opacity-50"
+            [ngClass]="{'border-red-500': getErrorMessage('completedTo') || getDateRangeErrorMessage('completedFrom', 'completedTo')}"
+            id="completedTo" type="date" formControlName="completedTo" [value]="searchForm.get('completedTo')?.value || ''">
+          @if (getErrorMessage('completedTo')) {
+            <div class="text-xs text-red-500 mt-1">{{ getErrorMessage('completedTo') }}</div>
+          }
+        </div>
       </div>
     </div>
+    @if (getDateRangeErrorMessage('completedFrom', 'completedTo')) {
+      <div class="text-xs text-red-500 mt-1">{{ getDateRangeErrorMessage('completedFrom', 'completedTo') }}</div>
+    }
   </div>
 
   <div data-orientation="horizontal" role="none" class="shrink-0 bg-border h-[1px] w-full"></div>
@@ -53,17 +79,32 @@
       <div class="space-y-2">
         <label class="text-sm font-medium leading-none p-0 peer-disabled:cursor-not-allowed peer-disabled:opacity-70"
           for="cancelledFrom">From</label>
-        <input
-          class="flex h-10 w-full rounded-md border border-input bg-background px-3 py-2 text-sm ring-offset-background file:border-0 file:bg-transparent file:text-sm file:font-medium file:text-foreground placeholder:text-muted-foreground focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2 disabled:cursor-not-allowed disabled:opacity-50"
-          id="cancelledFrom" type="date" formControlName="cancelledFrom" [value]="searchForm.get('cancelledFrom')?.value || ''">
+        <div class="relative">
+          <input
+            class="flex h-10 w-full rounded-md border border-input bg-background px-3 py-2 text-sm ring-offset-background file:border-0 file:bg-transparent file:text-sm file:font-medium file:text-foreground placeholder:text-muted-foreground focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2 disabled:cursor-not-allowed disabled:opacity-50"
+            [ngClass]="{'border-red-500': getErrorMessage('cancelledFrom') || getDateRangeErrorMessage('cancelledFrom', 'cancelledTo')}"
+            id="cancelledFrom" type="date" formControlName="cancelledFrom" [value]="searchForm.get('cancelledFrom')?.value || ''">
+          @if (getErrorMessage('cancelledFrom')) {
+            <div class="text-xs text-red-500 mt-1">{{ getErrorMessage('cancelledFrom') }}</div>
+          }
+        </div>
       </div>
       <div class="space-y-2">
         <label class="text-sm font-medium leading-none p-0 peer-disabled:cursor-not-allowed peer-disabled:opacity-70"
           for="cancelledTo">To</label>
-        <input
-          class="flex h-10 w-full rounded-md border border-input bg-background px-3 py-2 text-sm ring-offset-background file:border-0 file:bg-transparent file:text-sm file:font-medium file:text-foreground placeholder:text-muted-foreground focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2 disabled:cursor-not-allowed disabled:opacity-50"
-          id="cancelledTo" type="date" formControlName="cancelledTo" [value]="searchForm.get('cancelledTo')?.value || ''">
+        <div class="relative">
+          <input
+            class="flex h-10 w-full rounded-md border border-input bg-background px-3 py-2 text-sm ring-offset-background file:border-0 file:bg-transparent file:text-sm file:font-medium file:text-foreground placeholder:text-muted-foreground focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2 disabled:cursor-not-allowed disabled:opacity-50"
+            [ngClass]="{'border-red-500': getErrorMessage('cancelledTo') || getDateRangeErrorMessage('cancelledFrom', 'cancelledTo')}"
+            id="cancelledTo" type="date" formControlName="cancelledTo" [value]="searchForm.get('cancelledTo')?.value || ''">
+          @if (getErrorMessage('cancelledTo')) {
+            <div class="text-xs text-red-500 mt-1">{{ getErrorMessage('cancelledTo') }}</div>
+          }
+        </div>
       </div>
     </div>
+    @if (getDateRangeErrorMessage('cancelledFrom', 'cancelledTo')) {
+      <div class="text-xs text-red-500 mt-1">{{ getDateRangeErrorMessage('cancelledFrom', 'cancelledTo') }}</div>
+    }
   </div>
 </form>

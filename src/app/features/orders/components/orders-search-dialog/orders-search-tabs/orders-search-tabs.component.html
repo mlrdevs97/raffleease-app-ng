@@ -42,6 +42,7 @@
         class="mt-2 ring-offset-background focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2 space-y-4 pt-4">
         <app-orders-search-order-info
             [criteria]="criteria"
+            [fieldErrors]="fieldErrors"
             (criteriaChange)="onOrderInfoCriteriaChange($event)"></app-orders-search-order-info>
     </div>
 
@@ -49,6 +50,7 @@
         class="mt-2 ring-offset-background focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2 space-y-4 pt-4">
         <app-orders-search-payment-info
             [criteria]="criteria"
+            [fieldErrors]="fieldErrors"
             (criteriaChange)="onPaymentInfoCriteriaChange($event)"></app-orders-search-payment-info>
     </div>
 
@@ -56,6 +58,7 @@
         class="mt-2 ring-offset-background focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2 space-y-4 pt-4">
         <app-orders-search-customer 
             [criteria]="criteria"
+            [fieldErrors]="fieldErrors"
             (criteriaChange)="onCustomerCriteriaChange($event)"></app-orders-search-customer>
     </div>
 
@@ -63,6 +66,7 @@
         class="mt-2 ring-offset-background focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2 space-y-4 pt-4">
         <app-orders-search-dates
             [criteria]="criteria"
+            [fieldErrors]="fieldErrors"
             (criteriaChange)="onDatesCriteriaChange($event)"></app-orders-search-dates>
     </div>
 </div>

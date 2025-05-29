@@ -3,7 +3,7 @@
     <div class="flex flex-row gap-3">
         <button
             class="justify-center whitespace-nowrap ring-offset-background transition-colors focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2 disabled:pointer-events-none disabled:opacity-50 bg-background hover:bg-slate-100 hover:text-slate-950 h-10 flex items-center gap-2 rounded-lg border border-zinc-200 text-sm font-semibold px-3 py-2 relative"
-            (click)="toggleSearchDialog()">
+            (click)="onSearchClick()">
             <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none"
                 stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"
                 class="lucide lucide-search h-4 w-4">
@@ -23,8 +23,3 @@
         </a>
     </div>
 </div>
-
-<app-orders-search-dialog 
-    [isOpen]="isSearchDialogOpen" 
-    (closeDialog)="toggleSearchDialog()">
-</app-orders-search-dialog>

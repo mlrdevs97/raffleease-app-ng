@@ -1,29 +1,41 @@
 <form [formGroup]="searchForm" class="space-y-4">
   <div class="space-y-2">
     <label class="text-sm font-semibold leading-none p-0 peer-disabled:cursor-not-allowed peer-disabled:opacity-70"
-      for="customerFullName">Customer Name</label>
+      for="customerName">Customer Name</label>
     <div class="relative">
-    <input
-      class="flex h-10 w-full rounded-md border border-input bg-background px-3 py-2 text-sm ring-offset-background file:border-0 file:bg-transparent file:text-sm file:font-medium file:text-foreground placeholder:text-muted-foreground focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2 disabled:cursor-not-allowed disabled:opacity-50"
-      id="customerFullName" placeholder="Enter customer full name" formControlName="fullName">
+      <input
+        class="flex h-10 w-full rounded-md border border-input bg-background px-3 py-2 text-sm ring-offset-background file:border-0 file:bg-transparent file:text-sm file:font-medium file:text-foreground placeholder:text-muted-foreground focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2 disabled:cursor-not-allowed disabled:opacity-50"
+        [ngClass]="{'border-red-500': getErrorMessage('customerName')}"
+        id="customerName" placeholder="Enter customer name" formControlName="customerName">
+      @if (getErrorMessage('customerName')) {
+        <div class="text-xs text-red-500 mt-1">{{ getErrorMessage('customerName') }}</div>
+      }
     </div>
   </div>
   <div class="space-y-2">
     <label class="text-sm font-semibold leading-none p-0 peer-disabled:cursor-not-allowed peer-disabled:opacity-70"
       for="customerEmail">Customer Email</label>
     <div class="relative">
-    <input
-      class="flex h-10 w-full rounded-md border border-input bg-background px-3 py-2 text-sm ring-offset-background file:border-0 file:bg-transparent file:text-sm file:font-medium file:text-foreground placeholder:text-muted-foreground focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2 disabled:cursor-not-allowed disabled:opacity-50"
-      id="customerEmail" type="email" placeholder="Enter customer email" formControlName="email">
+      <input
+        class="flex h-10 w-full rounded-md border border-input bg-background px-3 py-2 text-sm ring-offset-background file:border-0 file:bg-transparent file:text-sm file:font-medium file:text-foreground placeholder:text-muted-foreground focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2 disabled:cursor-not-allowed disabled:opacity-50"
+        [ngClass]="{'border-red-500': getErrorMessage('customerEmail')}"
+        id="customerEmail" type="email" placeholder="Enter customer email" formControlName="customerEmail">
+      @if (getErrorMessage('customerEmail')) {
+        <div class="text-xs text-red-500 mt-1">{{ getErrorMessage('customerEmail') }}</div>
+      }
     </div>
   </div>
   <div class="space-y-2">
     <label class="text-sm font-semibold leading-none p-0 peer-disabled:cursor-not-allowed peer-disabled:opacity-70"
-      for="customerPhoneNumber">Customer Phone</label>
+      for="customerPhone">Customer Phone</label>
     <div class="relative">
-    <input
-      class="flex h-10 w-full rounded-md border border-input bg-background px-3 py-2 text-sm ring-offset-background file:border-0 file:bg-transparent file:text-sm file:font-medium file:text-foreground placeholder:text-muted-foreground focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2 disabled:cursor-not-allowed disabled:opacity-50"
-      id="customerPhoneNumber" type="tel" placeholder="Enter customer phone number" formControlName="phoneNumber">
+      <input
+        class="flex h-10 w-full rounded-md border border-input bg-background px-3 py-2 text-sm ring-offset-background file:border-0 file:bg-transparent file:text-sm file:font-medium file:text-foreground placeholder:text-muted-foreground focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2 disabled:cursor-not-allowed disabled:opacity-50"
+        [ngClass]="{'border-red-500': getErrorMessage('customerPhone')}"
+        id="customerPhone" type="tel" placeholder="Enter customer phone number" formControlName="customerPhone">
+      @if (getErrorMessage('customerPhone')) {
+        <div class="text-xs text-red-500 mt-1">{{ getErrorMessage('customerPhone') }}</div>
+      }
     </div>
   </div>
 </form>

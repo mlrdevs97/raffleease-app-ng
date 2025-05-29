@@ -1,8 +1,10 @@
 import { Component, Input, Output, EventEmitter, OnInit, OnChanges, SimpleChanges } from '@angular/core';
 import { CommonModule } from '@angular/common';
-import { FormBuilder, FormGroup, ReactiveFormsModule } from '@angular/forms';
+import { FormBuilder, FormGroup, ReactiveFormsModule, Validators } from '@angular/forms';
 import { OrderSource, OrderStatus, OrderSearchFilters } from '../../../models/order.model';
 import { DropdownSelectComponent } from '../../../../../layout/components/dropdown-select/dropdown-select.component';
+import { positiveNumberValidator } from '../../../../../core/validators/number.validators';
+import { ClientValidationMessages } from '../../../../../core/constants/client-validation-messages';
 
 @Component({
     selector: 'app-orders-search-order-info',
@@ -12,19 +14,21 @@ import { DropdownSelectComponent } from '../../../../../layout/components/dropdo
 })
 export class OrdersSearchOrderInfoComponent implements OnInit, OnChanges {
     @Input() criteria: OrderSearchFilters = {};
+    @Input() fieldErrors: Record<string, string> = {};
     @Output() criteriaChange = new EventEmitter<Partial<OrderSearchFilters>>();
     
     orderStatusOptions = Object.values(OrderStatus); 
     orderSourceOptions = Object.values(OrderSource);
     
     searchForm: FormGroup;
+    validationMessages = ClientValidationMessages;
     
     constructor(private fb: FormBuilder) {
         this.searchForm = this.fb.group({
             status: [''],
             orderSource: [''],
             orderReference: [''],
-            raffleId: ['']
+            raffleId: ['', [positiveNumberValidator()]]
         });
     }
     
@@ -43,6 +47,11 @@ export class OrdersSearchOrderInfoComponent implements OnInit, OnChanges {
         if (changes['criteria']) {
             this.updateFormFromCriteria();
         }
+        
+        // Apply server validation errors if any
+        if (changes['fieldErrors'] && this.fieldErrors) {
+            this.applyFieldErrors();
+        }
     }
 
     updateFormFromCriteria(): void {
@@ -56,15 +65,50 @@ export class OrdersSearchOrderInfoComponent implements OnInit, OnChanges {
     }
     
     updateCriteria(data: Partial<OrderSearchFilters>): void {
-        // Filter out empty values
-        const filteredData = Object.entries(data).reduce((acc, [key, value]) => {
-            if (value !== '' && value !== null && value !== undefined) {
-                // Cast the key to keyof OrderSearchFilters to ensure type safety
-                acc[key as keyof OrderSearchFilters] = value as any;
-            }
-            return acc;
-        }, {} as Partial<OrderSearchFilters>);
+        if (this.searchForm.valid) {
+            const filteredData = Object.entries(data).reduce((acc, [key, value]) => {
+                if (value !== '' && value !== null && value !== undefined) {
+                    acc[key as keyof OrderSearchFilters] = value as any;
+                }
+                return acc;
+            }, {} as Partial<OrderSearchFilters>);
+            
+            this.criteriaChange.emit(filteredData);
+        }
+    }
+    
+    applyFieldErrors(): void {
+        const orderErrorFields = Object.keys(this.fieldErrors).filter(
+            field => field.startsWith('order.') || field === 'raffleId'
+        );
         
-        this.criteriaChange.emit(filteredData);
+        orderErrorFields.forEach(fieldPath => {
+            const field = fieldPath.replace('order.', '');
+            const control = this.searchForm.get(field);
+            if (control) {
+                control.markAsTouched();
+                control.setErrors({ serverError: this.fieldErrors[fieldPath] });
+            }
+        });
+    }
+
+    // Helper methods for the template
+    getErrorMessage(controlName: string): string | null {
+        const control = this.searchForm.get(controlName);
+        if (!control?.touched || !control.errors) return null;
+        
+        // Check for server error first
+        if (control.errors['serverError']) {
+            return control.errors['serverError'];
+        }
+        
+        // Check for client-side validation errors
+        if (control.errors['required']) {
+            return this.validationMessages.common.required;
+        } else if (control.errors['positiveNumber']) {
+            return this.validationMessages.number.positive;
+        }
+        
+        return null;
     }
 }

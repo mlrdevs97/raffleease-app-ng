@@ -1,14 +1,16 @@
-import { Component, OnInit, inject, signal } from '@angular/core';
-import { CommonModule, NgComponentOutlet } from '@angular/common'; 
+import { Component, OnInit, signal, effect } from '@angular/core';
+import { CommonModule } from '@angular/common'; 
 import { RouterModule } from '@angular/router';
 import { OrdersToolbarComponent } from '../../components/orders-toolbar/orders-toolbar.component';
 import { OrdersTableComponent } from '../../components/orders-table/orders-table.component';
 import { OrdersSearchDialogComponent } from '../../components/orders-search-dialog/orders-search-dialog.component';
-import { Order, OrderStatus, OrderSource } from '../../models/order.model';
+import { Order, OrderSearchFilters } from '../../models/order.model';
 import { OrdersService } from '../../services/orders.service';
 import { PageResponse } from '../../../../core/models/pagination.model';
-import { catchError, finalize } from 'rxjs/operators';
+import { SearchResult } from '../../components/orders-search-dialog/orders-search-dialog.component';
+import { catchError } from 'rxjs/operators';
 import { of } from 'rxjs';
+import { ErrorHandlerService } from '../../../../core/services/error-handler.service';
 
 @Component({
     selector: 'app-orders-page',
@@ -22,8 +24,7 @@ import { of } from 'rxjs';
     ],
     templateUrl: './orders-page.component.html',
 })
-export class OrdersPageComponent implements OnInit {    
-    // State management with signals
+export class OrdersPageComponent implements OnInit {        
     isLoading = signal<boolean>(false);
     error = signal<string | null>(null);
     orders = signal<Order[]>([]);
@@ -39,12 +40,16 @@ export class OrdersPageComponent implements OnInit {
         pageSize: 10
     });
     
-    // Search dialog state
     isSearchDialogOpen = signal<boolean>(false);
+    currentFilters = signal<OrderSearchFilters>({});
 
-    constructor(private ordersService: OrdersService) {}
+    constructor(
+        private ordersService: OrdersService,
+        private errorHandler: ErrorHandlerService
+    ) {
+        effect(() => this.isLoading.set(this.ordersService.isLoading$()));
+    }
     
-    // Helper method for template
     min(a: number, b: number): number {
         return Math.min(a, b);
     }
@@ -54,27 +59,18 @@ export class OrdersPageComponent implements OnInit {
     }
     
     loadOrders(page = 0, size = 10): void {
-        this.isLoading.set(true);
-        this.error.set(null);
-        
-        this.ordersService.searchOrders({}, page, size)
-            .pipe(
-                catchError(error => {
-                    console.error('Error loading orders:', error);
-                    this.error.set('Failed to load orders. Please try again.');
-                    return of({ success: false, message: 'Error', timestamp: '', data: null });
-                }),
-                finalize(() => {
-                    this.isLoading.set(false);
-                })
-            )
-            .subscribe(response => {
-                if (response.success && response.data) {
-                    this.handleOrdersResponse(response.data);
-                } else {
-                    this.error.set(response.message || 'Unknown error occurred');
-                }
-            });
+        this.resetErrors();
+        this.ordersService.searchOrders(this.currentFilters(), page, size).subscribe({
+            next: (response: PageResponse<Order>) => {
+                this.handleOrdersResponse(response);
+            },
+            error: (error: unknown) => {
+                this.error.set(this.errorHandler.getErrorMessage(error));
+            },
+            complete: () => {
+                this.isLoading.set(false);
+            }
+        });
     }
     
     handleOrdersResponse(pageResponse: PageResponse<Order>): void {
@@ -88,7 +84,6 @@ export class OrdersPageComponent implements OnInit {
     }
     
     onPageChange(page: number | any): void {
-        // If page is an event object, extract the page number from it
         const pageNumber = typeof page === 'number' ? page : 0;
         this.loadOrders(pageNumber);
     }
@@ -101,7 +96,22 @@ export class OrdersPageComponent implements OnInit {
         this.isSearchDialogOpen.set(false);
     }
     
-    handleSearchResults(pageResponse: PageResponse<Order>): void {
-        this.handleOrdersResponse(pageResponse);
+    handleSearchResults(searchResult: SearchResult<Order>): void {
+        this.currentFilters.set(searchResult.filters);
+        this.handleOrdersResponse(searchResult.results);
+    }
+    
+    applyFilters(filters: OrderSearchFilters): void {
+        this.currentFilters.set(filters);
+        this.loadOrders(0);
+    }
+    
+    refreshOrders(): void {
+        this.ordersService.clearCache();
+        this.loadOrders(this.pagination().currentPage);
+    }
+    
+    resetErrors(): void {
+        this.error.set(null);
     }
 }

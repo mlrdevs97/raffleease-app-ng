@@ -6,7 +6,7 @@ import { AuthService } from '../../services/auth.service';
 import { ValidationErrorCodes } from '../../../../core/constants/error-codes';
 import { ErrorHandlerService } from '../../../../core/services/error-handler.service';
 import { passwordMatchValidator } from '../../../../core/validators/password.validators';
-import { ValidationMessages } from '../../../../core/constants/client-validation-messages';
+import { ClientValidationMessages } from '../../../../core/constants/client-validation-messages';
 
 interface AddressSuggestion {
   placeId: string;
@@ -42,7 +42,7 @@ export class RegisterComponent implements OnInit {
   addressSuggestions = signal<AddressSuggestion[]>([]);
   
   // Validation messages
-  validationMessages = ValidationMessages;
+  validationMessages = ClientValidationMessages;
   
   // User registration form
   userForm: FormGroup;
