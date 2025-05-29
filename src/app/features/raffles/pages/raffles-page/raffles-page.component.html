@@ -27,14 +27,14 @@
       (raffleDeleted)="onRaffleDeleted($event)">
     </app-raffle-card-list>
 
-    @if (totalElements() > pageSize) {
+    @if (pagination().totalElements > pagination().pageSize) {
       <div class="flex justify-center mt-8">
         <nav class="flex items-center gap-2">
-          @for (page of [].constructor(Math.ceil(totalElements() / pageSize)); track page) {
+          @for (page of [].constructor(Math.ceil(pagination().totalElements / pagination().pageSize)); track page) {
             <button
               (click)="onPageChange($index)"
-              [class.bg-black]="currentPage() === $index"
-              [class.text-white]="currentPage() === $index"
+              [class.bg-black]="pagination().currentPage === $index"
+              [class.text-white]="pagination().currentPage === $index"
               class="px-4 py-2 rounded-md border border-gray-300 hover:bg-gray-100"
             >
               {{ $index + 1 }}

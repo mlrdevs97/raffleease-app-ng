@@ -4,11 +4,11 @@ import { RafflesHeaderComponent } from '../../components/raffles/raffles-header/
 import { RaffleCardListComponent } from '../../components/raffles/raffle-card-list/raffle-card-list.component';
 import { Raffle } from '../../models/raffle.model';
 import { RaffleQueryService } from '../../services/raffle-query.service';
-import { RaffleSearchResponse } from '../../models/raffle-search.model';
 import { ErrorHandlerService } from '../../../../core/services/error-handler.service';
 import { EMPTY, Subject, Subscription, catchError, switchMap, tap } from 'rxjs';
 import { RaffleSearchFilters } from '../../models/raffle-search.model';
 import { AuthService } from '../../../auth/services/auth.service';
+import { PageResponse } from '../../../../core/models/pagination.model';
 
 @Component({
   selector: 'app-raffles-page',
@@ -19,9 +19,17 @@ import { AuthService } from '../../../auth/services/auth.service';
 export class RafflesPageComponent implements OnInit {
   // Data signals
   raffles = signal<Raffle[]>([]);
-  totalElements = signal(0);
-  currentPage = signal(0);
-  pageSize = 20;
+  pagination = signal<{
+    totalElements: number;
+    totalPages: number;
+    currentPage: number;
+    pageSize: number;
+  }>({
+    totalElements: 0,
+    totalPages: 0,
+    currentPage: 0,
+    pageSize: 20
+  });
   errorMessage = signal<string | null>(null);
   associationId = signal<number>(0);
   
@@ -93,7 +101,7 @@ export class RafflesPageComponent implements OnInit {
         };
         
         return this.raffleQueryService.search(filters, 0, 10, this.sort()).pipe(
-          tap((response: RaffleSearchResponse) => {
+          tap((response: PageResponse<Raffle>) => {
             this.suggestions.set(response.content);
             this.noSearchResults.set(response.content.length === 0);
             this.isSearchLoading.set(false);
@@ -113,18 +121,32 @@ export class RafflesPageComponent implements OnInit {
   }
 
   loadRaffles(page: number = 0): void {
-    this.currentPage.set(page);
+    this.pagination.update(current => ({ ...current, currentPage: page }));
     this.errorMessage.set(null);
     
-    this.raffleQueryService.search(this.filters(), page, this.pageSize, this.sort()).subscribe({
-      next: (response: RaffleSearchResponse) => {
+    this.raffleQueryService.search(
+      this.filters(), 
+      page, 
+      this.pagination().pageSize, 
+      this.sort()
+    ).subscribe({
+      next: (response: PageResponse<Raffle>) => {
         this.raffles.set(response.content);
-        this.totalElements.set(response.totalElements);
+        this.pagination.set({
+          totalElements: response.totalElements,
+          totalPages: response.totalPages,
+          currentPage: response.number,
+          pageSize: response.size
+        });
       },
       error: (error) => {
         this.errorMessage.set(this.errorHandler.getErrorMessage(error));
         this.raffles.set([]);
-        this.totalElements.set(0);
+        this.pagination.update(current => ({ 
+          ...current,
+          totalElements: 0,
+          totalPages: 0
+        }));
       }
     });
   }
@@ -179,11 +201,14 @@ export class RafflesPageComponent implements OnInit {
     this.raffles.set(updatedRaffles);
     
     // Update total count
-    this.totalElements.update(count => count - 1);
+    this.pagination.update(current => ({
+      ...current,
+      totalElements: current.totalElements - 1
+    }));
     
     // If the page is now empty and it's not the first page, go to previous page
-    if (updatedRaffles.length === 0 && this.currentPage() > 0) {
-      this.loadRaffles(this.currentPage() - 1);
+    if (updatedRaffles.length === 0 && this.pagination().currentPage > 0) {
+      this.loadRaffles(this.pagination().currentPage - 1);
     }
   }
   
