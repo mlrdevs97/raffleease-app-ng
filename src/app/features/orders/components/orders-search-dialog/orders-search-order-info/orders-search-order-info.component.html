@@ -13,18 +13,6 @@
         </div>
         <div class="space-y-2">
             <label class="text-sm font-semibold leading-none p-0 peer-disabled:cursor-not-allowed peer-disabled:opacity-70"
-                for="orderSource">Order Source</label>
-            <div class="relative">  
-                <app-dropdown-select [options]="orderSourceOptions" placeholder="Select order source"
-                    formControlName="orderSource">
-                </app-dropdown-select>
-                @if (getErrorMessage('orderSource')) {
-                    <div class="text-xs text-red-500 mt-1">{{ getErrorMessage('orderSource') }}</div>
-                }
-            </div>
-        </div>
-        <div class="space-y-2">
-            <label class="text-sm font-semibold leading-none p-0 peer-disabled:cursor-not-allowed peer-disabled:opacity-70"
                 for="orderReference">Order Reference</label>
             <div class="relative">
                 <input
@@ -33,19 +21,6 @@
                     id="orderReference" placeholder="Enter order reference" formControlName="orderReference">
                 @if (getErrorMessage('orderReference')) {
                     <div class="text-xs text-red-500 mt-1">{{ getErrorMessage('orderReference') }}</div>
-                }
-            </div>
-        </div>
-        <div class="space-y-2">
-            <label class="text-sm font-semibold leading-none p-0 peer-disabled:cursor-not-allowed peer-disabled:opacity-70"
-                for="raffleId">Raffle ID</label>
-            <div class="relative">
-                <input
-                    class="flex h-10 w-full rounded-md border border-input bg-background px-3 py-2 text-sm ring-offset-background file:border-0 file:bg-transparent file:text-sm file:font-medium file:text-foreground placeholder:text-muted-foreground focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2 disabled:cursor-not-allowed disabled:opacity-50"
-                    [ngClass]="{'border-red-500': getErrorMessage('raffleId')}"
-                    id="raffleId" type="number" placeholder="Enter raffle ID" formControlName="raffleId">
-                @if (getErrorMessage('raffleId')) {
-                    <div class="text-xs text-red-500 mt-1">{{ getErrorMessage('raffleId') }}</div>
                 }
             </div>
         </div>

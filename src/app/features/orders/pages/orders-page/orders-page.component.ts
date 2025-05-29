@@ -8,8 +8,6 @@ import { Order, OrderSearchFilters } from '../../models/order.model';
 import { OrdersService } from '../../services/orders.service';
 import { PageResponse } from '../../../../core/models/pagination.model';
 import { SearchResult } from '../../components/orders-search-dialog/orders-search-dialog.component';
-import { catchError } from 'rxjs/operators';
-import { of } from 'rxjs';
 import { ErrorHandlerService } from '../../../../core/services/error-handler.service';
 
 @Component({
@@ -65,6 +63,7 @@ export class OrdersPageComponent implements OnInit {
                 this.handleOrdersResponse(response);
             },
             error: (error: unknown) => {
+                console.error('Error loading orders:', error);
                 this.error.set(this.errorHandler.getErrorMessage(error));
             },
             complete: () => {

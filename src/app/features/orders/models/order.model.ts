@@ -2,11 +2,6 @@ import { Customer } from "../../../core/models/customer.model";
 import { Payment } from "../../../core/models/payment.model";
 import { PaymentMethods, PaymentStatus } from "../../../core/models/payment.model";
 
-export enum OrderSource {
-    CUSTOMER = 'CUSTOMER',
-    ADMIN = 'ADMIN'
-}
-
 export enum OrderStatus {
     PENDING = 'PENDING',
     CANCELLED = 'CANCELLED',
@@ -25,7 +20,6 @@ export interface Order {
     id: number;
     raffleSummary: OrderRaffleSummary;
     orderReference: string;
-    orderSource: OrderSource;
     status: OrderStatus;
     orderItems: OrderItem[];
     payment: Payment;
@@ -52,7 +46,6 @@ export interface OrderSearchFilters {
     status?: OrderStatus;
     paymentStatus?: PaymentStatus;
     paymentMethod?: PaymentMethods;
-    orderSource?: OrderSource;
     orderReference?: string;
     customerName?: string;
     customerEmail?: string;

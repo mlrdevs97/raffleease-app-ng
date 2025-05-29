@@ -1,6 +1,6 @@
 import { Injectable, signal } from '@angular/core';
 import { Router } from '@angular/router';
-import { User, AuthState, LoginRequest, RegisterRequest, AuthResponse, RegisterResponse, RegisterEmailVerificationRequest } from '../models/auth.model';
+import { AuthState, LoginRequest, RegisterRequest, AuthResponse, RegisterResponse, RegisterEmailVerificationRequest } from '../models/auth.model';
 import { HttpClient } from '@angular/common/http';
 import { environment } from '../../../../environments/environment';
 import { Observable, tap, map } from 'rxjs';
@@ -73,14 +73,14 @@ export class AuthService {
 
   register(registerData: RegisterRequest): Observable<RegisterResponse> {
     return this.http.post<SuccessResponse<RegisterResponse>>(`${this.apiUrl}/auth/register`, registerData).pipe(
-      tap((response) => {
+      tap((response: SuccessResponse<RegisterResponse>) => {
         if (response?.data?.email) {
           this.router.navigate(['/auth/verify-email'], { state: { email: response.data.email } });
         } else {
           this.router.navigate(['/auth/verify-email']);
         }
       }),
-      map((response) => response?.data as RegisterResponse)
+      map((response: SuccessResponse<RegisterResponse>) => response?.data as RegisterResponse)
     );
   }
 
@@ -91,7 +91,7 @@ export class AuthService {
   login(identifier: string, password: string, rememberMe: boolean = false): Observable<void> {
     const loginRequest: LoginRequest = { identifier, password };
     return this.http.post<SuccessResponse<AuthResponse>>(`${this.apiUrl}/auth/login`, loginRequest).pipe(
-      tap((response) => {
+      tap((response: SuccessResponse<AuthResponse>) => {
         const authResponse = response?.data;
         if (!authResponse) {
           throw new Error('Invalid server response');
@@ -107,8 +107,8 @@ export class AuthService {
 
         this.setTokenRefreshTimer(authResponse.accessToken);
       }),
-      map((response) => response?.data?.associationId),
-      tap(async (associationId) => {
+      map((response: SuccessResponse<AuthResponse>) => response?.data?.associationId as number),
+      tap((associationId: number) => {
         this.authState.update(state => ({
           ...state,
           associationId,

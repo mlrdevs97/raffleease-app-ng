@@ -1,6 +1,6 @@
 import { Injectable, signal, computed } from '@angular/core';
 import { HttpClient, HttpParams } from '@angular/common/http';
-import { Observable, map, of, tap } from 'rxjs';
+import { Observable, finalize, map, of, tap } from 'rxjs';
 import { OrderSearchFilters, Order } from '../models/order.model';
 import { SuccessResponse } from '../../../core/models/api-response.model';
 import { PageResponse } from '../../../core/models/pagination.model';
@@ -11,7 +11,7 @@ import { AuthService } from '../../auth/services/auth.service';
     providedIn: 'root'
 })
 export class OrdersService {
-    private baseUrl = `${environment.apiUrl}/admin/api/v1/associations`;
+    private baseUrl = `${environment.apiUrl}/associations`;
     private readonly cache = signal<Map<string, PageResponse<Order>>>(new Map());
     private readonly isLoading = signal(false);
 
@@ -45,7 +45,6 @@ export class OrdersService {
         const cacheKey = this.generateCacheKey(filters, page, size, sort);
         const cachedData = this.cache().get(cacheKey);
 
-        // Return cached data if available
         if (cachedData) {
             return of(cachedData);
         }
@@ -69,20 +68,14 @@ export class OrdersService {
             { params }
         ).pipe(
             tap((response: SuccessResponse<PageResponse<Order>>) => {
-                // Update cache with new data
                 this.cache.update((cache: Map<string, PageResponse<Order>>) => {
                     const newCache = new Map(cache);
                     newCache.set(cacheKey, response.data!);
                     return newCache;
                 });
-                this.isLoading.set(false);
             }),
-            map(response => response.data!),
-            tap({
-                error: () => {
-                    this.isLoading.set(false);
-                }
-            })
+            map((response: SuccessResponse<PageResponse<Order>>) => response.data!),
+            finalize(() => this.isLoading.set(false))
         );
     }
 

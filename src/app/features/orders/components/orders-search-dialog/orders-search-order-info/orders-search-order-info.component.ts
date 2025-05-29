@@ -1,7 +1,7 @@
 import { Component, Input, Output, EventEmitter, OnInit, OnChanges, SimpleChanges } from '@angular/core';
 import { CommonModule } from '@angular/common';
-import { FormBuilder, FormGroup, ReactiveFormsModule, Validators } from '@angular/forms';
-import { OrderSource, OrderStatus, OrderSearchFilters } from '../../../models/order.model';
+import { FormBuilder, FormGroup, ReactiveFormsModule } from '@angular/forms';
+import { OrderStatus, OrderSearchFilters } from '../../../models/order.model';
 import { DropdownSelectComponent } from '../../../../../layout/components/dropdown-select/dropdown-select.component';
 import { positiveNumberValidator } from '../../../../../core/validators/number.validators';
 import { ClientValidationMessages } from '../../../../../core/constants/client-validation-messages';
@@ -18,7 +18,6 @@ export class OrdersSearchOrderInfoComponent implements OnInit, OnChanges {
     @Output() criteriaChange = new EventEmitter<Partial<OrderSearchFilters>>();
     
     orderStatusOptions = Object.values(OrderStatus); 
-    orderSourceOptions = Object.values(OrderSource);
     
     searchForm: FormGroup;
     validationMessages = ClientValidationMessages;
@@ -26,7 +25,6 @@ export class OrdersSearchOrderInfoComponent implements OnInit, OnChanges {
     constructor(private fb: FormBuilder) {
         this.searchForm = this.fb.group({
             status: [''],
-            orderSource: [''],
             orderReference: [''],
             raffleId: ['', [positiveNumberValidator()]]
         });
@@ -58,7 +56,6 @@ export class OrdersSearchOrderInfoComponent implements OnInit, OnChanges {
         // Reset form when criteria is empty or update with existing values
         this.searchForm.patchValue({
             status: this.criteria?.status || '',
-            orderSource: this.criteria?.orderSource || '',
             orderReference: this.criteria?.orderReference || '',
             raffleId: this.criteria?.raffleId || ''
         }, { emitEvent: false }); // Prevent triggering valueChanges subscription
