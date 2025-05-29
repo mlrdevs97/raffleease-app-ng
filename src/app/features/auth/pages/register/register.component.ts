@@ -104,7 +104,6 @@ export class RegisterComponent implements OnInit {
     private authService: AuthService,
     private errorHandler: ErrorHandlerService,
     private elementRef: ElementRef,
-    private router: Router
   ) {
     this.userForm = this.fb.group({
       firstName: ['', [Validators.required, Validators.minLength(2), Validators.maxLength(50)]],
@@ -117,7 +116,7 @@ export class RegisterComponent implements OnInit {
       }),
       password: ['', [
         Validators.required, 
-        Validators.pattern(/^(?=.*[a-z])(?=.*[A-Z])(?=.*\d)(?=.*[!@#-$_%^&*(),.?":{}|<>]).{8,32}$/)
+        Validators.pattern(/^(?=.*[a-z])(?=.*[A-Z])(?=.*\d)(?=.*[!@#$%^&*(),.?":{}|<>]).{8,32}$/)
       ]],
       confirmPassword: ['', [Validators.required]]
     }, { 
@@ -133,7 +132,6 @@ export class RegisterComponent implements OnInit {
         nationalNumber: ['', [Validators.pattern(/^\d{1,14}$/)]]
       }),
       addressData: this.fb.group({
-        addressInput: ['', [Validators.required]],
         placeId: ['', [Validators.required]],
         latitude: [null, [Validators.required]],
         longitude: [null, [Validators.required]],
@@ -265,7 +263,6 @@ export class RegisterComponent implements OnInit {
     const addressData = this.associationForm.get('addressData');
     if (addressData) {
       addressData.patchValue({
-        addressInput: address.formattedAddress,
         placeId: address.placeId,
         latitude: address.latitude,
         longitude: address.longitude,
