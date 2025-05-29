@@ -116,7 +116,7 @@ export class RegisterComponent implements OnInit {
       }),
       password: ['', [
         Validators.required, 
-        Validators.pattern(/^(?=.*[a-z])(?=.*[A-Z])(?=.*\d)(?=.*[!@#$%^&*(),.?":{}|<>]).{8,32}$/)
+        Validators.pattern(/^(?=.*[a-z])(?=.*[A-Z])(?=.*\d)(?=.*[!@#-$_%^&*(),.?":{}|<>]).{8,32}$/)
       ]],
       confirmPassword: ['', [Validators.required]]
     }, { 

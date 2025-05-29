@@ -1,5 +1,4 @@
 <form class="space-y-8" (ngSubmit)="onSubmit()" [formGroup]="raffleForm">
-    <!-- Global Error Message -->
     @if (errorMessage()) {
     <div class="text-red-500 text-sm mb-4">
         {{ errorMessage() }}

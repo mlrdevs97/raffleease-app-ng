@@ -1,0 +1,58 @@
+<div [formGroup]="customerInformationForm" class="space-y-4">
+    <div class="flex items-center justify-between">
+        <h3 class="text-lg font-semibold">Customer Information</h3>
+    </div>
+    <div class="shrink-0 bg-slate-200 h-[1px] w-full"></div>
+    <div class="space-y-4">
+        <div class="space-y-2">
+            <label
+                class="text-sm font-semibold leading-none p-0 peer-disabled:cursor-not-allowed peer-disabled:opacity-70"
+                for="fullName">Full Name</label>
+            <input formControlName="fullName"
+                class="flex h-10 w-full rounded-md border border-input bg-background px-3 py-2 text-sm ring-offset-background file:border-0 file:bg-transparent file:text-sm file:font-medium file:text-foreground placeholder:text-muted-foreground focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2 disabled:cursor-not-allowed disabled:opacity-50"
+                id="fullName" required>
+            @if(customerInformationForm.get('fullName')?.invalid && customerInformationForm.get('fullName')?.touched) {
+            <div class="text-red-500 text-xs">
+                Full Name is required.
+            </div>
+            }
+        </div>
+        <div class="space-y-2">
+            <label
+                class="text-sm font-semibold leading-none p-0 peer-disabled:cursor-not-allowed peer-disabled:opacity-70"
+                for="email">Email</label>
+            <input formControlName="email"
+                class="flex h-10 w-full rounded-md border border-input bg-background px-3 py-2 text-sm ring-offset-background file:border-0 file:bg-transparent file:text-sm file:font-medium file:text-foreground placeholder:text-muted-foreground focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2 disabled:cursor-not-allowed disabled:opacity-50"
+                id="email" type="email">
+            @if(customerInformationForm.get('email')?.invalid && customerInformationForm.get('email')?.touched) {
+            <div class="text-red-500 text-xs">
+                @if(customerInformationForm.get('email')?.errors?.['required']) {
+                <span>Email is required.</span>
+                }
+                @if(customerInformationForm.get('email')?.errors?.['email']) {
+                <span>Enter a valid email.</span>
+                }
+            </div>
+            }
+        </div>
+        <div formGroupName="phoneNumber" class="space-y-2">
+            <label
+                class="text-sm font-semibold leading-none p-0 peer-disabled:cursor-not-allowed peer-disabled:opacity-70">Phone
+                Number</label>
+            <div class="flex gap-2">
+                <app-dropdown-select #countryCodeDropdown [formControlName]="'countryCode'" [options]="countryCodes"
+                    [displayAllOption]="false" class="w-[140px]">
+                </app-dropdown-select>
+                <input formControlName="nationalNumber"
+                    class="flex h-10 w-full rounded-md border border-input bg-background px-3 py-2 text-sm ring-offset-background file:border-0 file:bg-transparent file:text-sm file:font-medium file:text-foreground placeholder:text-muted-foreground focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2 disabled:cursor-not-allowed disabled:opacity-50 flex-1"
+                    id="phoneNumber.nationalNumber" placeholder="Phone number">
+            </div>
+            @if(customerInformationForm.get('phoneNumber.nationalNumber')?.invalid &&
+            customerInformationForm.get('phoneNumber.nationalNumber')?.touched) {
+            <div class="text-red-500 text-xs">
+                Phone number is required.
+            </div>
+            }
+        </div>
+    </div>
+</div>

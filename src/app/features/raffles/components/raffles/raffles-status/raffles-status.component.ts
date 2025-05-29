@@ -1,9 +1,12 @@
-import { Component, ElementRef, EventEmitter, HostListener, Output, signal } from '@angular/core';
+import { Component, EventEmitter, Output } from '@angular/core';
+import { FormsModule } from '@angular/forms';
+import { DropdownSelectComponent } from '../../../../../layout/components/dropdown-select/dropdown-select.component';
 
 @Component({
   selector: 'app-raffles-status',
   templateUrl: './raffles-status.component.html',
-  standalone: true
+  standalone: true,
+  imports: [DropdownSelectComponent, FormsModule]
 })
 export class RafflesStatusComponent {
   readonly statusOptions = [
@@ -14,27 +17,12 @@ export class RafflesStatusComponent {
     'completed'
   ];
 
-  isOpen = signal(false);
-  selectedStatus = signal<string>('All statuses');
+  selectedStatus: string = 'All statuses';
 
   @Output() statusChange = new EventEmitter<string>();
 
-  constructor(private elementRef: ElementRef) {}
-
-  @HostListener('document:click', ['$event'])
-  onDocumentClick(event: MouseEvent) {
-    if (!this.elementRef.nativeElement.contains(event.target)) {
-      this.isOpen.set(false);
-    }
-  }
-
-  toggleDropdown() {
-    this.isOpen.update(open => !open);
-  }
-
-  selectStatus(option: string) {
-    this.selectedStatus.set(option);
-    this.statusChange.emit(option);
-    this.isOpen.set(false);
+  onStatusChange(status: string): void {
+    this.selectedStatus = status;
+    this.statusChange.emit(status);
   }
 }

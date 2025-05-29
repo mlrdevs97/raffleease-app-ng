@@ -1,0 +1,24 @@
+<div class="space-y-4">
+    <h3 class="text-lg font-semibold">Ticket Selection</h3>
+    <div class="shrink-0 bg-slate-200 h-[1px] w-full"></div>
+    <div class="w-full space-y-4">
+        <app-ticket-selection-tabs 
+            [selectedTab]="ticketSelectionForm.get('ticketSearchType')?.value"
+            (tabSelected)="onTabSelected($event)">
+        </app-ticket-selection-tabs>
+    </div>
+
+    @if (ticketSelectionForm.get('ticketSearchType')?.value === 'specific') {
+    <div
+        class="mt-2 ring-offset-background focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2 space-y-4">
+        <app-specific-ticket-selection [parentFormGroup]="ticketSelectionForm"></app-specific-ticket-selection>
+    </div>
+    }
+
+    @if (ticketSelectionForm.get('ticketSearchType')?.value === 'random') {
+    <div
+        class="mt-2 ring-offset-background focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2 space-y-4">
+        <app-random-ticket-selection [parentFormGroup]="ticketSelectionForm"></app-random-ticket-selection>
+    </div>
+    }
+</div>

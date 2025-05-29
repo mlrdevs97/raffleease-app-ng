@@ -1,4 +1,6 @@
-import { Component, ElementRef, EventEmitter, HostListener, Output, signal } from '@angular/core';
+import { Component, EventEmitter, OnInit, Output } from '@angular/core';
+import { FormsModule } from '@angular/forms';
+import { DropdownSelectComponent } from '../../../../../layout/components/dropdown-select/dropdown-select.component';
 
 interface SortOption {
   label: string;
@@ -9,15 +11,11 @@ interface SortOption {
 @Component({
   selector: 'app-raffles-sort',
   templateUrl: './raffles-sort.component.html',
-  standalone: true
+  standalone: true,
+  imports: [DropdownSelectComponent, FormsModule]
 })
-export class RafflesSortComponent {
-  isOpen = signal(false);
-  selectedSortOption = signal<SortOption>({
-    label: 'Sort by name',
-    value: 'title',
-    direction: 'asc'
-  });
+export class RafflesSortComponent implements OnInit {
+  selectedSortDisplay: string = '';
   
   sortOptions: SortOption[] = [
     { label: 'Sort by name', value: 'title', direction: 'asc' },
@@ -27,27 +25,27 @@ export class RafflesSortComponent {
     { label: 'Sort by status', value: 'status', direction: 'asc' }
   ];
   
+  sortOptionLabels: string[] = [];  
+  private labelToOptionMap = new Map<string, SortOption>();
+  
   @Output() sortChange = new EventEmitter<{sortBy: string, sortDirection: 'asc' | 'desc'}>();
   
-  constructor(private elementRef: ElementRef) {}
-  
-  @HostListener('document:click', ['$event'])
-  onDocumentClick(event: MouseEvent) {
-    if (!this.elementRef.nativeElement.contains(event.target)) {
-      this.isOpen.set(false);
-    }
-  }
-  
-  toggleDropdown() {
-    this.isOpen.update(state => !state);
-  }
-  
-  selectOption(option: SortOption) {
-    this.selectedSortOption.set(option);
-    this.sortChange.emit({
-      sortBy: option.value,
-      sortDirection: option.direction
+  ngOnInit(): void {
+    this.sortOptionLabels = this.sortOptions.map(option => {
+      this.labelToOptionMap.set(option.label, option);
+      return option.label;
     });
-    this.isOpen.set(false);
+    
+    this.selectedSortDisplay = this.sortOptionLabels[0];
+  }
+  
+  onSortChange(selectedLabel: string): void {
+    const selectedOption = this.labelToOptionMap.get(selectedLabel);
+    if (selectedOption) {
+      this.sortChange.emit({
+        sortBy: selectedOption.value,
+        sortDirection: selectedOption.direction
+      });
+    }
   }
 } 

@@ -63,7 +63,6 @@ export class OrdersPageComponent implements OnInit {
                 this.handleOrdersResponse(response);
             },
             error: (error: unknown) => {
-                console.error('Error loading orders:', error);
                 this.error.set(this.errorHandler.getErrorMessage(error));
             },
             complete: () => {

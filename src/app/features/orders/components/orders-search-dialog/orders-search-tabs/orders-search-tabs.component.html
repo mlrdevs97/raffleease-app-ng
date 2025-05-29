@@ -1,8 +1,6 @@
 <div class="w-full">
-    <div role="tablist"
-        class="h-10 items-center justify-center rounded-md bg-muted p-1 text-muted-foreground bg-slate-100 grid w-full grid-cols-4"
-        tabindex="0" style="outline: none;">
-        <button type="button" role="tab" aria-controls="order-tab-content"
+    <div class="h-10 items-center justify-center rounded-md bg-muted p-1 text-muted-foreground bg-slate-100 grid w-full grid-cols-4">
+        <button type="button"
             class="cursor-pointer inline-flex items-center justify-center whitespace-nowrap text-slate-500 rounded-sm px-3 py-1.5 text-sm font-semibold ring-offset-background transition-all focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2 disabled:pointer-events-none disabled:opacity-50"
             [class.bg-white]="activeTab === 'order'"
             [class.text-slate-950]="activeTab === 'order'"
@@ -10,8 +8,7 @@
             (click)="setActiveTab('order')">
             Order Info
         </button>
-        <button type="button" role="tab" 
-            aria-controls="payment-tab-content"
+        <button type="button"
             class="cursor-pointer inline-flex items-center justify-center whitespace-nowrap text-slate-500 rounded-sm px-3 py-1.5 text-sm font-semibold ring-offset-background transition-all focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2 disabled:pointer-events-none disabled:opacity-50"
             [class.bg-white]="activeTab === 'payment'"
             [class.text-slate-950]="activeTab === 'payment'"
@@ -19,8 +16,7 @@
             (click)="setActiveTab('payment')">
             Payment Info
         </button>
-        <button type="button" role="tab" 
-            aria-controls="customer-tab-content"
+        <button type="button"
             class="cursor-pointer inline-flex items-center justify-center whitespace-nowrap text-slate-500 rounded-sm px-3 py-1.5 text-sm font-semibold ring-offset-background transition-all focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2 disabled:pointer-events-none disabled:opacity-50"
             [class.bg-white]="activeTab === 'customer'"
             [class.text-slate-950]="activeTab === 'customer'"
@@ -28,7 +24,7 @@
             (click)="setActiveTab('customer')">
             Customer
         </button>
-        <button type="button" role="tab" aria-controls="dates-tab-content"
+        <button type="button"
             class="cursor-pointer inline-flex items-center justify-center whitespace-nowrap text-slate-500 rounded-sm px-3 py-1.5 text-sm font-semibold ring-offset-background transition-all focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2 disabled:pointer-events-none disabled:opacity-50"
             [class.bg-white]="activeTab === 'dates'"
             [class.text-slate-950]="activeTab === 'dates'"
@@ -38,7 +34,7 @@
         </button>
     </div>
 
-    <div [hidden]="activeTab !== 'order'" role="tabpanel"
+    <div [hidden]="activeTab !== 'order'"
         class="mt-2 ring-offset-background focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2 space-y-4 pt-4">
         <app-orders-search-order-info
             [criteria]="criteria"
@@ -46,7 +42,7 @@
             (criteriaChange)="onOrderInfoCriteriaChange($event)"></app-orders-search-order-info>
     </div>
 
-    <div [hidden]="activeTab !== 'payment'" role="tabpanel"
+    <div [hidden]="activeTab !== 'payment'"
         class="mt-2 ring-offset-background focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2 space-y-4 pt-4">
         <app-orders-search-payment-info
             [criteria]="criteria"
@@ -54,7 +50,7 @@
             (criteriaChange)="onPaymentInfoCriteriaChange($event)"></app-orders-search-payment-info>
     </div>
 
-    <div [hidden]="activeTab !== 'customer'" role="tabpanel"
+    <div [hidden]="activeTab !== 'customer'"
         class="mt-2 ring-offset-background focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2 space-y-4 pt-4">
         <app-orders-search-customer 
             [criteria]="criteria"
@@ -62,7 +58,7 @@
             (criteriaChange)="onCustomerCriteriaChange($event)"></app-orders-search-customer>
     </div>
 
-    <div [hidden]="activeTab !== 'dates'" role="tabpanel"
+    <div [hidden]="activeTab !== 'dates'"
         class="mt-2 ring-offset-background focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2 space-y-4 pt-4">
         <app-orders-search-dates
             [criteria]="criteria"

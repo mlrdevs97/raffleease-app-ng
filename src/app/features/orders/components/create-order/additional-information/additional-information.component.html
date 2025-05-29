@@ -1,0 +1,13 @@
+<div [formGroup]="additionalInformationForm" class="space-y-4">
+    <h3 class="text-lg font-semibold">Additional Information</h3>
+    <div class="shrink-0 bg-slate-200 h-[1px] w-full"></div>
+    <div class="space-y-2">
+        <label class="text-sm font-semibold leading-none p-0 peer-disabled:cursor-not-allowed peer-disabled:opacity-70"
+            for="comment">Comment</label>
+        <textarea formControlName="comment"
+            class="flex min-h-[80px] w-full rounded-md border border-input bg-background px-3 py-2 text-sm ring-offset-background placeholder:text-muted-foreground focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2 disabled:cursor-not-allowed disabled:opacity-50"
+            id="comment" placeholder="Add any additional notes or comments" rows="4" maxlength="500"></textarea>
+        <p class="text-xs text-gray-500">{{ additionalInformationForm.get('comment')?.value?.length || 0 }}/500
+            characters</p>
+    </div>
+</div>
