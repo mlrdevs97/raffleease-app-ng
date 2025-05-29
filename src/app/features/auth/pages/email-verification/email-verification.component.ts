@@ -15,7 +15,7 @@ export class EmailVerificationComponent implements OnInit {
       const token = params['token'];
       if (token) {
         this.authService.verifyEmail(token).subscribe({
-          next: () => this.router.navigate(['/raffles']),
+          next: () => this.router.navigate(['/auth/login'], { queryParams: { emailVerified: 'success' } }),
           error: () => this.router.navigate(['/auth/login'])
         });
       } else {

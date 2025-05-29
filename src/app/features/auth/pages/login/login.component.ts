@@ -5,6 +5,7 @@ import { RouterLink, ActivatedRoute } from '@angular/router';
 import { AuthService } from '../../services/auth.service';
 import { ErrorHandlerService } from '../../../../core/services/error-handler.service';
 import { ErrorMessages } from '../../../../core/constants/error-messages';
+import { SuccessMessages } from '../../../../core/constants/success-messages';
 
 @Component({
   selector: 'app-login',
@@ -16,6 +17,7 @@ export class LoginComponent {
   loginForm: FormGroup;
   isLoading = signal(false);
   errorMessage = signal<string | null>(null);
+  successMessage = signal<string | null>(null);
   fieldErrors = signal<Record<string, string>>({});
   showPassword = signal(false);
   returnUrl: string = '/dashboard';
@@ -35,6 +37,11 @@ export class LoginComponent {
     // Get the return URL from route parameters or default to '/dashboard'
     this.route.queryParams.subscribe(params => {
       this.returnUrl = params['returnUrl'] || '/dashboard';
+      
+      // Check if email was verified successfully
+      if (params['emailVerified'] === 'success') {
+        this.successMessage.set(SuccessMessages.auth.emailVerified);
+      }
     });
   }
 
@@ -93,8 +100,8 @@ export class LoginComponent {
     const { identifier, password } = this.loginForm.value;
     this.isLoading.set(true);
     this.resetErrors();
+    this.successMessage.set(null);
     this.authService.login(identifier, password).subscribe({
-      next: () => {},
       error: (error: unknown) => {
         this.errorMessage.set(this.errorHandler.getErrorMessage(error));
         if (this.errorHandler.isValidationError(error)) {
