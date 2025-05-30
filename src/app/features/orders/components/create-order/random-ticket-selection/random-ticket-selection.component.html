@@ -1,26 +1,37 @@
 <div [formGroup]="parentFormGroup">
-    <div
-        class="mt-2 ring-offset-background focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2 space-y-4">
+    <div class="space-y-4">
+        @if (errorMessage()) {
+        <div class="p-3 bg-red-50 border border-red-200 rounded-md">
+            <p class="text-sm text-red-800">{{ errorMessage() }}</p>
+        </div>
+        }
+
         <div class="space-y-2">
             <label
                 class="text-sm font-semibold leading-none p-0 peer-disabled:cursor-not-allowed peer-disabled:opacity-70"
                 for="quantity">Number of Tickets</label>
             <div class="flex gap-2">
                 <input formControlName="quantity"
-                    class="flex h-10 w-full rounded-md border border-input bg-background px-3 py-2 text-sm ring-offset-background file:border-0 file:bg-transparent file:text-sm file:font-medium file:text-foreground placeholder:text-muted-foreground focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2 disabled:cursor-not-allowed disabled:opacity-50 flex-1"
-                    id="quantity" min="1" type="number" value="1">
-                <button
-                    class="inline-flex items-center justify-center gap-2 whitespace-nowrap rounded-md text-sm font-medium ring-offset-background transition-colors focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2 disabled:pointer-events-none disabled:opacity-50 [&amp;_svg]:pointer-events-none [&amp;_svg]:size-4 [&amp;_svg]:shrink-0 h-10 px-4 py-2 bg-gray-500 text-white hover:bg-gray-600"
-                    [disabled]="parentFormGroup.get('quantity')?.invalid">Get Random Tickets</button>
+                    class="flex h-10 w-full rounded-md border border-input bg-background px-3 py-2 text-sm ring-offset-background placeholder:text-slate-200 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2 disabled:cursor-not-allowed disabled:opacity-50 flex-1"
+                    [ngClass]="{'border-red-500': getErrorMessage('quantity')}" id="quantity" min="1" type="number"
+                    value="1" [placeholder]="disabled ? 'Select a raffle first' : 'Enter number of tickets'" [disabled]="disabled || isLoading" (focus)="resetErrors()"
+                    (keydown.enter)="onEnterKeyPressed($event)">
+                <button type="button"
+                    class="inline-flex items-center justify-center gap-2 ring-offset-background transition-colors focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2 disabled:pointer-events-none disabled:opacity-50 hover:bg-slate-100 h-10 whitespace-nowrap rounded-lg border border-transparent bg-zinc-900 text-white text-sm font-semibold px-4 py-2 relative hover:bg-slate-800"
+                    [disabled]="disabled || parentFormGroup.get('quantity')?.invalid || isLoading" (click)="onGetRandomTickets()">
+                    @if (isLoading) {
+                    <span
+                        class="inline-block h-4 w-4 animate-spin rounded-full border-2 border-white border-t-transparent"></span>
+                    Generating...
+                    } @else {
+                    Get Random Tickets
+                    }
+                </button>
             </div>
-            @if (parentFormGroup.get('quantity')?.invalid && parentFormGroup.get('quantity')?.touched) {
+
+            @if (getErrorMessage('quantity')) {
             <div class="text-red-500 text-xs">
-                @if (parentFormGroup.get('quantity')?.errors?.['required']) {
-                <span>Quantity is required.</span>
-                }
-                @if (parentFormGroup.get('quantity')?.errors?.['min']) {
-                <span>Quantity must be at least 1.</span>
-                }
+                {{ getErrorMessage('quantity') }}
             </div>
             }
         </div>

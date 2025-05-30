@@ -10,14 +10,13 @@ import { DropdownSelectComponent } from '../../../../../layout/components/dropdo
 })
 export class RafflesStatusComponent {
   readonly statusOptions = [
-    'All statuses',
     'pending',
     'active',
     'paused',
     'completed'
   ];
 
-  selectedStatus: string = 'All statuses';
+  selectedStatus: string = 'ANY';
 
   @Output() statusChange = new EventEmitter<string>();
 

@@ -14,6 +14,7 @@ import { Raffle } from '../models/raffle.model';
 export class RaffleQueryService {
     private readonly apiUrl = `${environment.apiUrl}/associations`;
     private readonly cache = signal<Map<string, PageResponse<Raffle>>>(new Map());
+    private readonly raffleCache = signal<Map<number, Raffle>>(new Map());
     private readonly isLoading = signal(false);
 
     constructor(
@@ -23,6 +24,27 @@ export class RaffleQueryService {
 
     get isLoading$() {
         return this.isLoading.asReadonly();
+    }
+
+    getById(raffleId: number): Observable<Raffle> {
+        const associationId = this.authService.getAssociationId();
+        const cachedRaffle = this.raffleCache().get(raffleId);
+
+        if (cachedRaffle) {
+            return of(cachedRaffle);
+        }
+
+        return this.http.get<SuccessResponse<Raffle>>(`${this.apiUrl}/${associationId}/raffles/${raffleId}`)
+            .pipe(
+                tap((response: SuccessResponse<Raffle>) => {
+                    this.raffleCache.update((cache: Map<number, Raffle>) => {
+                        const newCache = new Map(cache);
+                        newCache.set(raffleId, response.data!);
+                        return newCache;
+                    });
+                }),
+                map(response => response.data!)
+            );
     }
 
     search(
@@ -73,6 +95,7 @@ export class RaffleQueryService {
 
     clearCache(): void {
         this.cache.set(new Map());
+        this.raffleCache.set(new Map());
     }
 
     private generateCacheKey(

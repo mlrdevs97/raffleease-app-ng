@@ -3,10 +3,11 @@ import { HttpClient } from '@angular/common/http';
 import { Observable } from 'rxjs';
 import { ImageResponse } from '../models/image-response.model';
 import { SuccessResponse } from '../../../core/models/api-response.model';
+import { environment } from '../../../../environments/environment';
 
 @Injectable({ providedIn: 'root' })
 export class RaffleImagesUploadService {
-  private readonly baseUrl = '/api/v1/associations';
+  private readonly baseUrl = `${environment.apiUrl}/associations`;
   constructor(private readonly http: HttpClient) {}
 
   uploadImages(associationId: number, files: File[]): Observable<SuccessResponse<ImageResponse>> {

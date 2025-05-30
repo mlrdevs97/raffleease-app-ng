@@ -3,6 +3,7 @@
     [options]="sortOptionLabels"
     [(ngModel)]="selectedSortDisplay"
     (ngModelChange)="onSortChange($event)"
+    [displayAllOption]="false"
     placeholder="Select sort option"
     class="w-full">
   </app-dropdown-select>

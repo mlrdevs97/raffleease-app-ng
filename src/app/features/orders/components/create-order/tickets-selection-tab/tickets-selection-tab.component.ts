@@ -9,10 +9,11 @@ import { CommonModule } from '@angular/common';
 })
 export class TicketSelectionTabsComponent {
     @Input() selectedTab: 'specific' | 'random' = 'specific';
+    @Input() disabled = false;
     @Output() tabSelected = new EventEmitter<'specific' | 'random'>();
 
     selectTab(tab: 'specific' | 'random'): void {
-        if (this.selectedTab !== tab) { 
+        if (!this.disabled && this.selectedTab !== tab) { 
             this.selectedTab = tab; 
             this.tabSelected.emit(tab);
         }

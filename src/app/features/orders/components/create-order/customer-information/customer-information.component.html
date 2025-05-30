@@ -10,10 +10,11 @@
                 for="fullName">Full Name</label>
             <input formControlName="fullName"
                 class="flex h-10 w-full rounded-md border border-input bg-background px-3 py-2 text-sm ring-offset-background file:border-0 file:bg-transparent file:text-sm file:font-medium file:text-foreground placeholder:text-muted-foreground focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2 disabled:cursor-not-allowed disabled:opacity-50"
+                [ngClass]="{'border-red-500': getErrorMessage('fullName')}"
                 id="fullName" required>
-            @if(customerInformationForm.get('fullName')?.invalid && customerInformationForm.get('fullName')?.touched) {
+            @if(getErrorMessage('fullName')) {
             <div class="text-red-500 text-xs">
-                Full Name is required.
+                {{ getErrorMessage('fullName') }}
             </div>
             }
         </div>
@@ -23,15 +24,11 @@
                 for="email">Email</label>
             <input formControlName="email"
                 class="flex h-10 w-full rounded-md border border-input bg-background px-3 py-2 text-sm ring-offset-background file:border-0 file:bg-transparent file:text-sm file:font-medium file:text-foreground placeholder:text-muted-foreground focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2 disabled:cursor-not-allowed disabled:opacity-50"
+                [ngClass]="{'border-red-500': getErrorMessage('email')}"
                 id="email" type="email">
-            @if(customerInformationForm.get('email')?.invalid && customerInformationForm.get('email')?.touched) {
+            @if(getErrorMessage('email')) {
             <div class="text-red-500 text-xs">
-                @if(customerInformationForm.get('email')?.errors?.['required']) {
-                <span>Email is required.</span>
-                }
-                @if(customerInformationForm.get('email')?.errors?.['email']) {
-                <span>Enter a valid email.</span>
-                }
+                {{ getErrorMessage('email') }}
             </div>
             }
         </div>
@@ -45,12 +42,12 @@
                 </app-dropdown-select>
                 <input formControlName="nationalNumber"
                     class="flex h-10 w-full rounded-md border border-input bg-background px-3 py-2 text-sm ring-offset-background file:border-0 file:bg-transparent file:text-sm file:font-medium file:text-foreground placeholder:text-muted-foreground focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2 disabled:cursor-not-allowed disabled:opacity-50 flex-1"
+                    [ngClass]="{'border-red-500': getErrorMessage('phoneNumber.nationalNumber')}"
                     id="phoneNumber.nationalNumber" placeholder="Phone number">
             </div>
-            @if(customerInformationForm.get('phoneNumber.nationalNumber')?.invalid &&
-            customerInformationForm.get('phoneNumber.nationalNumber')?.touched) {
+            @if(getErrorMessage('phoneNumber.nationalNumber')) {
             <div class="text-red-500 text-xs">
-                Phone number is required.
+                {{ getErrorMessage('phoneNumber.nationalNumber') }}
             </div>
             }
         </div>

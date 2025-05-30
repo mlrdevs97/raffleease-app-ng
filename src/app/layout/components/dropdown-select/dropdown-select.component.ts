@@ -1,4 +1,4 @@
-import { Component, Input, Self, Optional, ElementRef, HostListener } from '@angular/core';
+import { Component, Input, Self, Optional, ElementRef, HostListener, ViewChild } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { ControlValueAccessor, NgControl, ReactiveFormsModule } from '@angular/forms';
 
@@ -12,6 +12,7 @@ export class DropdownSelectComponent implements ControlValueAccessor {
     @Input() options: string[] = [];
     @Input() placeholder: string = 'Select an option';
     @Input() displayAllOption: boolean = true;
+    @ViewChild('optionsContainer', { static: false }) optionsContainer!: ElementRef<HTMLDivElement>;
 
     isOpen: boolean = false;
     value: string = '';
@@ -136,6 +137,9 @@ export class DropdownSelectComponent implements ControlValueAccessor {
             // Wrap to first option
             this.focusedIndex = 0;
         }
+
+        // Scroll the focused option into view
+        this.scrollFocusedOptionIntoView();
     }
 
     /**
@@ -153,6 +157,45 @@ export class DropdownSelectComponent implements ControlValueAccessor {
         } else {
             this.focusedIndex = allOptions.length - 1;
         }
+
+        // Scroll the focused option into view
+        this.scrollFocusedOptionIntoView();
+    }
+
+    /**
+     * Scroll the currently focused option into view
+     */
+    private scrollFocusedOptionIntoView(): void {
+        if (this.focusedIndex < 0) return;
+
+        // Use setTimeout to ensure the DOM has been updated
+        setTimeout(() => {
+            const container = this.elementRef.nativeElement.querySelector('[role="presentation"].overflow-auto');
+            if (!container) return;
+
+            const focusedOptionId = `option-${this.focusedIndex}`;
+            const focusedElement = document.getElementById(focusedOptionId);
+            
+            if (!focusedElement) return;
+
+            const containerRect = container.getBoundingClientRect();
+            const elementRect = focusedElement.getBoundingClientRect();
+
+            // Calculate relative positions within the container
+            const elementTop = elementRect.top - containerRect.top + container.scrollTop;
+            const elementBottom = elementTop + elementRect.height;
+            const containerScrollTop = container.scrollTop;
+            const containerScrollBottom = containerScrollTop + container.clientHeight;
+
+            // Check if element is above the visible area
+            if (elementTop < containerScrollTop) {
+                container.scrollTop = elementTop;
+            }
+            // Check if element is below the visible area
+            else if (elementBottom > containerScrollBottom) {
+                container.scrollTop = elementBottom - container.clientHeight;
+            }
+        }, 0);
     }
 
     /**

@@ -60,5 +60,14 @@ export const ClientValidationMessages = {
     noCriteria: 'Please enter at least one search criteria',
     searchFailed: 'Failed to search orders. Please try again.',
     unknownError: 'Unknown error occurred'
+  },
+
+  /**
+   * Ticket validation error messages
+   */
+  ticket: {
+    raffleRequired: 'Please select a raffle first to search for tickets',
+    notFound: 'Ticket not found',
+    notAvailable: 'This ticket is not available for selection'
   }
 }; 

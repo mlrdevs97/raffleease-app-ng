@@ -1,20 +1,24 @@
-<div class="h-full sm:h-12 items-center justify-center rounded-md bg-slate-100 p-1 text-muted-foreground grid w-full grid-cols-2">
+<div class="h-full sm:h-12 items-center justify-center rounded-md bg-slate-100 p-1 text-muted-foreground grid w-full grid-cols-1 sm:grid-cols-2">
     <button type="button"
         (click)="selectTab('specific')"
+        [disabled]="disabled"
         class="cursor-pointer inline-flex items-center justify-center whitespace-nowrap rounded-sm px-4 py-2 text-sm font-semibold ring-offset-background transition-all focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2 disabled:pointer-events-none disabled:opacity-50"
         [class.bg-white]="selectedTab === 'specific'"
         [class.text-slate-950]="selectedTab === 'specific'"
         [class.shadow-sm]="selectedTab === 'specific'"
-        [class.text-slate-500]="selectedTab !== 'specific'">
+        [class.text-slate-500]="selectedTab !== 'specific'"
+        [class.cursor-not-allowed]="disabled">
         Search Specific Tickets
     </button>
     <button type="button"
         (click)="selectTab('random')"   
+        [disabled]="disabled"
         class="cursor-pointer inline-flex items-center justify-center whitespace-nowrap rounded-sm px-4 py-2 text-sm font-semibold ring-offset-background transition-all focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2 disabled:pointer-events-none disabled:opacity-50"
         [class.bg-white]="selectedTab === 'random'"
         [class.text-slate-950]="selectedTab === 'random'"
         [class.shadow-sm]="selectedTab === 'random'"
-        [class.text-slate-500]="selectedTab !== 'random'">
+        [class.text-slate-500]="selectedTab !== 'random'"
+        [class.cursor-not-allowed]="disabled">
         Get Random Tickets
     </button>
 </div>

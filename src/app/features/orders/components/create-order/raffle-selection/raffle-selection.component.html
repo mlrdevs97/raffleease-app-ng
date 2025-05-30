@@ -1,0 +1,48 @@
+<div class="space-y-4">
+    <h3 class="text-lg font-semibold">Select Raffle</h3>
+    <div class="shrink-0 bg-slate-200 h-[1px] w-full"></div>
+
+    @if (isLoadingPreselected()) {
+    <div class="flex justify-center items-center py-8">
+        <div class="animate-spin rounded-full h-6 w-6 border-b-2 border-gray-900"></div>
+        <span class="ml-2 text-sm text-gray-600">Loading raffle details...</span>
+    </div>
+    } @else if (showSearchSection) {
+    <div class="space-y-2">
+        <label class="block text-sm font-semibold">
+            Search for a raffle
+        </label>
+
+        <div>
+            <app-raffles-search [suggestions]="suggestions" [isLoading]="isSearchLoading" [noResults]="noSearchResults"
+                (searchChange)="onSearchChange($event)" (enterPressed)="onEnterPressed($event)"
+                (suggestionSelected)="onSuggestionSelected($event)">
+            </app-raffles-search>
+        </div>
+
+        @if (getErrorMessage('raffleId')) {
+        <div class="text-red-500 text-sm">
+            {{ getErrorMessage('raffleId') }}
+        </div>
+        }
+    </div>
+    } @else if (showSelectedSection) {
+    <div class="space-y-3">
+        <label class="block text-sm font-medium text-gray-700">
+            Selected Raffle
+        </label>
+
+        <div>
+            <app-raffle-card [raffle]="selectedRaffle()!" mode="clearSelection" clearSelectionLabel="Change"
+                (clearSelection)="clearSelection()">
+            </app-raffle-card>
+        </div>
+
+        @if (getErrorMessage('raffleId')) {
+        <div class="text-red-500 text-sm">
+            {{ getErrorMessage('raffleId') }}
+        </div>
+        }
+    </div>
+    }
+</div>

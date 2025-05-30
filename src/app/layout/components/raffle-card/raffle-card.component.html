@@ -1,0 +1,148 @@
+<div class="flex flex-col">
+  <!-- Error message at the top -->
+  @if (errorMessage) {
+  <div class="mb-4 w-full rounded-md bg-red-50 p-3">
+    <div class="flex">
+      <div class="flex-shrink-0">
+        <svg class="h-5 w-5 text-red-500" viewBox="0 0 20 20" fill="currentColor" aria-hidden="true">
+          <path fill-rule="evenodd"
+            d="M10 18a8 8 0 100-16 8 8 0 000 16zM8.28 7.22a.75.75 0 00-1.06 1.06L8.94 10l-1.72 1.72a.75.75 0 101.06 1.06L10 11.06l1.72 1.72a.75.75 0 101.06-1.06L11.06 10l1.72-1.72a.75.75 0 00-1.06-1.06L10 8.94 8.28 7.22z"
+            clip-rule="evenodd" />
+        </svg>
+      </div>
+      <div class="ml-3 text-sm text-red-700">
+        <p>{{ errorMessage }}</p>
+      </div>
+      <div class="ml-auto pl-3">
+        <div class="-mx-1.5 -my-1.5">
+          <button type="button" (click)="errorMessage = null"
+            class="inline-flex rounded-md p-1.5 text-red-500 hover:bg-red-100 focus:outline-none">
+            <span class="sr-only">Dismiss</span>
+            <svg class="h-5 w-5" viewBox="0 0 20 20" fill="currentColor" aria-hidden="true">
+              <path
+                d="M6.28 5.22a.75.75 0 00-1.06 1.06L8.94 10l-3.72 3.72a.75.75 0 101.06 1.06L10 11.06l3.72 3.72a.75.75 0 101.06-1.06L11.06 10l3.72-3.72a.75.75 0 00-1.06-1.06L10 8.94 6.28 5.22z" />
+            </svg>
+          </button>
+        </div>
+      </div>
+    </div>
+  </div>
+  }
+
+  <div class="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-4 sm:gap-0">
+    <!-- Left: Image + Info -->
+    <div class="flex flex-col sm:flex-row gap-4 sm:gap-6 w-full">
+      <div class="w-full sm:w-32 shrink-0">
+        <a [routerLink]="['/raffles', raffle.id]">
+          <img class="aspect-3/2 rounded-lg shadow-sm object-cover w-full h-auto" [src]="raffle.images[0].url"
+            [alt]="raffle.title" />
+        </a>
+      </div>
+
+      <div class="px-2 space-y-2 flex-1">
+        <div class="text-base font-semibold leading-6">
+          <a [routerLink]="['/raffles', raffle.id]">{{ raffle.title }}</a>
+        </div>
+
+        <div class="flex items-center gap-2 text-xs/6 text-zinc-500">
+          <svg xmlns="http://www.w3.org/2000/svg" fill="currentColor" viewBox="0 0 20 20" class="h-4 w-4 text-zinc-500">
+            <path
+              d="M0 18a2 2 0 0 0 2 2h16a2 2 0 0 0 2-2V8H0v10Zm14-7.5a.5.5 0 0 1 .5-.5h1a.5.5 0 0 1 .5.5v1a.5.5 0 0 1-.5.5h-1a.5.5 0 0 1-.5-.5v-1Zm0 4a.5.5 0 0 1 .5-.5h1a.5.5 0 0 1 .5.5v1a.5.5 0 0 1-.5.5h-1a.5.5 0 0 1-.5-.5v-1Zm-5-4a.5.5 0 0 1 .5-.5h1a.5.5 0 0 1 .5.5v1a.5.5 0 0 1-.5.5h-1a.5.5 0 0 1-.5-.5v-1Zm0 4a.5.5 0 0 1 .5-.5h1a.5.5 0 0 1 .5.5v1a.5.5 0 0 1-.5.5h-1a.5.5 0 0 1-.5-.5v-1Zm-5-4a.5.5 0 0 1 .5-.5h1a.5.5 0 0 1 .5.5v1a.5.5 0 0 1-.5.5h-1a.5.5 0 0 1-.5-.5v-1Zm0 4a.5.5 0 0 1 .5-.5h1a.5.5 0 0 1 .5.5v1a.5.5 0 0 1-.5.5h-1a.5.5 0 0 1-.5-.5v-1ZM20 4a2 2 0 0 0-2-2h-2V1a1 1 0 0 0-2 0v1h-3V1a1 1 0 0 0-2 0v1H6V1a1 1 0 0 0-2 0v1H2a2 2 0 0 0-2 2v2h20V4Z" />
+          </svg>
+
+          @if (raffle.startDate) {
+          {{ raffle.startDate | date:'d MMM y' }}
+          } @else {
+          Not Scheduled
+          }
+          – {{ raffle.endDate | date:'d MMM y' }}
+        </div>
+
+        <div class="flex items-center gap-2 text-xs/6 text-zinc-500">
+          <svg xmlns="http://www.w3.org/2000/svg" viewBox="2 3 16 14" fill="currentColor" class="h-4 w-4 text-zinc-500">
+            <path fill-rule="evenodd"
+              d="M15.75 3A2.25 2.25 0 0 1 18 5.25v1.214c0 .423-.277.788-.633 1.019A2.997 2.997 0 0 0 16 10c0 1.055.544 1.982 1.367 2.517.356.231.633.596.633 1.02v1.213A2.25 2.25 0 0 1 15.75 17H4.25A2.25 2.25 0 0 1 2 14.75v-1.213c0-.424.277-.789.633-1.02A2.998 2.998 0 0 0 4 10a2.997 2.997 0 0 0-1.367-2.517C2.277 7.252 2 6.887 2 6.463V5.25A2.25 2.25 0 0 1 4.25 3h11.5ZM13.5 7.396a.75.75 0 0 0-1.5 0v1.042a.75.75 0 0 0 1.5 0V7.396Zm0 4.167a.75.75 0 0 0-1.5 0v1.041a.75.75 0 0 0 1.5 0v-1.041Z"
+              clip-rule="evenodd"></path>
+          </svg>
+          {{ raffle.soldTickets }} / {{ raffle.totalTickets }} tickets sold
+        </div>
+
+        <div class="flex items-center gap-2 text-xs/6 text-zinc-500">
+          <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 375 375" fill="currentColor"
+            class="h-4 w-4 text-zinc-500">
+            <path
+              d="M175.7 141.5h29.5v18.3c16.3 6.2 27.1 21.9 27.1 39.3h-29.1c0-7.1-5.7-12.8-12.8-12.8s-12.8 5.7-12.8 12.8c0 5 2.9 9.6 7.5 11.7l22.8 12.1c20.5 10.8 28.3 36.2 17.5 56.6-4.4 8.3-11.5 14.9-20.2 18.6v19.2h-29.5v-17.6c-17.4-5.5-29.3-21.7-29.3-40.2h29.1c0 7.1 5.7 12.8 12.8 12.8s12.8-5.7 12.8-12.8c0-4.7-2.6-9.1-6.8-11.3l-23.5-12.5c-20.5-10.8-28.3-36.2-17.4-56.7 4.8-9 12.7-15.9 22.2-19.6zM201.6 2c-2.3.1-4.6.8-6.7 2.1l-12.5 7.6c-3 1.8-6.7 2-9.8.7l-12.2-5.2c-2.3-1-5-0.8-7.1.5l-16.8 10.5c-2.4 1.5-5.3 2-8 1.2l-8.4-2.2c-3.2-.9-6.6.2-9 2.4l-19.1 16.9c-2 1.9-2.2 5-.3 7 .3.4.8.7 1.3.9 19.6 8.5 36.1 21.8 49 38.6.9 1.1.8 2.7-.3 3.6-.4.3-1 .5-1.5.5h-7.4c-3.9 0-7 3.2-7 7.1s3.2 7.1 7.1 7.1h3.3c1.4 0 2.5 1.1 2.5 2.5 0 .8-.4 1.6-1.1 2.1-53.4 37-88.8 94.6-97.6 158.8-4.8 35.2 13.3 69.5 45.1 85.3 65.2 32.4 141.8 32.4 207 0 31.8-15.8 49.9-50.1 45.1-85.3-8.9-64.2-44.3-121.8-97.6-158.8-.9-.6-1.1-1.9-.5-2.8.5-.7 1.3-1.2 2.2-1.2h3.3c3.9 0 7-3.2 7-7.1s-3.2-7.1-7.1-7.1h-13.4c-1.4 0-2.5-1.1-2.5-2.5 0-.3 0-.6.1-.9 9.4-23.9 27.8-42.9 51.3-53.4 2.5-1.1 3.6-4 2.6-6.5-5.6-11.6-18.7-17.6-30.4-14l-16.6 6.6c-3 1.2-6.3.9-9-0.8l-14.9-9.4c-2.4-1.5-5.2-2.2-8-2.1z" />
+          </svg>
+          Revenue: {{ raffle.soldTickets * raffle.ticketPrice }}
+        </div>
+      </div>
+    </div>
+
+    <!-- Right: Status + Action Button -->
+    <div class="flex items-center justify-between sm:justify-end gap-4">
+      @if (shouldShowStatus) {
+      <app-raffle-status-label [status]="raffle.status" />
+      }
+
+      @if (mode === 'menu') {
+      <!-- Menu Mode -->
+      <div class="relative inline-block text-left">
+        <button type="button" (click)="toggleMenu()"
+          class="inline-flex h-8 w-8 items-center justify-center rounded-md hover:bg-zinc-100 focus:outline-none">
+          <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none"
+            stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"
+            class="lucide lucide-ellipsis-vertical h-4 w-4">
+            <circle cx="12" cy="12" r="1"></circle>
+            <circle cx="12" cy="5" r="1"></circle>
+            <circle cx="12" cy="19" r="1"></circle>
+          </svg>
+          <span class="sr-only">More options</span>
+        </button>
+
+        @if (menuOpen) {
+        <div class="absolute right-0 w-28 rounded-md border border-zinc-200 bg-white shadow-lg z-50">
+          <ul class="py-1 text-sm text-zinc-700">
+            <li>
+              <button class="w-full px-4 py-2 text-left hover:bg-zinc-100" (click)="viewRaffle()">View</button>
+            </li>
+            <li>
+              <button class="w-full px-4 py-2 text-left hover:bg-zinc-100" (click)="editRaffle()">Edit</button>
+            </li>
+            <li>
+              <button class="w-full px-4 py-2 text-left text-red-600 hover:bg-zinc-100" (click)="deleteRaffle()">
+                @if (isDeleting) {
+                <span class="flex items-center">
+                  <svg class="animate-spin -ml-1 mr-2 h-4 w-4 text-red-600" xmlns="http://www.w3.org/2000/svg"
+                    fill="none" viewBox="0 0 24 24">
+                    <circle class="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" stroke-width="4"></circle>
+                    <path class="opacity-75" fill="currentColor"
+                      d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4zm2 5.291A7.962 7.962 0 014 12H0c0 3.042 1.135 5.824 3 7.938l3-2.647z">
+                    </path>
+                  </svg>
+                  Deleting...
+                </span>
+                } @else {
+                Delete
+                }
+              </button>
+            </li>
+          </ul>
+        </div>
+        }
+      </div>
+      } @else if (mode === 'clearSelection') {
+      <!-- Clear Selection Mode -->
+      <button (click)="onClearSelection()"
+        class="inline-flex items-center justify-center gap-2 whitespace-nowrap text-sm font-medium ring-offset-background transition-colors focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2 disabled:pointer-events-none disabled:opacity-50 rounded-md px-2 text-red-600 hover:text-red-700 hover:bg-red-50">
+        <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none"
+          stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"
+          class="lucide lucide-x h-4 w-4 mr-1">
+          <path d="M18 6 6 18"></path>
+          <path d="m6 6 12 12"></path>
+        </svg>
+        {{ clearSelectionLabel }}
+      </button>
+      }
+    </div>
+  </div>
+</div> 

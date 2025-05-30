@@ -25,5 +25,23 @@ export const SuccessMessages = {
   transaction: {
     completed: 'Your transaction has been completed successfully.',
     orderPlaced: 'Your order has been placed successfully.'
+  },
+
+  /**
+   * Raffle success messages
+   */
+  raffle: {
+    created: 'Your raffle has been created successfully. Redirecting to raffle details...',
+    updated: 'Your raffle has been updated successfully.',
+    deleted: 'Your raffle has been deleted successfully.'
+  },
+
+  /**
+   * Ticket success messages
+   */
+  tickets: {
+    added: 'Ticket added to your selection successfully.',
+    addedMultiple: (count: number) => `Successfully added ${count} random ticket${count !== 1 ? 's' : ''} to your order`,
+    removed: 'Ticket removed from your selection.'
   }
 }; 

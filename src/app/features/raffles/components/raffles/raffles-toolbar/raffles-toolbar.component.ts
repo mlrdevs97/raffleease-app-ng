@@ -17,7 +17,6 @@ export class RafflesToolbarComponent {
   @Output() statusChange = new EventEmitter<string>();
   @Output() sortChange = new EventEmitter<{sortBy: string, sortDirection: 'asc' | 'desc'}>();
   
-  // Input properties to pass to search component
   @Input() suggestions: Raffle[] = [];
   @Input() isSearchLoading = false;
   @Input() noSearchResults = false;

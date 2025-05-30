@@ -2,6 +2,7 @@ import { Injectable, signal, computed } from '@angular/core';
 import { HttpClient, HttpParams } from '@angular/common/http';
 import { Observable, finalize, map, of, tap } from 'rxjs';
 import { OrderSearchFilters, Order } from '../models/order.model';
+import { AdminOrderCreate } from '../models/admin-order-create.model';
 import { SuccessResponse } from '../../../core/models/api-response.model';
 import { PageResponse } from '../../../core/models/pagination.model';
 import { environment } from '../../../../environments/environment';
@@ -25,6 +26,24 @@ export class OrdersService {
      */
     get isLoading$() {
         return this.isLoading.asReadonly();
+    }
+
+    /**
+     * Create a new order
+     * @param orderData The order data
+     * @returns Observable with the created order
+     */
+    createOrder(orderData: AdminOrderCreate): Observable<Order> {
+        return this.http.post<SuccessResponse<Order>>(
+            `${this.baseUrl}/${this.getAssociationId()}/orders`,
+            orderData
+        ).pipe(
+            map(response => response.data!),
+            tap(() => {
+                // Clear cache when a new order is created
+                this.clearCache();
+            })
+        );
     }
 
     /**

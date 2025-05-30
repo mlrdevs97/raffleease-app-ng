@@ -37,9 +37,11 @@ export class RafflesSortComponent implements OnInit {
     });
     
     this.selectedSortDisplay = this.sortOptionLabels[0];
+    this.onSortChange(this.selectedSortDisplay);
   }
   
   onSortChange(selectedLabel: string): void {
+    this.selectedSortDisplay = selectedLabel;
     const selectedOption = this.labelToOptionMap.get(selectedLabel);
     if (selectedOption) {
       this.sortChange.emit({

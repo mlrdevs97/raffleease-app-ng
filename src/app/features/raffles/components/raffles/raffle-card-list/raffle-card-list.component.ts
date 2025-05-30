@@ -1,7 +1,8 @@
 import { Component, Input, Output, EventEmitter } from '@angular/core';
 import { CommonModule } from '@angular/common';
-import { RaffleCardComponent } from '../raffle-card/raffle-card.component';
+import { RaffleCardComponent } from '../../../../../layout/components/raffle-card/raffle-card.component';
 import { Raffle } from '../../../models/raffle.model';
+
 @Component({
   selector: 'app-raffle-card-list',
   templateUrl: './raffle-card-list.component.html',

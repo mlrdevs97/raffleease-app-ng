@@ -1,8 +1,8 @@
 <div class="container mx-auto px-4 py-8">
   <app-raffles-header 
-    [suggestions]="suggestions()"
-    [isSearchLoading]="isSearchLoading()"
-    [noSearchResults]="noSearchResults()"
+    [suggestions]="suggestions"
+    [isSearchLoading]="isSearchLoading"
+    [noSearchResults]="noSearchResults"
     (searchChange)="onSearchChange($event)"
     (enterPressed)="onSearchEnterPressed($event)"
     (suggestionSelected)="onSuggestionSelected($event)"

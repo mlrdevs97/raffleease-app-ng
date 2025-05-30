@@ -8,6 +8,10 @@ import { RaffleService } from '../../../services/raffle.service';
 import { RaffleCreate } from '../../../models/raffle-create.model';
 import { ErrorHandlerService } from '../../../../../core/services/error-handler.service';
 import { AuthService } from '../../../../auth/services/auth.service';
+import { Router } from '@angular/router';
+import { SuccessResponse } from '../../../../../core/models/api-response.model';
+import { Raffle } from '../../../models/raffle.model';
+import { SuccessMessages } from '../../../../../core/constants/success-messages';
 
 @Component({
   selector: 'app-raffle-form',
@@ -25,7 +29,8 @@ export class RaffleFormComponent {
     private fb: FormBuilder, 
     private raffleService: RaffleService, 
     private errorHandler: ErrorHandlerService,
-    private authService: AuthService
+    private authService: AuthService,
+    private router: Router
   ) {
     this.raffleForm = this.fb.group({
       title: ['', [Validators.required, Validators.maxLength(100)]],
@@ -70,8 +75,11 @@ export class RaffleFormComponent {
     this.isLoading.set(true);
     this.resetErrors();
     this.raffleService.createRaffle(associationId, raffleData).subscribe({
-      next: (response) => {
-        console.log('Raffle created successfully', response);
+      next: (response: SuccessResponse<Raffle>) => {
+        console.log(SuccessMessages.raffle.created, response);
+        if (response.data?.id) {
+          this.router.navigate(['/raffles', response.data.id]);
+        }
       },
       error: (error: unknown) => {
         this.errorMessage.set(this.errorHandler.getErrorMessage(error));

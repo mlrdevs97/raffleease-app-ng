@@ -45,11 +45,9 @@ export class OrdersSearchPaymentInfoComponent implements OnInit, OnChanges {
     
     ngOnChanges(changes: SimpleChanges): void {
         if (changes['criteria']) {
-            // Reset form when criteria changes (especially when reset)
             this.updateFormFromCriteria();
         }
         
-        // Apply server validation errors if any
         if (changes['fieldErrors'] && this.fieldErrors) {
             this.applyFieldErrors();
         }

@@ -1,25 +1,27 @@
 import { Component, ElementRef, EventEmitter, HostListener, Input, Output, signal } from '@angular/core';
 import { FormsModule } from '@angular/forms';
-import { Raffle } from '../../../models/raffle.model';
+import { Ticket } from '../../../../../core/models/ticket.model';
 
 @Component({
-  selector: 'app-raffles-search',
-  templateUrl: './raffles-search.component.html',
+  selector: 'app-ticket-search',
+  templateUrl: './ticket-search.component.html',
   standalone: true,
   imports: [FormsModule]
 })
-export class RafflesSearchComponent {
+export class TicketSearchComponent {
   searchQuery = '';
   showSuggestions = signal(false);
   focusedIndex: number = -1;
   
-  @Input() suggestions: Raffle[] = [];
+  @Input() suggestions: Ticket[] = [];
   @Input() isLoading = false;
   @Input() noResults = false;
-
+  @Input() disabled = false;
+  @Input() placeholder = 'Search ticket number...';
+  
   @Output() searchChange = new EventEmitter<string>();
   @Output() enterPressed = new EventEmitter<string>();
-  @Output() suggestionSelected = new EventEmitter<Raffle>();
+  @Output() suggestionSelected = new EventEmitter<Ticket>();
   
   constructor(private elementRef: ElementRef) {}
 
@@ -40,9 +42,9 @@ export class RafflesSearchComponent {
   onInputChange() {
     this.searchChange.emit(this.searchQuery);
     
-    if (this.searchQuery.trim().length >= 2) {
+    if (this.searchQuery.trim().length >= 1) {
       this.showSuggestions.set(true);
-      this.focusedIndex = -1;
+      this.focusedIndex = -1; // Reset focus when showing new suggestions
     } else {
       this.showSuggestions.set(false);
       this.focusedIndex = -1;
@@ -77,9 +79,18 @@ export class RafflesSearchComponent {
     }
   }
   
-  selectSuggestion(raffle: Raffle) {
-    this.searchQuery = raffle.title;
-    this.suggestionSelected.emit(raffle);
+  selectSuggestion(ticket: Ticket) {
+    this.searchQuery = ticket.ticketNumber;
+    this.suggestionSelected.emit(ticket);
+    this.showSuggestions.set(false);
+    this.focusedIndex = -1;
+  }
+
+  /**
+   * Clear the search input and hide suggestions
+   */
+  clearSearch(): void {
+    this.searchQuery = '';
     this.showSuggestions.set(false);
     this.focusedIndex = -1;
   }
@@ -137,8 +148,6 @@ export class RafflesSearchComponent {
   private scrollFocusedSuggestionIntoView(): void {
     if (this.focusedIndex < 0) return;
 
-    // Use setTimeout to ensure the DOM has been updated
-    setTimeout(() => {
       const container = this.elementRef.nativeElement.querySelector('[role="listbox"]');
       if (!container) return;
 
@@ -164,6 +173,5 @@ export class RafflesSearchComponent {
       else if (elementBottom > containerScrollBottom) {
         container.scrollTop = elementBottom - container.clientHeight;
       }
-    }, 0);
   }
 } 

@@ -6,7 +6,7 @@ export const RAFFLES_ROUTES: Routes = [
     loadComponent: () => import('./pages/raffles-page/raffles-page.component').then(c => c.RafflesPageComponent)
   },
   {
-    path: 'raffles/:id',
+    path: ':id',
     loadComponent: () => import('./pages/raffle-details-page/raffle-details-page.component').then(c => c.RaffleDetailsPageComponent),
   },
   {

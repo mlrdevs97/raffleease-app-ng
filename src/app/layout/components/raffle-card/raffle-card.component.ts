@@ -1,12 +1,14 @@
 import { Component, Input, ElementRef, HostListener, Output, EventEmitter, OnDestroy } from '@angular/core';
 import { RouterLink, Router } from '@angular/router';
 import { DatePipe } from '@angular/common';
-import { Raffle, RaffleStatus } from '../../../models/raffle.model';
-import { RaffleStatusLabelComponent } from '../../shared/raffle-status-label/raffle-status-label.component';
-import { RaffleService } from '../../../services/raffle.service';
-import { ErrorHandlerService } from '../../../../../core/services/error-handler.service';
-import { ErrorCodes } from '../../../../../core/constants/error-codes';
-import { ErrorMessages } from '../../../../../core/constants/error-messages';
+import { Raffle } from '../../../features/raffles/models/raffle.model';
+import { RaffleStatusLabelComponent } from '../../../features/raffles/components/shared/raffle-status-label/raffle-status-label.component';
+import { RaffleService } from '../../../features/raffles/services/raffle.service';
+import { ErrorHandlerService } from '../../../core/services/error-handler.service';
+import { ErrorCodes } from '../../../core/constants/error-codes';
+import { ErrorMessages } from '../../../core/constants/error-messages';
+
+export type RaffleCardMode = 'menu' | 'clearSelection';
 
 @Component({
   selector: 'app-raffle-card',
@@ -16,8 +18,12 @@ import { ErrorMessages } from '../../../../../core/constants/error-messages';
 })
 export class RaffleCardComponent implements OnDestroy {
   @Input() raffle!: Raffle;
-  @Input() associationId!: number;
+  @Input() associationId?: number;
+  @Input() mode: RaffleCardMode = 'menu';
+  @Input() clearSelectionLabel = 'Change';
+  @Input() showStatus?: boolean;
   @Output() deleted = new EventEmitter<number>();
+  @Output() clearSelection = new EventEmitter<void>();
   
   menuOpen = false;
   isDeleting = false;
@@ -31,6 +37,10 @@ export class RaffleCardComponent implements OnDestroy {
     private errorHandler: ErrorHandlerService
   ) {}
   
+  get shouldShowStatus(): boolean {
+    return this.showStatus !== undefined ? this.showStatus : this.mode === 'menu';
+  }
+
   @HostListener('document:click', ['$event'])
   onDocumentClick(event: MouseEvent) {
     if (!this.elementRef.nativeElement.contains(event.target)) {
@@ -52,6 +62,11 @@ export class RaffleCardComponent implements OnDestroy {
   }
 
   deleteRaffle() {
+    if (!this.associationId) {
+      console.error('associationId is required for delete operation');
+      return;
+    }
+
     this.menuOpen = false;
     this.clearErrorMessage();
     this.isDeleting = true;
@@ -78,6 +93,10 @@ export class RaffleCardComponent implements OnDestroy {
       }
     });
   }
+
+  onClearSelection() {
+    this.clearSelection.emit();
+  }
   
   clearErrorMessage(): void {
     if (this.errorTimeout) {
@@ -90,4 +109,4 @@ export class RaffleCardComponent implements OnDestroy {
   ngOnDestroy(): void {
     this.clearErrorMessage();
   }
-}
+} 

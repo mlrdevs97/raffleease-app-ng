@@ -1,24 +1,47 @@
-<div class="space-y-4">
+<div class="space-y-6">
     <h3 class="text-lg font-semibold">Ticket Selection</h3>
     <div class="shrink-0 bg-slate-200 h-[1px] w-full"></div>
-    <div class="w-full space-y-4">
-        <app-ticket-selection-tabs 
-            [selectedTab]="ticketSelectionForm.get('ticketSearchType')?.value"
-            (tabSelected)="onTabSelected($event)">
-        </app-ticket-selection-tabs>
-    </div>
 
-    @if (ticketSelectionForm.get('ticketSearchType')?.value === 'specific') {
-    <div
-        class="mt-2 ring-offset-background focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2 space-y-4">
-        <app-specific-ticket-selection [parentFormGroup]="ticketSelectionForm"></app-specific-ticket-selection>
-    </div>
+    @if (isDisabled) {
+    <div class="text-sm text-gray-500 italic mb-2">Please select a raffle before searching for tickets.</div>
     }
+    
+    <div class="space-y-4" [class.opacity-60]="isDisabled">
+        <div class="w-full">
+            <app-ticket-selection-tabs 
+                [selectedTab]="ticketSearchType" 
+                [disabled]="isDisabled"
+                (tabSelected)="onTabSelected($event)">
+            </app-ticket-selection-tabs>
+        </div>
 
-    @if (ticketSelectionForm.get('ticketSearchType')?.value === 'random') {
-    <div
-        class="mt-2 ring-offset-background focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2 space-y-4">
-        <app-random-ticket-selection [parentFormGroup]="ticketSelectionForm"></app-random-ticket-selection>
+        @if (isSpecificMode) {
+        <div class="mt-2 ring-offset-background focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2 space-y-4">
+            <app-specific-ticket-selection 
+                [parentFormGroup]="ticketSelectionForm" 
+                [fieldErrors]="fieldErrors"
+                [raffleId]="raffleId"
+                [disabled]="isDisabled">
+            </app-specific-ticket-selection>
+        </div>
+        }
+
+        @if (isRandomMode) {
+        <div class="mt-2 ring-offset-background focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2 space-y-4">
+            <app-random-ticket-selection 
+                [parentFormGroup]="ticketSelectionForm" 
+                [fieldErrors]="fieldErrors"
+                [raffleId]="raffleId"
+                [disabled]="isDisabled">
+            </app-random-ticket-selection>
+        </div>
+        }
+    </div>
+
+    @if (!isDisabled) {
+    <div>
+        <app-tickets-preview (ticketRemoved)="onTicketRemoved($event)">
+        </app-tickets-preview>
     </div>
     }
 </div>

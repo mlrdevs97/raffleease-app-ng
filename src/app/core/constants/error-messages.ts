@@ -73,7 +73,26 @@ export const ErrorMessages: {
             REQUIRED: 'You must upload at least one image'
         },
         'raffle': {
-            CANNOT_DELETE: 'Only raffles with PENDING status can be deleted'
+            CANNOT_DELETE: 'Only raffles with PENDING status can be deleted',
+            NOT_FOUND: 'The selected raffle was not found. Please try selecting a different raffle.',
+            INACTIVE: 'This raffle is not currently active and tickets cannot be selected.',
+            INSUFFICIENT_TICKETS: 'Not enough tickets are available for this request.',
+            SELECTION_REQUIRED: 'Please select a raffle first to generate random tickets'
+        },
+        'tickets': {
+            NOT_FOUND: 'The requested ticket was not found or is no longer available.',
+            ALREADY_SELECTED: 'This ticket has already been selected.',
+            NOT_AVAILABLE: 'This ticket is not available for selection.',
+            SEARCH_FAILED: 'Failed to search for tickets. Please try again.',
+            GENERATION_FAILED: 'Failed to generate random tickets. Please try again.',
+            INSUFFICIENT_QUANTITY: 'Not enough tickets are available to fulfill your request.',
+            INVALID_QUANTITY: 'Please enter a valid number of tickets (minimum 1)',
+            ADDITION_FAILED: 'Failed to add ticket to your selection. Please try again.',
+            RAFFLE_NOT_FOUND: 'Raffle not found. Please select a valid raffle.',
+            ACCESS_DENIED: 'You do not have permission to search tickets for this raffle.',
+            SERVER_ERROR: 'Server error occurred while searching for tickets. Please try again.',
+            CONNECTION_ERROR: 'Connection error. Please check your internet connection.',
+            SEARCH_ERROR: 'Failed to search for tickets. Please try again.'
         }
     }
 };
