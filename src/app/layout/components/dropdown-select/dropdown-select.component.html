@@ -1,7 +1,10 @@
 <div class="relative w-full">
     <button type="button" (click)="toggleDropdown()"
         class="flex h-10 w-full items-center justify-between rounded-md border border-input bg-background px-3 py-2 text-sm ring-offset-background placeholder:text-muted-foreground focus:outline-none focus:ring-2 focus:ring-ring focus:ring-offset-2 hover:border-slate-300 transition-colors disabled:cursor-not-allowed disabled:opacity-50"
-        [disabled]="isDisabled">
+        [disabled]="isDisabled"
+        [attr.aria-expanded]="isOpen"
+        [attr.aria-haspopup]="true"
+        role="combobox">
         <span style="pointer-events: none;">{{ displayValue | titlecase }}</span>
         <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none"
             stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"
@@ -15,14 +18,21 @@
 
         <div data-side="bottom" data-align="start" role="listbox"
             class="flex flex-col relative z-50 max-h-96 min-w-[8rem] overflow-hidden rounded-md border bg-popover text-popover-foreground shadow-md"
-            tabindex="-1">
+            tabindex="-1"
+            [attr.aria-activedescendant]="focusedIndex >= 0 ? 'option-' + focusedIndex : null">
 
             <div role="presentation" class="p-1 h-full w-full min-w-full relative flex-1 overflow-auto">
 
                 @if (displayAllOption) {
                 <div role="option"
-                    tabindex="0"
-                    class="relative flex w-full cursor-pointer select-none items-center rounded-sm py-1.5 pl-8 pr-2 text-sm outline-none focus:bg-slate-100 hover:bg-slate-100 hover:text-slate-800 transition-colors duration-150"
+                    [id]="'option-0'"
+                    [attr.aria-selected]="value === 'ANY'"
+                    tabindex="-1"
+                    class="relative flex w-full cursor-pointer select-none items-center rounded-sm py-1.5 pl-8 pr-2 text-sm outline-none transition-colors duration-150"
+                    [class.bg-slate-100]="isOptionFocused('ANY')"
+                    [class.text-slate-800]="isOptionFocused('ANY')"
+                    [class.hover:bg-slate-100]="!isOptionFocused('ANY')"
+                    [class.hover:text-slate-800]="!isOptionFocused('ANY')"
                     (click)="selectOption('ANY')">
                     <span class="absolute left-2 flex h-3.5 w-3.5 items-center justify-center">
                         @if (value === 'ANY') {
@@ -37,10 +47,18 @@
                 </div>
                 }
 
-                @for (option of options; track option) {
-                <div role="option" tabindex="-1" (click)="selectOption(option)"
-                    class="relative flex w-full cursor-pointer select-none items-center rounded-sm py-1.5 pl-8 pr-2 text-sm outline-none hover:bg-slate-100 hover:text-slate-800 transition-colors duration-150"
-                    [class.bg-slate-50]="value === option">
+                @for (option of options; track option; let i = $index) {
+                <div role="option" 
+                    [id]="'option-' + (displayAllOption ? i + 1 : i)"
+                    [attr.aria-selected]="value === option"
+                    tabindex="-1" 
+                    (click)="selectOption(option)"
+                    class="relative flex w-full cursor-pointer select-none items-center rounded-sm py-1.5 pl-8 pr-2 text-sm outline-none transition-colors duration-150"
+                    [class.bg-slate-50]="value === option && !isOptionFocused(option)"
+                    [class.bg-slate-100]="isOptionFocused(option)"
+                    [class.text-slate-800]="isOptionFocused(option)"
+                    [class.hover:bg-slate-100]="!isOptionFocused(option)"
+                    [class.hover:text-slate-800]="!isOptionFocused(option)">
                     <span class="absolute left-2 flex h-3.5 w-3.5 items-center justify-center">
                         @if (value === option) {
                         <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none"
