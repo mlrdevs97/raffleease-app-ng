@@ -80,4 +80,15 @@ export class RaffleDetailsPageComponent implements OnInit {
       }
     });
   }
+
+  onRaffleUpdated(updatedRaffle: Raffle): void {
+    this.raffle.set(updatedRaffle);
+  }
+
+  onEditRequested(): void {
+    const currentRaffle = this.raffle();
+    if (currentRaffle) {
+      this.router.navigate(['/raffles', currentRaffle.id, 'edit']);
+    }
+  }
 }

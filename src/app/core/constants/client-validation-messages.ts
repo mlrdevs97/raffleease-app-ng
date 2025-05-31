@@ -79,5 +79,29 @@ export const ClientValidationMessages = {
     nationalNumberPattern: 'Phone number must contain only digits (1-14 digits)',
     countryCodeRequired: 'Country code is required',
     nationalNumberRequired: 'Phone number is required'
+  },
+
+  /**
+   * Raffle confirmation messages
+   */
+  raffle: {
+    confirmActivation: {
+      title: 'Activate Raffle',
+      message: 'Are you sure you want to activate this raffle? Once activated, customers will be able to purchase tickets and the raffle cannot be edited.',
+      confirmText: 'Activate Raffle',
+      cancelText: 'Cancel'
+    },
+    confirmPause: {
+      title: 'Pause Raffle',
+      message: 'Are you sure you want to pause this raffle? Customers will not be able to purchase tickets while the raffle is paused.',
+      confirmText: 'Pause Raffle',
+      cancelText: 'Cancel'
+    },
+    confirmReactivation: {
+      title: 'Reactivate Raffle',
+      message: 'Are you sure you want to reactivate this raffle? Customers will be able to purchase tickets again.',
+      confirmText: 'Reactivate Raffle',
+      cancelText: 'Cancel'
+    }
   }
 }; 
