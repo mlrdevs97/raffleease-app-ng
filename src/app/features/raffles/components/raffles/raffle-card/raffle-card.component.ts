@@ -1,12 +1,12 @@
 import { Component, Input, ElementRef, HostListener, Output, EventEmitter, OnDestroy } from '@angular/core';
 import { RouterLink, Router } from '@angular/router';
 import { DatePipe } from '@angular/common';
-import { Raffle } from '../../../features/raffles/models/raffle.model';
-import { RaffleStatusLabelComponent } from '../../../features/raffles/components/shared/raffle-status-label/raffle-status-label.component';
-import { RaffleService } from '../../../features/raffles/services/raffle.service';
-import { ErrorHandlerService } from '../../../core/services/error-handler.service';
-import { ErrorCodes } from '../../../core/constants/error-codes';
-import { ErrorMessages } from '../../../core/constants/error-messages';
+import { Raffle } from '../../../models/raffle.model';
+import { RaffleStatusLabelComponent } from '../../shared/raffle-status-label/raffle-status-label.component';
+import { RaffleService } from '../../../services/raffle.service';
+import { ErrorHandlerService } from '../../../../../core/services/error-handler.service';
+import { ErrorCodes } from '../../../../../core/constants/error-codes';
+import { ErrorMessages } from '../../../../../core/constants/error-messages';
 
 export type RaffleCardMode = 'menu' | 'clearSelection';
 
