@@ -1,35 +1,75 @@
 @if (tickets().length > 0) {
     <div class="rounded-lg border bg-card text-card-foreground shadow-sm">
         <div class="p-4">
-            <h3 class="text-lg font-medium mb-4">Selected Tickets</h3>
-            <div class="grid grid-cols-3 gap-4 border-b pb-2 text-sm font-medium text-gray-500">
-                <div>Ticket Number</div>
-                <div>Price</div>
-                <div class="text-right">Action</div>
-            </div>
+            <h3 class="text-lg font-medium mb-4">{{ displayTitle }}</h3>
+            
+            <!-- Dynamic table header based on configuration -->
+            @if (shouldShowStatus) {
+                <div class="grid grid-cols-3 gap-4 border-b pb-2 text-sm font-medium text-gray-500">
+                    <div>Ticket Number</div>
+                    <div>Status</div>
+                    <div>Price</div>
+                </div>
+            } @else if (shouldShowActions) {
+                <div class="grid grid-cols-3 gap-4 border-b pb-2 text-sm font-medium text-gray-500">
+                    <div>Ticket Number</div>
+                    <div>Price</div>
+                    <div class="text-right">Action</div>
+                </div>
+            } @else {
+                <div class="grid grid-cols-2 gap-4 border-b pb-2 text-sm font-medium text-gray-500">
+                    <div>Ticket Number</div>
+                    <div>Price</div>
+                </div>
+            }
+            
+            <!-- Dynamic table rows based on configuration -->
             <div class="divide-y">
                 @for (ticket of tickets(); track ticket.id) {
-                    <div class="grid grid-cols-3 gap-4 py-3 items-center">
-                        <div class="font-medium">{{ ticket.ticketNumber }}</div>
-                        <div>${{ ticket.price | number:'1.2-2' }}</div>
-                        <div class="text-right">
-                            <button (click)="removeTicket(ticket.ticketNumber)"
-                                class="inline-flex items-center justify-center gap-2 whitespace-nowrap text-sm font-medium ring-offset-background transition-colors focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2 disabled:pointer-events-none disabled:opacity-50 [&amp;_svg]:pointer-events-none [&amp;_svg]:size-4 [&amp;_svg]:shrink-0 h-9 rounded-md px-3 text-red-600 hover:text-red-700 hover:bg-red-50">
-                                <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none"
-                                    stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"
-                                    class="lucide lucide-x h-4 w-4">
-                                    <path d="M18 6 6 18"></path>
-                                    <path d="m6 6 12 12"></path>
-                                </svg>
-                            </button>
+                    @if (shouldShowStatus) {
+                        <div class="grid grid-cols-3 gap-4 py-3 items-center">
+                            <div class="font-medium">{{ ticket.ticketNumber }}</div>
+                            <div>
+                                <div class="inline-flex items-center rounded-full border px-2.5 py-0.5 text-xs font-semibold transition-colors focus:outline-none focus:ring-2 focus:ring-ring focus:ring-offset-2 border-transparent bg-gray-100 text-gray-800 hover:bg-gray-100">
+                                    {{ ticket.status }}
+                                </div>
+                            </div>
+                            <div>{{ formatPrice(ticket.price) }}</div>
                         </div>
-                    </div>
+                    } @else if (shouldShowActions) {
+                        <div class="grid grid-cols-3 gap-4 py-3 items-center">
+                            <div class="font-medium">{{ ticket.ticketNumber }}</div>
+                            <div>{{ formatPrice(ticket.price) }}</div>
+                            <div class="text-right">
+                                <button (click)="removeTicket(ticket.ticketNumber)"
+                                    class="inline-flex items-center justify-center gap-2 whitespace-nowrap text-sm font-medium ring-offset-background transition-colors focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2 disabled:pointer-events-none disabled:opacity-50 [&amp;_svg]:pointer-events-none [&amp;_svg]:size-4 [&amp;_svg]:shrink-0 h-9 rounded-md px-3 text-red-600 hover:text-red-700 hover:bg-red-50">
+                                    <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none"
+                                        stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"
+                                        class="lucide lucide-x h-4 w-4">
+                                        <path d="M18 6 6 18"></path>
+                                        <path d="m6 6 12 12"></path>
+                                    </svg>
+                                </button>
+                            </div>
+                        </div>
+                    } @else {
+                        <div class="grid grid-cols-2 gap-4 py-3 items-center">
+                            <div class="font-medium">{{ ticket.ticketNumber }}</div>
+                            <div>{{ formatPrice(ticket.price) }}</div>
+                        </div>
+                    }
                 }
             </div>
+            
+            <!-- Footer with totals -->
             <div class="mt-4 flex justify-between items-center border-t pt-4">
-                <div class="text-sm text-gray-500">Total tickets: {{ tickets().length }}</div>
-                <div class="text-lg font-medium">Total: ${{ calculateTotalPrice() | number:'1.2-2' }}</div>
+                <div class="text-sm text-gray-500">Total tickets: {{ ticketCount }}</div>
+                <div class="text-lg font-medium">Total: {{ formatPrice(calculateTotalPrice()) }}</div>
             </div>
         </div>
+    </div>
+} @else {
+    <div class="text-center py-8 text-gray-500">
+        <p>No tickets found.</p>
     </div>
 }

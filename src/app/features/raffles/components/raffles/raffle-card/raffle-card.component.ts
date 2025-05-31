@@ -62,16 +62,11 @@ export class RaffleCardComponent implements OnDestroy {
   }
 
   deleteRaffle() {
-    if (!this.associationId) {
-      console.error('associationId is required for delete operation');
-      return;
-    }
-
     this.menuOpen = false;
     this.clearErrorMessage();
     this.isDeleting = true;
     
-    this.raffleService.deleteRaffle(this.associationId, this.raffle.id).subscribe({
+    this.raffleService.deleteRaffle(this.raffle.id).subscribe({
       next: () => {
         this.isDeleting = false;
         this.deleted.emit(this.raffle.id);

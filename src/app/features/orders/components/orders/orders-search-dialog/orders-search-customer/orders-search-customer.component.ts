@@ -1,8 +1,9 @@
 import { Component, Input, Output, EventEmitter, OnInit, OnChanges, SimpleChanges } from '@angular/core';
 import { CommonModule } from '@angular/common';
-import { FormBuilder, FormGroup, ReactiveFormsModule, Validators } from '@angular/forms';
-import { OrderSearchFilters } from '../../../models/order.model';
-import { ClientValidationMessages } from '../../../../../core/constants/client-validation-messages';
+import { FormBuilder, FormGroup, ReactiveFormsModule } from '@angular/forms';
+import { OrderSearchFilters } from '../../../../models/order.model';
+import { ClientValidationMessages } from '../../../../../../core/constants/client-validation-messages';
+import { Validators } from '@angular/forms';
 
 @Component({
   selector: 'app-orders-search-customer',

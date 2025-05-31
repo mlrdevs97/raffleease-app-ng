@@ -1,34 +1,33 @@
-import { Component, Input, Output, EventEmitter, OnChanges, SimpleChanges, OnInit } from '@angular/core';
+import { Component, Input, Output, EventEmitter, OnInit, OnChanges, SimpleChanges } from '@angular/core';
 import { CommonModule } from '@angular/common';
-import { FormBuilder, FormGroup, ReactiveFormsModule, Validators } from '@angular/forms';
-import { PaymentMethods } from '../../../../../core/models/payment.model';
-import { OrderSearchFilters } from '../../../models/order.model';
-import { DropdownSelectComponent } from '../../../../../layout/components/dropdown-select/dropdown-select.component';
-import { nonNegativeNumberValidator, minMaxValidator } from '../../../../../core/validators/number.validators';
-import { ClientValidationMessages } from '../../../../../core/constants/client-validation-messages';
+import { FormBuilder, FormGroup, ReactiveFormsModule } from '@angular/forms';
+import { OrderStatus, OrderSearchFilters } from '../../../../models/order.model';
+import { DropdownSelectComponent } from '../../../../../../layout/components/dropdown-select/dropdown-select.component';
+import { positiveNumberValidator } from '../../../../../../core/validators/number.validators';
+import { ClientValidationMessages } from '../../../../../../core/constants/client-validation-messages';
 
 @Component({
-    selector: 'app-orders-search-payment-info',
+    selector: 'app-orders-search-order-info',
     standalone: true,
     imports: [CommonModule, DropdownSelectComponent, ReactiveFormsModule],
-    templateUrl: './orders-search-payment-info.component.html',
+    templateUrl: './orders-search-order-info.component.html',
 })
-export class OrdersSearchPaymentInfoComponent implements OnInit, OnChanges {
+export class OrdersSearchOrderInfoComponent implements OnInit, OnChanges {
     @Input() criteria: OrderSearchFilters = {};
     @Input() fieldErrors: Record<string, string> = {};
     @Output() criteriaChange = new EventEmitter<Partial<OrderSearchFilters>>();
     
-    paymentMethodOptions = Object.values(PaymentMethods);
+    orderStatusOptions = Object.values(OrderStatus); 
     
     searchForm: FormGroup;
     validationMessages = ClientValidationMessages;
     
     constructor(private fb: FormBuilder) {
         this.searchForm = this.fb.group({
-            paymentMethod: [''],
-            minTotal: ['', [nonNegativeNumberValidator()]],
-            maxTotal: ['', [nonNegativeNumberValidator()]]
-        }, { validators: minMaxValidator('minTotal', 'maxTotal') });
+            status: [''],
+            orderReference: [''],
+            raffleId: ['', [positiveNumberValidator()]]
+        });
     }
     
     ngOnInit(): void {
@@ -42,28 +41,28 @@ export class OrdersSearchPaymentInfoComponent implements OnInit, OnChanges {
     }
     
     ngOnChanges(changes: SimpleChanges): void {
+        // Detect when criteria is reset to an empty object
         if (changes['criteria']) {
             this.updateFormFromCriteria();
         }
         
+        // Apply server validation errors if any
         if (changes['fieldErrors'] && this.fieldErrors) {
             this.applyFieldErrors();
         }
     }
-    
+
     updateFormFromCriteria(): void {
         // Reset form when criteria is empty or update with existing values
         this.searchForm.patchValue({
-            paymentMethod: this.criteria?.paymentMethod || '',
-            minTotal: this.criteria?.minTotal || '',
-            maxTotal: this.criteria?.maxTotal || ''
+            status: this.criteria?.status || '',
+            orderReference: this.criteria?.orderReference || '',
+            raffleId: this.criteria?.raffleId || ''
         }, { emitEvent: false }); // Prevent triggering valueChanges subscription
     }
     
     updateCriteria(data: Partial<OrderSearchFilters>): void {
-        // Only proceed if the form is valid
         if (this.searchForm.valid) {
-            // Filter out empty values
             const filteredData = Object.entries(data).reduce((acc, [key, value]) => {
                 if (value !== '' && value !== null && value !== undefined) {
                     acc[key as keyof OrderSearchFilters] = value as any;
@@ -76,12 +75,12 @@ export class OrdersSearchPaymentInfoComponent implements OnInit, OnChanges {
     }
     
     applyFieldErrors(): void {
-        const paymentErrorFields = Object.keys(this.fieldErrors).filter(
-            field => field.startsWith('payment.') || field.includes('Total') || field === 'paymentMethod'
+        const orderErrorFields = Object.keys(this.fieldErrors).filter(
+            field => field.startsWith('order.') || field === 'raffleId'
         );
         
-        paymentErrorFields.forEach(fieldPath => {
-            const field = fieldPath.replace('payment.', '');
+        orderErrorFields.forEach(fieldPath => {
+            const field = fieldPath.replace('order.', '');
             const control = this.searchForm.get(field);
             if (control) {
                 control.markAsTouched();
@@ -89,7 +88,7 @@ export class OrdersSearchPaymentInfoComponent implements OnInit, OnChanges {
             }
         });
     }
-    
+
     // Helper methods for the template
     getErrorMessage(controlName: string): string | null {
         const control = this.searchForm.get(controlName);
@@ -103,19 +102,10 @@ export class OrdersSearchPaymentInfoComponent implements OnInit, OnChanges {
         // Check for client-side validation errors
         if (control.errors['required']) {
             return this.validationMessages.common.required;
-        } else if (control.errors['nonNegative']) {
-            return this.validationMessages.number.nonNegative;
+        } else if (control.errors['positiveNumber']) {
+            return this.validationMessages.number.positive;
         }
         
-        return null;
-    }
-    
-    getFormErrorMessage(): string | null {
-        if (this.searchForm.touched && this.searchForm.errors) {
-            if (this.searchForm.errors['minGreaterThanMax']) {
-                return this.validationMessages.number.minGreaterThanMax;
-            }
-        }
         return null;
     }
 }

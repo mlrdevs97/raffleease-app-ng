@@ -1,0 +1,38 @@
+<td class="table-cell-base">
+  <a [routerLink]="['/orders', order.id]" class="cell-link">
+  </a>
+  {{ order.orderReference }}
+</td>
+
+<td class="table-cell-base text-zinc-500">
+  <a [routerLink]="['/orders', order.id]" class="cell-link">
+  </a>
+  {{ order.createdAt | date:'mediumDate' }}
+</td>
+
+<td class="table-cell-base">
+  <a [routerLink]="['/orders', order.id]" class="cell-link">
+  </a>
+  {{ order.customer.fullName | titlecase }}
+</td>
+
+<td class="table-cell-base">
+  <a [routerLink]="getRaffleLink()" class="cell-link">
+  </a>
+  <div class="">
+    <app-order-raffle-preview [imageUrl]="raffleDisplaySummary.imageURL" [eventName]="raffleDisplaySummary.title">
+    </app-order-raffle-preview>
+  </div>
+</td>
+
+<td class="table-cell-base">
+  <a [routerLink]="['/orders', order.id]" class="cell-link">
+  </a>
+  <div [ngClass]="getStatusClass(order.status)">{{ order.status | titlecase }}</div>
+</td>
+
+<td class="table-cell-base text-right">
+  <a [routerLink]="['/orders', order.id]" class="cell-link">
+  </a>
+  {{ order.payment.total | currency:(order.payment.currencyCode || 'EUR') }}
+</td>

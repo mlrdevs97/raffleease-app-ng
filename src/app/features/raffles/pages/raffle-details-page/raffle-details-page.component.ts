@@ -1,65 +1,83 @@
-import { Component } from '@angular/core';
+import { Component, OnInit, signal, computed } from '@angular/core';
+import { ActivatedRoute, Params, Router } from '@angular/router';
+import { CommonModule } from '@angular/common';
+import { EMPTY } from 'rxjs';
 import { RaffleStatisticsComponent } from '../../components/raffle-details/raffle-statistics/raffle-statistics.component';
-import { BackLinkComponent } from '../../components/raffle-details/back-link/back-link.component';
 import { RaffleGalleryComponent } from '../../components/raffle-details/raffle-gallery/raffle-gallery.component';
 import { RaffleHeaderComponent } from '../../components/raffle-details/raffle-header/raffle-header.component';
-import { RecentOrdersComponent } from '../../components/raffle-details/recent-orders/recent-orders.component';
-import { Raffle, RaffleStatus } from '../../models/raffle.model';
-import { CommonModule } from '@angular/common';
+import { BackLinkComponent } from '../../../../layout/components/back-link/back-link.component';
+import { Raffle } from '../../models/raffle.model';
+import { RaffleQueryService } from '../../services/raffle-query.service';
+import { ErrorHandlerService } from '../../../../core/services/error-handler.service';
+import { RaffleOrdersComponent } from '../../components/raffle-details/raffle-orders/raffle-orders.component';
+import { ErrorMessages } from '../../../../core/constants/error-messages';
 
 @Component({
   selector: 'app-raffle-details-page',
   standalone: true,
   imports: [
     CommonModule,
-    BackLinkComponent, 
-    RaffleGalleryComponent, 
-    RaffleHeaderComponent, 
-    RecentOrdersComponent,
+    BackLinkComponent,
+    RaffleGalleryComponent,
+    RaffleHeaderComponent,
+    RaffleOrdersComponent,
     RaffleStatisticsComponent
   ],
   templateUrl: './raffle-details-page.component.html'
 })
-export class RaffleDetailsPageComponent {
-  raffle: Raffle = {
-    id: 1,
-    title: 'Raffle 1',
-    description: 'Description 1',
-    startDate: new Date('2025-04-01'),
-    endDate: new Date('2025-06-02'),
-    ticketPrice: 10,
-    firstTicketNumber: 1,
-    totalTickets: 100,
-    revenue: 900,
-    soldTickets: 90,
-    images: [
-      {
-        id: 1,
-        url: 'https://picsum.photos/200/300',
-        fileName: 'image.jpg',
-        filePath: '//via.placeholder.com/150',
-        contentType: 'image/jpeg',
-        imageOrder: 1,
-      }
-    ],
-    url: 'https://www.google.com',
-    createdAt: new Date(),
-    updatedAt: new Date(),
-    completedAt: null,
-    status: RaffleStatus.ACTIVE,
-    completionReason: null,
-    availableTickets: 100,
-    winningTicketId: null,
-  };
+export class RaffleDetailsPageComponent implements OnInit {
+  raffle = signal<Raffle | null>(null);
+  isLoading = signal(false);
 
-  get timePassed(): string {
-    const start = new Date(this.raffle.startDate);
+  timePassed = computed(() => {
+    const raffleData = this.raffle();
+    if (!raffleData) return '';
+
+    const start = new Date(raffleData.startDate);
     const now = new Date();
     const diff = Math.max(0, Math.floor((+now - +start) / (1000 * 60 * 60 * 24)));
     return `${diff} day${diff !== 1 ? 's' : ''}`;
-  }
+  });
+
+  constructor(
+    private route: ActivatedRoute,
+    private router: Router,
+    private raffleQueryService: RaffleQueryService,
+    private errorHandler: ErrorHandlerService
+  ) { }
 
   ngOnInit(): void {
-    console.log(this.raffle);
+    this.route.params.subscribe({
+      next: (params: Params) => {
+        const raffleId = parseInt(params['id'], 10);
+
+        if (isNaN(raffleId)) {
+          this.router.navigate(['/raffles'], {
+            queryParams: { error: ErrorMessages.dedicated['raffle']['NOT_FOUND'] }
+          });
+          return EMPTY;
+        }
+
+        this.isLoading.set(true);
+
+        return this.raffleQueryService.getById(raffleId).subscribe({
+          next: (raffle: Raffle) => {
+            this.raffle.set(raffle);
+            this.isLoading.set(false);
+          },
+          error: (error) => {
+            this.isLoading.set(false);
+            this.router.navigate(['/raffles'], {
+              queryParams: { error: this.errorHandler.getErrorMessage(error) }
+            });
+          }
+        });
+      },
+      error: (error) => {
+        this.router.navigate(['/raffles'], {
+          queryParams: { error: this.errorHandler.getErrorMessage(error) }
+        });
+      }
+    });
   }
-} 
+}

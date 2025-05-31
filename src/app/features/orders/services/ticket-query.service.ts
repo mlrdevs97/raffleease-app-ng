@@ -24,7 +24,7 @@ export class TicketQueryService {
   }
 
   getById(raffleId: number, ticketId: number): Observable<Ticket> {
-    const associationId = this.authService.getAssociationId();
+    const associationId = this.authService.requireAssociationId();
 
     return this.http.get<SuccessResponse<Ticket>>(
       `${this.apiUrl}/${associationId}/raffles/${raffleId}/tickets/${ticketId}`
@@ -40,12 +40,8 @@ export class TicketQueryService {
     size: number = 10,
     sort: string = 'ticketNumber,asc'
   ): Observable<PageResponse<Ticket>> {
-    const associationId = this.authService.getAssociationId();
+    const associationId = this.authService.requireAssociationId();
     
-    if (!associationId) {
-      throw new Error('Association ID not found');
-    }
-
     this.isLoading.set(true);
 
     let params = new HttpParams()

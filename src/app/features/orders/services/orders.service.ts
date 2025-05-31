@@ -34,13 +34,13 @@ export class OrdersService {
      * @returns Observable with the created order
      */
     createOrder(orderData: AdminOrderCreate): Observable<Order> {
+        const associationId = this.authService.requireAssociationId();
         return this.http.post<SuccessResponse<Order>>(
-            `${this.baseUrl}/${this.getAssociationId()}/orders`,
+            `${this.baseUrl}/${associationId}/orders`,
             orderData
         ).pipe(
             map(response => response.data!),
             tap(() => {
-                // Clear cache when a new order is created
                 this.clearCache();
             })
         );
@@ -61,7 +61,7 @@ export class OrdersService {
         size = 10,
         sort = 'createdAt,desc'
     ): Observable<PageResponse<Order>> {
-        const associationId = this.getAssociationId();
+        const associationId = this.authService.requireAssociationId();
         const cacheKey = this.generateCacheKey(filters, page, size, sort);
         const cachedData = this.cache().get(cacheKey);
 
@@ -105,7 +105,7 @@ export class OrdersService {
      * @returns Observable with the order details
      */
     getOrder(orderId: number): Observable<Order> {
-        const associationId = this.getAssociationId();
+        const associationId = this.authService.requireAssociationId();
 
         return this.http.get<SuccessResponse<Order>>(
             `${this.baseUrl}/${associationId}/orders/${orderId}`
@@ -116,14 +116,6 @@ export class OrdersService {
 
     clearCache(): void {
         this.cache.set(new Map());
-    }
-
-    private getAssociationId(): number {
-        const associationId = this.authService.getAssociationId();
-        if (!associationId) {
-            throw new Error('Authentication required. Please log in again.');
-        }
-        return associationId;
     }
 
     /**

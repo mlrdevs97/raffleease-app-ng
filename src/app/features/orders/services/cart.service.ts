@@ -47,7 +47,7 @@ export class CartService {
    * Create a new cart for the current association
    */
   createCart(): Observable<Cart> {
-    const associationId = this.getAssociationId();
+    const associationId = this.authService.requireAssociationId();
     
     this.isCreatingCart.set(true);
 
@@ -74,7 +74,7 @@ export class CartService {
       return throwError(() => new Error('No cart available for reservation'));
     }
 
-    const associationId = this.getAssociationId();
+    const associationId = this.authService.requireAssociationId();
     this.isReservingTickets.set(true);
 
     return this.http.post<SuccessResponse<Cart>>(
@@ -115,16 +115,5 @@ export class CartService {
    */
   getCartId(): number | null {
     return this.currentCart()?.id || null;
-  }
-
-  /**
-   * Get the current association ID
-   */
-  private getAssociationId(): number {
-    const associationId = this.authService.getAssociationId();
-    if (!associationId) {
-      throw new Error('Authentication required. Please log in again.');
-    }
-    return associationId;
   }
 } 

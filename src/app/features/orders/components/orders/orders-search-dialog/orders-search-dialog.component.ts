@@ -1,11 +1,11 @@
 import { Component, Input, Output, EventEmitter, HostListener, ViewChild, signal } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { OrdersSearchTabsComponent } from './orders-search-tabs/orders-search-tabs.component';
-import { Order, OrderSearchFilters } from '../../models/order.model';
-import { OrdersService } from '../../services/orders.service';
-import { PageResponse } from '../../../../core/models/pagination.model';
-import { ClientValidationMessages } from '../../../../core/constants/client-validation-messages';
-import { ErrorHandlerService } from '../../../../core/services/error-handler.service';
+import { Order, OrderSearchFilters } from '../../../models/order.model';
+import { OrdersService } from '../../../services/orders.service';
+import { PageResponse } from '../../../../../core/models/pagination.model';
+import { ClientValidationMessages } from '../../../../../core/constants/client-validation-messages';
+import { ErrorHandlerService } from '../../../../../core/services/error-handler.service';
 
 export interface SearchResult<T> {
     filters: OrderSearchFilters;

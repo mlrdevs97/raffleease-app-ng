@@ -35,16 +35,11 @@ export class RaffleImagesUploadComponent {
     if (!input.files) return;
 
     const files = Array.from(input.files);
-    const associationId = this.authService.getAssociationId();
-    if (!associationId) {
-      this.authService.logout();
-      return;
-    }
-    
+
     this.isLoading.set(true);
     this.errorMessage.set(null);
     
-    this.uploadService.uploadImages(associationId, files).subscribe({
+    this.uploadService.uploadImages(files).subscribe({
       next: (response: SuccessResponse<ImageResponse>) => {
         this.images = [...this.images, ...response.data!.images];
         this.control.setValue(this.images);
@@ -64,16 +59,10 @@ export class RaffleImagesUploadComponent {
   }
   
   deleteImage(index: number, imageId: number): void {
-    const associationId = this.authService.getAssociationId();
-    if (!associationId) {
-      this.authService.logout();
-      return;
-    }
-
     this.isLoading.set(true);
     this.errorMessage.set(null);
 
-    this.uploadService.deleteImage(associationId, imageId).subscribe({
+    this.uploadService.deleteImage(imageId).subscribe({
       next: () => {
         this.images.splice(index, 1);
         // Update imageOrder for each image based on its new index

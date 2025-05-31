@@ -27,7 +27,7 @@ export class RaffleQueryService {
     }
 
     getById(raffleId: number): Observable<Raffle> {
-        const associationId = this.authService.getAssociationId();
+        const associationId = this.authService.requireAssociationId();
         const cachedRaffle = this.raffleCache().get(raffleId);
 
         if (cachedRaffle) {
@@ -53,7 +53,7 @@ export class RaffleQueryService {
         size: number = 10,
         sort: string = 'createdAt,desc'
     ): Observable<PageResponse<Raffle>> {
-        const associationId = this.authService.getAssociationId();
+        const associationId = this.authService.requireAssociationId();
         const cacheKey = this.generateCacheKey(filters, page, size, sort);
         const cachedData = this.cache().get(cacheKey);
 

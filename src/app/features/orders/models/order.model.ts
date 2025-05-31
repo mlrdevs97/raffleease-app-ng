@@ -6,7 +6,8 @@ export enum OrderStatus {
     PENDING = 'PENDING',
     CANCELLED = 'CANCELLED',
     COMPLETED = 'COMPLETED',
-    UNPAID = 'UNPAID'
+    UNPAID = 'UNPAID',
+    REFUNDED = 'REFUNDED'
 }
 
 export interface OrderItem {
@@ -15,6 +16,7 @@ export interface OrderItem {
     priceAtPurchase: number;
     ticketId: number;
     raffleId: number;
+    customerId: number;
 }
 
 export interface Order {

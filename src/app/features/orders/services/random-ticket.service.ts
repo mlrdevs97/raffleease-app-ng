@@ -23,7 +23,7 @@ export class RandomTicketService {
    * Get random tickets from the backend API
    */
   getRandomTickets(raffleId: number, quantity: number): Observable<Ticket[]> {
-    const associationId = this.authService.getAssociationId();
+    const associationId = this.authService.requireAssociationId();
     this.isLoading.set(true);
 
     return this.http.get<SuccessResponse<Ticket[]>>(

@@ -8,14 +8,13 @@ import { CustomerInformationComponent } from '../customer-information/customer-i
 import { AdditionalInformationComponent } from '../additional-information/additional-information.component';
 import { RaffleSelectionComponent } from '../raffle-selection/raffle-selection.component';
 import { TicketSelectionService } from '../../../services/ticket-selection.service';
-import { OrderService } from '../../../services/order.service';
 import { CartService } from '../../../services/cart.service';
 import { AuthService } from '../../../../auth/services/auth.service';
 import { ErrorHandlerService } from '../../../../../core/services/error-handler.service';
 import { AdminOrderCreate } from '../../../models/admin-order-create.model';
-import { SuccessResponse } from '../../../../../core/models/api-response.model';
 import { Order } from '../../../models/order.model';
 import { ErrorMessages } from '../../../../../core/constants/error-messages';
+import { OrdersService } from '../../../services/orders.service';
 
 @Component({
   selector: 'app-order-form',
@@ -45,7 +44,7 @@ export class OrderFormComponent implements OnInit, OnDestroy {
     private fb: FormBuilder,
     private ticketSelectionService: TicketSelectionService,
     private router: Router,
-    private orderService: OrderService,
+    private ordersService: OrdersService,
     private cartService: CartService,
     private authService: AuthService,
     private errorHandler: ErrorHandlerService
@@ -223,23 +222,16 @@ export class OrderFormComponent implements OnInit, OnDestroy {
       comment: rawFormValue.additionalInformation.comment || null
     };
 
-    const associationId = this.authService.getAssociationId();
-    if (!associationId) {
-      this.authService.logout();
-      return;
-    }
+    const associationId = this.authService.requireAssociationId();
 
     this.isLoading.set(true);
     this.resetErrors();
 
-    this.orderService.createOrder(associationId, orderData).subscribe({
-      next: (response: SuccessResponse<Order>) => {
-        console.log('Order created successfully', response);
+    this.ordersService.createOrder(orderData).subscribe({
+      next: (response: Order) => {
         this.cartService.clearCart();
         this.ticketSelectionService.clearTickets();
-        if (response.data?.id) {
-          this.router.navigate(['/orders', response.data.id]);
-        }
+        this.router.navigate(['/orders', response.id]);
       },
       error: (error: unknown) => {
         this.errorMessage.set(this.errorHandler.getErrorMessage(error));

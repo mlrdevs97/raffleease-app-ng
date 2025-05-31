@@ -4,7 +4,7 @@ import { OrdersSearchOrderInfoComponent } from '../orders-search-order-info/orde
 import { OrdersSearchCustomerComponent } from '../orders-search-customer/orders-search-customer.component';
 import { OrdersSearchPaymentInfoComponent } from '../orders-search-payment-info/orders-search-payment-info.component';
 import { OrdersSearchDatesComponent } from '../orders-search-dates/orders-search-dates.component';
-import { OrderSearchFilters } from '../../../models/order.model';
+import { OrderSearchFilters } from '../../../../models/order.model';
 import { Subscription } from 'rxjs';
 
 @Component({

@@ -1,0 +1,47 @@
+<div class="mt-12">
+  <h2 class="text-base/7 font-semibold text-zinc-950 dark:text-zinc-50">Summary</h2>
+  <hr class="mt-4 w-full border-t border-zinc-950/10 dark:border-white/10">
+  
+  <dl class="mt-0 grid grid-cols-1 text-base/6 sm:grid-cols-[min(50%,_15rem)_auto] sm:text-sm/6">
+    <!-- Customer -->
+    <dt class="col-start-1 border-t border-zinc-950/5 pt-3 text-zinc-500 dark:border-white/5 dark:text-zinc-400">
+      Customer
+    </dt>
+    <dd class="pt-1 pb-3 text-zinc-950 sm:border-t sm:border-zinc-950/5 sm:pt-3 sm:dark:border-white/5 dark:text-white">
+      {{ customerFullName }}
+    </dd>
+    
+    <!-- Raffle -->
+    <dt class="col-start-1 border-t border-zinc-950/5 pt-3 text-zinc-500 dark:border-white/5 dark:text-zinc-400">
+      Raffle
+    </dt>
+    <dd class="flex items-center gap-2 pt-1 pb-3 text-zinc-950 sm:border-t sm:border-zinc-950/5 sm:pt-3 sm:dark:border-white/5 dark:text-white">
+      <div class="relative h-6 w-6 overflow-hidden rounded-full">
+        <img 
+          [alt]="order.raffleSummary.title" 
+          loading="lazy" 
+          decoding="async" 
+          class="object-cover w-full h-full"
+          [src]="order.raffleSummary.imageURL" 
+          style="position: absolute; height: 100%; width: 100%; inset: 0px; color: transparent;">
+      </div>
+      <span>{{ order.raffleSummary.title }}</span>
+    </dd>
+    
+    <!-- Amount -->
+    <dt class="col-start-1 border-t border-zinc-950/5 pt-3 text-zinc-500 dark:border-white/5 dark:text-zinc-400">
+      Amount
+    </dt>
+    <dd class="pt-1 pb-3 text-zinc-950 sm:border-t sm:border-zinc-950/5 sm:pt-3 sm:dark:border-white/5 dark:text-white">
+      {{ formattedAmount }}
+    </dd>
+    
+    <!-- Payment Method -->
+    <dt class="col-start-1 border-t border-zinc-950/5 pt-3 text-zinc-500 dark:border-white/5 dark:text-zinc-400">
+      Payment Method
+    </dt>
+    <dd class="pt-1 pb-3 text-zinc-950 sm:border-t sm:border-zinc-950/5 sm:pt-3 sm:dark:border-white/5 dark:text-white">
+      {{ paymentMethodDisplay }}
+    </dd>
+  </dl>
+</div> 

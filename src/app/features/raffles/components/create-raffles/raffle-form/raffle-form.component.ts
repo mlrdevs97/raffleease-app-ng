@@ -67,14 +67,9 @@ export class RaffleFormComponent {
       endDate: `${rawFormValue.endDate}T00:00:00`
     };
 
-    const associationId = this.authService.getAssociationId();
-    if (!associationId) {
-      this.authService.logout();
-      return;
-    }
     this.isLoading.set(true);
     this.resetErrors();
-    this.raffleService.createRaffle(associationId, raffleData).subscribe({
+    this.raffleService.createRaffle(raffleData).subscribe({
       next: (response: SuccessResponse<Raffle>) => {
         console.log(SuccessMessages.raffle.created, response);
         if (response.data?.id) {

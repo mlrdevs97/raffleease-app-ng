@@ -1,0 +1,41 @@
+<div class="mx-auto max-w-4xl">
+  <!-- Back link -->
+  <div class="mb-6">
+    <app-back-link routePath="/orders" label="Orders"></app-back-link>
+  </div>
+
+  <!-- Loading state -->
+  @if (isLoading()) {
+    <div class="flex items-center justify-center py-12">
+      <div class="text-center">
+        <div class="inline-block h-8 w-8 animate-spin rounded-full border-4 border-solid border-blue-600 border-r-transparent"></div>
+        <p class="mt-4 text-sm text-zinc-600 dark:text-zinc-400">Loading order details...</p>
+      </div>
+    </div>
+  }
+
+  @else if (order()) {
+    <div>
+      <app-order-detail-header [order]="order()!"></app-order-detail-header>
+    </div>
+
+    <div>
+      <app-order-summary [order]="order()!"></app-order-summary>
+    </div>
+
+    <div>
+      <app-order-comment [order]="order()!"></app-order-comment>
+    </div>
+
+    <div class="mt-12">
+      <h2 class="text-base/7 font-semibold text-zinc-950 dark:text-zinc-50">Tickets</h2>
+      <hr class="mt-4 w-full border-t border-zinc-950/10 dark:border-white/10">
+      <div class="mt-4">
+        <app-tickets-preview 
+          [config]="ticketsConfig" 
+          [ticketsData]="orderTickets">
+        </app-tickets-preview>
+      </div>
+    </div>
+  }
+</div> 

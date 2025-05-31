@@ -1,23 +1,38 @@
-<div class="space-y-8">
-    <app-back-link label="Raffles" link="/raffles" />
+<div class="space-y-12">
+    <app-back-link label="Raffles" routePath="/raffles" />
 
-    <div class="flex flex-col md:flex-row gap-6">
-        <div class="w-full md:w-1/2 xl:w-1/3">
-            <app-raffle-gallery [images]="raffle.images" />
+    @if (isLoading()) {
+        <div class="flex justify-center items-center py-12">
+            <div class="animate-spin rounded-full h-8 w-8 border-b-2 border-gray-900"></div>
+            <span class="ml-3 text-gray-600">Loading raffle details...</span>
+        </div>
+    } @else if (raffle()) {
+        <div class="flex flex-col md:flex-row gap-6">
+            <div class="w-full md:w-1/2 xl:w-1/3">
+                <app-raffle-gallery [images]="raffle()!.images" />
+            </div>
+
+            <div class="flex-1">
+                <app-raffle-header 
+                    [title]="raffle()!.title" 
+                    [status]="raffle()!.status" 
+                    [description]="raffle()!.description"
+                    [startDate]="raffle()!.startDate" 
+                    [endDate]="raffle()!.endDate" 
+                    [ticketPrice]="raffle()!.ticketPrice"
+                    [firstTicketNumber]="raffle()!.firstTicketNumber" 
+                    [totalTickets]="raffle()!.totalTickets" />
+            </div>
         </div>
 
-        <div class="flex-1">
-            <app-raffle-header [title]="raffle.title" [status]="raffle.status" [description]="raffle.description"
-                [startDate]="raffle.startDate" [endDate]="raffle.endDate" [ticketPrice]="raffle.ticketPrice"
-                [firstTicketNumber]="raffle.firstTicketNumber" [totalTickets]="raffle.totalTickets" />
+        <div>
+            <app-raffle-statistics [raffle]="raffle()!" />
         </div>
-    </div>
 
-    <div>
-        <app-raffle-statistics [raffle]="raffle" />
-    </div>
+        <div class="shrink-0 bg-slate-100 h-[1px] w-full"></div>
 
-    <div>
-        <app-recent-orders [raffleId]="raffle.id" />
-    </div>
+        <div>
+            <app-raffle-orders [raffleId]="raffle()!.id" />
+        </div>
+    }
 </div>

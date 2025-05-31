@@ -77,7 +77,7 @@ export const ErrorMessages: {
             NOT_FOUND: 'The selected raffle was not found. Please try selecting a different raffle.',
             INACTIVE: 'This raffle is not currently active and tickets cannot be selected.',
             INSUFFICIENT_TICKETS: 'Not enough tickets are available for this request.',
-            SELECTION_REQUIRED: 'Please select a raffle first to generate random tickets'
+            SELECTION_REQUIRED: 'Please select a raffle first to generate random tickets',
         },
         'tickets': {
             NOT_FOUND: 'The requested ticket was not found or is no longer available.',
@@ -99,7 +99,8 @@ export const ErrorMessages: {
             CART_NOT_FOUND: 'No active cart found. Please refresh and try again.',
             CART_EXPIRED: 'Your cart has expired. Please start a new order.',
             INVALID_CART: 'Invalid cart. Please refresh and try again.',
-            NO_TICKETS_SELECTED: 'Please select at least one ticket before creating an order.'
+            NO_TICKETS_SELECTED: 'Please select at least one ticket before creating an order.',
+            NOT_FOUND: 'The selected order was not found. Please try selecting a different order.'
         },
         'customer': {
             PHONE_INVALID: 'Please enter a valid phone number',

@@ -30,43 +30,6 @@ export class AuthService {
     this.checkAuthState();
   }
 
-  private checkAuthState(): void {
-    let storedToken = localStorage.getItem('accessToken');
-    let storedAssociationId = localStorage.getItem('associationId');
-
-    if (!storedToken) {
-      this.closeSession();
-      return;
-    }
-
-    try {
-      const decodedToken: DecodedToken = jwtDecode(storedToken);
-      if (decodedToken.exp * 1000 < Date.now()) {
-        this.closeSession();
-        return;
-      }
-
-      const associationId = storedAssociationId ? Number(storedAssociationId) : undefined;
-
-      this.authState.update(state => ({
-        ...state,
-        associationId,
-        isAuthenticated: !!storedToken,
-        token: storedToken
-      }));
-
-      this.setTokenRefreshTimer(storedToken);
-    } catch (error) {
-      console.error('Error parsing stored auth data:', error);
-      this.clearStoredAuth();
-    }
-  }
-
-  private clearStoredAuth(): void {
-    localStorage.removeItem('accessToken');
-    localStorage.removeItem('associationId');
-  }
-
   getToken(): string | null {
     return this.authState().token;
   }
@@ -137,6 +100,15 @@ export class AuthService {
     return this.authState().associationId;
   }
 
+  requireAssociationId(): number {
+    const associationId = this.authState().associationId;
+    if (!associationId) {
+      this.closeSession();
+      throw new Error('Authentication required. Please log in again.');
+    }
+    return associationId;
+  }
+
   private setTokenRefreshTimer(token: string): void {
     const decodedToken: DecodedToken = jwtDecode(token);
     const expiresIn = decodedToken.exp * 1000 - Date.now() - 60000;
@@ -183,5 +155,42 @@ export class AuthService {
       clearTimeout(this.tokenRefreshTimeout);
     }    
     this.router.navigate(['/auth/login']);    
+  }
+
+  private checkAuthState(): void {
+    let storedToken = localStorage.getItem('accessToken');
+    let storedAssociationId = localStorage.getItem('associationId');
+
+    if (!storedToken) {
+      this.closeSession();
+      return;
+    }
+
+    try {
+      const decodedToken: DecodedToken = jwtDecode(storedToken);
+      if (decodedToken.exp * 1000 < Date.now()) {
+        this.closeSession();
+        return;
+      }
+
+      const associationId = storedAssociationId ? Number(storedAssociationId) : undefined;
+
+      this.authState.update(state => ({
+        ...state,
+        associationId,
+        isAuthenticated: !!storedToken,
+        token: storedToken
+      }));
+
+      this.setTokenRefreshTimer(storedToken);
+    } catch (error) {
+      console.error('Error parsing stored auth data:', error);
+      this.clearStoredAuth();
+    }
+  }
+
+  private clearStoredAuth(): void {
+    localStorage.removeItem('accessToken');
+    localStorage.removeItem('associationId');
   }
 } 
