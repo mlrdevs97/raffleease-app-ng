@@ -1,6 +1,5 @@
 export interface Payment {
-    status: PaymentStatus;
-    paymentMethod: string;
+    paymentMethod: PaymentMethods;
     total: number;
     currencyCode?: string;
     paymentIntentId: string;
@@ -8,15 +7,6 @@ export interface Payment {
     updatedAt: string;
     completedAt?: string | null;
     cancelledAt?: string | null;
-}
-
-export enum PaymentStatus {
-    PENDING = 'PENDING',
-    SUCCEEDED = 'SUCCEEDED',
-    FAILED = 'FAILED',
-    REFUNDED = 'REFUNDED',
-    UNPAID = 'UNPAID',
-    CANCELLED = 'CANCELLED'
 }
 
 export enum PaymentMethods {

@@ -1,7 +1,7 @@
 import { Component, Input, Output, EventEmitter, OnChanges, SimpleChanges, OnInit } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { FormBuilder, FormGroup, ReactiveFormsModule, Validators } from '@angular/forms';
-import { PaymentMethods, PaymentStatus } from '../../../../../core/models/payment.model';
+import { PaymentMethods } from '../../../../../core/models/payment.model';
 import { OrderSearchFilters } from '../../../models/order.model';
 import { DropdownSelectComponent } from '../../../../../layout/components/dropdown-select/dropdown-select.component';
 import { nonNegativeNumberValidator, minMaxValidator } from '../../../../../core/validators/number.validators';
@@ -18,7 +18,6 @@ export class OrdersSearchPaymentInfoComponent implements OnInit, OnChanges {
     @Input() fieldErrors: Record<string, string> = {};
     @Output() criteriaChange = new EventEmitter<Partial<OrderSearchFilters>>();
     
-    paymentStatusOptions = Object.values(PaymentStatus);
     paymentMethodOptions = Object.values(PaymentMethods);
     
     searchForm: FormGroup;
@@ -26,7 +25,6 @@ export class OrdersSearchPaymentInfoComponent implements OnInit, OnChanges {
     
     constructor(private fb: FormBuilder) {
         this.searchForm = this.fb.group({
-            paymentStatus: [''],
             paymentMethod: [''],
             minTotal: ['', [nonNegativeNumberValidator()]],
             maxTotal: ['', [nonNegativeNumberValidator()]]
@@ -56,7 +54,6 @@ export class OrdersSearchPaymentInfoComponent implements OnInit, OnChanges {
     updateFormFromCriteria(): void {
         // Reset form when criteria is empty or update with existing values
         this.searchForm.patchValue({
-            paymentStatus: this.criteria?.paymentStatus || '',
             paymentMethod: this.criteria?.paymentMethod || '',
             minTotal: this.criteria?.minTotal || '',
             maxTotal: this.criteria?.maxTotal || ''
@@ -80,7 +77,7 @@ export class OrdersSearchPaymentInfoComponent implements OnInit, OnChanges {
     
     applyFieldErrors(): void {
         const paymentErrorFields = Object.keys(this.fieldErrors).filter(
-            field => field.startsWith('payment.') || field.includes('Total') || field === 'paymentMethod' || field === 'paymentStatus'
+            field => field.startsWith('payment.') || field.includes('Total') || field === 'paymentMethod'
         );
         
         paymentErrorFields.forEach(fieldPath => {

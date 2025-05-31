@@ -1,11 +1,12 @@
 import { Customer } from "../../../core/models/customer.model";
 import { Payment } from "../../../core/models/payment.model";
-import { PaymentMethods, PaymentStatus } from "../../../core/models/payment.model";
+import { PaymentMethods } from "../../../core/models/payment.model";
 
 export enum OrderStatus {
     PENDING = 'PENDING',
     CANCELLED = 'CANCELLED',
-    COMPLETED = 'COMPLETED'
+    COMPLETED = 'COMPLETED',
+    UNPAID = 'UNPAID'
 }
 
 export interface OrderItem {
@@ -44,7 +45,6 @@ export interface EventDisplayDetails {
 
 export interface OrderSearchFilters {
     status?: OrderStatus;
-    paymentStatus?: PaymentStatus;
     paymentMethod?: PaymentMethods;
     orderReference?: string;
     customerName?: string;

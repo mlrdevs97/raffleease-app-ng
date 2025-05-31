@@ -1,18 +1,6 @@
 <form [formGroup]="searchForm" class="space-y-4">
   <div class="space-y-2">
     <label class="text-sm font-semibold leading-none p-0 peer-disabled:cursor-not-allowed peer-disabled:opacity-70"
-      for="paymentStatus">Payment Status</label>
-    <div class="relative">
-      <app-dropdown-select [options]="paymentStatusOptions" placeholder="Select payment status"
-        formControlName="paymentStatus">
-      </app-dropdown-select>
-      @if (getErrorMessage('paymentStatus')) {
-        <div class="text-xs text-red-500 mt-1">{{ getErrorMessage('paymentStatus') }}</div>
-      }
-    </div>
-  </div>
-  <div class="space-y-2">
-    <label class="text-sm font-semibold leading-none p-0 peer-disabled:cursor-not-allowed peer-disabled:opacity-70"
       for="paymentMethod">Payment Method</label>
     <div class="relative">
         <app-dropdown-select [options]="paymentMethodOptions" placeholder="Select payment method"
