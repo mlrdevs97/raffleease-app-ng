@@ -6,7 +6,7 @@ import { RaffleQueryService } from '../../../../raffles/services/raffle-query.se
 import { RaffleSearchService } from '../../../../raffles/services/raffle-search.service';
 import { Raffle } from '../../../../raffles/models/raffle.model';
 import { ClientValidationMessages } from '../../../../../core/constants/client-validation-messages';
-import { RaffleCardComponent } from '../../../../../layout/components/raffle-card/raffle-card.component';
+import { RaffleCardComponent } from '../../../../raffles/components/raffles/raffle-card/raffle-card.component';
 
 @Component({
   selector: 'app-raffle-selection',

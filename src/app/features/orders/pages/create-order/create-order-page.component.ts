@@ -59,7 +59,6 @@ export class CreateOrderPageComponent implements OnInit, OnDestroy {
   private createCart(): void {
     this.cartService.createCart().subscribe({
       next: (cart: Cart) => {
-        console.log('Cart created successfully:', cart);
         this.cartError.set(null);
       },
       error: (error) => {

@@ -1,53 +1,49 @@
-<div class="mx-auto max-w-6xl p-4">
-  <app-orders-toolbar (searchClick)="openSearchDialog()"></app-orders-toolbar>
-  
+<div class="mx-auto max-w-6xl p-4 space-y-8">
+  <div>
+    <app-orders-toolbar (searchClick)="openSearchDialog()"></app-orders-toolbar>
+  </div>
+
   @if (isLoading()) {
-    <div class="flex items-center justify-center py-8">
-      <div class="animate-spin rounded-full h-8 w-8 border-b-2 border-zinc-900"></div>
-    </div>
+  <div class="flex items-center justify-center">
+    <div class="animate-spin rounded-full h-8 w-8 border-b-2 border-zinc-900"></div>
+  </div>
   } @else if (error()) {
-    <div class="bg-red-50 border border-red-200 text-red-700 px-4 py-3 rounded-md my-4">
-      <p>{{ error() }}</p>
-    </div>
+  <div class="bg-red-50 border border-red-200 text-red-700 px-4 py-2 rounded-md">
+    <p>{{ error() }}</p>
+  </div>
   } @else if (orders().length === 0) {
-    <div class="text-center py-8">
-      <p class="text-slate-500">No orders found</p>
-    </div>
+  <div class="text-center">
+    <p class="text-slate-500">No orders found</p>
+  </div>
   } @else {
-    <app-orders-table 
-      [orders]="orders()"
-      (pageChange)="onPageChange($event)">
+  <div>
+    <app-orders-table [orders]="orders()" (pageChange)="onPageChange($event)">
     </app-orders-table>
-    
-    @if (pagination().totalPages > 1) {
-      <div class="flex justify-between items-center mt-4">
-        <div class="text-sm text-slate-500">
-          Showing {{ pagination().currentPage * pagination().pageSize + 1 }}-{{ 
-            min((pagination().currentPage + 1) * pagination().pageSize, pagination().totalElements) 
-          }} of {{ pagination().totalElements }} orders
-        </div>
-        
-        <div class="flex space-x-2">
-          <button 
-            [disabled]="pagination().currentPage === 0"
-            (click)="onPageChange(pagination().currentPage - 1)"
-            class="px-3 py-1 rounded border hover:bg-slate-50 disabled:opacity-50 disabled:pointer-events-none">
-            Previous
-          </button>
-          <button
-            [disabled]="pagination().currentPage === pagination().totalPages - 1"
-            (click)="onPageChange(pagination().currentPage + 1)"
-            class="px-3 py-1 rounded border hover:bg-slate-50 disabled:opacity-50 disabled:pointer-events-none">
-            Next
-          </button>
-        </div>
-      </div>
-    }
+  </div>
+  @if (pagination().totalPages > 1) {
+  <div class="flex justify-between items-center">
+    <div class="text-sm text-slate-500">
+      Showing {{ pagination().currentPage * pagination().pageSize + 1 }}-{{
+      min((pagination().currentPage + 1) * pagination().pageSize, pagination().totalElements)
+      }} of {{ pagination().totalElements }} orders
+    </div>
+
+    <div class="flex space-x-2">
+      <button [disabled]="pagination().currentPage === 0" (click)="onPageChange(pagination().currentPage - 1)"
+        class="px-3 py-1 rounded border hover:bg-slate-50 disabled:opacity-50 disabled:pointer-events-none">
+        Previous
+      </button>
+      <button [disabled]="pagination().currentPage === pagination().totalPages - 1"
+        (click)="onPageChange(pagination().currentPage + 1)"
+        class="px-3 py-1 rounded border hover:bg-slate-50 disabled:opacity-50 disabled:pointer-events-none">
+        Next
+      </button>
+    </div>
+  </div>
   }
-  
-  <app-orders-search-dialog
-    [isOpen]="isSearchDialogOpen()"
-    (closeDialog)="closeSearchDialog()"
+  }
+
+  <app-orders-search-dialog [isOpen]="isSearchDialogOpen()" (closeDialog)="closeSearchDialog()"
     (searchResults)="handleSearchResults($event)">
   </app-orders-search-dialog>
 </div>

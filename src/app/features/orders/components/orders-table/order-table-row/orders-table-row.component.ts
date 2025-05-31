@@ -16,6 +16,16 @@ import { Order, OrderStatus, EventDisplayDetails, OrderRaffleSummary } from '../
     TitleCasePipe
   ],
   templateUrl: './orders-table-row.component.html',
+  styles: [`
+    .table-cell-base {
+      @apply relative break-words p-4 border-b border-zinc-950/5;
+      @apply first:pl-2 last:pr-2 sm:first:pl-1 sm:last:pr-1;
+    }
+    
+    .cell-link {
+      @apply absolute inset-0 focus:outline-none focus:ring-2 focus:ring-blue-500 focus:ring-inset;
+    }
+  `]
 })
 export class OrdersTableRowComponent {
   @Input() order!: Order;
