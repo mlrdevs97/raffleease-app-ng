@@ -1,4 +1,4 @@
-<form [formGroup]="orderForm" class="space-y-8">
+<form [formGroup]="orderForm" (ngSubmit)="onSubmit()" class="space-y-8">
     <!-- Global Error Message -->
     @if (errorMessage()) {
         <div class="rounded-md bg-red-50 p-4">
@@ -21,15 +21,15 @@
                 [fieldErrors]="fieldErrors()">
             </app-raffle-selection>
         </div>
-
-        <div class="w-full">
-            <app-ticket-selection 
-                [ticketSelectionForm]="ticketSelectionGroup"
-                [fieldErrors]="fieldErrors()"
-                [raffleId]="selectedRaffleId()">
-            </app-ticket-selection>
-        </div>
     }
+
+    <div class="w-full">
+        <app-ticket-selection 
+            [ticketSelectionForm]="ticketSelectionGroup"
+            [fieldErrors]="fieldErrors()"
+            [raffleId]="selectedRaffleId()">
+        </app-ticket-selection>
+    </div>
 
     <div class="w-full">
         <app-customer-information 
@@ -44,11 +44,12 @@
     <div class="flex justify-end space-x-4 pt-4">
         <button type="button"
             class="px-4 py-2 text-sm font-medium text-gray-700 bg-gray-100 rounded-md hover:bg-gray-200"
+            routerLink="/orders"
             [disabled]="isLoading()">
             Cancel
         </button>
         <button type="submit"
-            class="inline-flex items-center justify-center gap-2 whitespace-nowrap rounded-md text-sm font-medium ring-offset-background transition-colors focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2 disabled:pointer-events-none disabled:opacity-50 h-10 px-4 py-2 bg-black text-white hover:bg-black/90"
+            class="inline-flex items-center justify-center gap-2 whitespace-nowrap rounded-md text-sm font-semibold ring-offset-background transition-colors focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2 disabled:pointer-events-none disabled:opacity-50 h-10 px-4 py-2 bg-zinc-900 text-white hover:bg-slate-800"
             [disabled]="orderForm.invalid || !hasSelectedTickets || isLoading()">
             @if (isLoading()) {
                 <div class="animate-spin rounded-full h-4 w-4 border-b-2 border-white"></div>

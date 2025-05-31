@@ -69,5 +69,15 @@ export const ClientValidationMessages = {
     raffleRequired: 'Please select a raffle first to search for tickets',
     notFound: 'Ticket not found',
     notAvailable: 'This ticket is not available for selection'
+  },
+
+  /**
+   * Phone number validation error messages
+   */
+  phone: {
+    countryCodePattern: 'Country code must start with + followed by 1-3 digits',
+    nationalNumberPattern: 'Phone number must contain only digits (1-14 digits)',
+    countryCodeRequired: 'Country code is required',
+    nationalNumberRequired: 'Phone number is required'
   }
 }; 

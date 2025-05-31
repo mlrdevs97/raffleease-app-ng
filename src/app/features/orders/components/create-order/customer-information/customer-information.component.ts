@@ -95,11 +95,23 @@ export class CustomerInformationComponent implements AfterViewInit {
         if (!control?.touched || !control.errors) return null;
 
         if (control.errors['required']) {
+            if (fieldName === 'phoneNumber.countryCode') {
+                return this.clientValidationMessages.phone.countryCodeRequired;
+            } else if (fieldName === 'phoneNumber.nationalNumber') {
+                return this.clientValidationMessages.phone.nationalNumberRequired;
+            }
             return this.clientValidationMessages.common.required;
         } else if (control.errors['email']) {
             return this.clientValidationMessages.common.email;
         } else if (control.errors['maxlength']) {
             return this.clientValidationMessages.common.maxlength(control.errors['maxlength'].requiredLength);
+        } else if (control.errors['pattern']) {
+            if (fieldName === 'phoneNumber.countryCode') {
+                return this.clientValidationMessages.phone.countryCodePattern;
+            } else if (fieldName === 'phoneNumber.nationalNumber') {
+                return this.clientValidationMessages.phone.nationalNumberPattern;
+            }
+            return this.clientValidationMessages.common.pattern;
         } else if (control.errors['serverError']) {
             return this.fieldErrors[fieldName] || this.clientValidationMessages.common.serverError;
         }

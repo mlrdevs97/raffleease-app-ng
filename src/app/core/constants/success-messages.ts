@@ -43,5 +43,14 @@ export const SuccessMessages = {
     added: 'Ticket added to your selection successfully.',
     addedMultiple: (count: number) => `Successfully added ${count} random ticket${count !== 1 ? 's' : ''} to your order`,
     removed: 'Ticket removed from your selection.'
+  },
+
+  /**
+   * Order success messages
+   */
+  order: {
+    created: 'Your order has been created successfully.',
+    completed: 'Your order has been completed successfully.',
+    cancelled: 'Your order has been cancelled successfully.'
   }
 }; 

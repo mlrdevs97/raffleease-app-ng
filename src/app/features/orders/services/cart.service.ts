@@ -1,7 +1,7 @@
 import { Injectable, signal } from '@angular/core';
 import { HttpClient } from '@angular/common/http';
-import { Observable, map, tap } from 'rxjs';
-import { Cart, ReservationRequest } from '../../../core/models/cart.model';
+import { Observable, map, tap, throwError } from 'rxjs';
+import { Cart } from '../../../core/models/cart.model';
 import { SuccessResponse } from '../../../core/models/api-response.model';
 import { environment } from '../../../../environments/environment';
 import { AuthService } from '../../auth/services/auth.service';
@@ -71,7 +71,7 @@ export class CartService {
   reserveTickets(ticketIds: number[]): Observable<Cart> {
     const cart = this.currentCart();
     if (!cart) {
-      throw new Error('No cart available for reservation');
+      return throwError(() => new Error('No cart available for reservation'));
     }
 
     const associationId = this.getAssociationId();
@@ -123,7 +123,7 @@ export class CartService {
   private getAssociationId(): number {
     const associationId = this.authService.getAssociationId();
     if (!associationId) {
-      throw new Error('Association ID not found');
+      throw new Error('Authentication required. Please log in again.');
     }
     return associationId;
   }

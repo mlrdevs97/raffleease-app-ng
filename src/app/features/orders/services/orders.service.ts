@@ -1,6 +1,6 @@
 import { Injectable, signal, computed } from '@angular/core';
 import { HttpClient, HttpParams } from '@angular/common/http';
-import { Observable, finalize, map, of, tap } from 'rxjs';
+import { Observable, finalize, map, of, tap, throwError } from 'rxjs';
 import { OrderSearchFilters, Order } from '../models/order.model';
 import { AdminOrderCreate } from '../models/admin-order-create.model';
 import { SuccessResponse } from '../../../core/models/api-response.model';
@@ -61,6 +61,7 @@ export class OrdersService {
         size = 10,
         sort = 'createdAt,desc'
     ): Observable<PageResponse<Order>> {
+        const associationId = this.getAssociationId();
         const cacheKey = this.generateCacheKey(filters, page, size, sort);
         const cachedData = this.cache().get(cacheKey);
 
@@ -83,7 +84,7 @@ export class OrdersService {
         });
 
         return this.http.get<SuccessResponse<PageResponse<Order>>>(
-            `${this.baseUrl}/${this.getAssociationId()}/orders`,
+            `${this.baseUrl}/${associationId}/orders`,
             { params }
         ).pipe(
             tap((response: SuccessResponse<PageResponse<Order>>) => {
@@ -104,27 +105,23 @@ export class OrdersService {
      * @returns Observable with the order details
      */
     getOrder(orderId: number): Observable<Order> {
+        const associationId = this.getAssociationId();
+
         return this.http.get<SuccessResponse<Order>>(
-            `${this.baseUrl}/${this.getAssociationId()}/orders/${orderId}`
+            `${this.baseUrl}/${associationId}/orders/${orderId}`
         ).pipe(
             map(response => response.data!)
         );
     }
 
-    /**
-     * Clear the search cache, forcing the next search to fetch fresh data
-     */
     clearCache(): void {
         this.cache.set(new Map());
     }
 
-    /**
-     * Get the current association ID
-     */
     private getAssociationId(): number {
         const associationId = this.authService.getAssociationId();
         if (!associationId) {
-            throw new Error('Association ID not found');
+            throw new Error('Authentication required. Please log in again.');
         }
         return associationId;
     }

@@ -1,18 +1,28 @@
-import { Component, Input, OnInit, OnDestroy } from '@angular/core';
+import { Component, Input, OnInit, OnDestroy, effect } from '@angular/core';
 import { FormBuilder, FormGroup, ReactiveFormsModule, Validators } from '@angular/forms';
 import { signal } from '@angular/core';
 import { Subscription } from 'rxjs';
+import { Router, RouterLink } from '@angular/router';
 import { TicketSelectionComponent } from '../ticket-selection/ticket-selection.component';
 import { CustomerInformationComponent } from '../customer-information/customer-information.component';
 import { AdditionalInformationComponent } from '../additional-information/additional-information.component';
 import { RaffleSelectionComponent } from '../raffle-selection/raffle-selection.component';
 import { TicketSelectionService } from '../../../services/ticket-selection.service';
+import { OrderService } from '../../../services/order.service';
+import { CartService } from '../../../services/cart.service';
+import { AuthService } from '../../../../auth/services/auth.service';
+import { ErrorHandlerService } from '../../../../../core/services/error-handler.service';
+import { AdminOrderCreate } from '../../../models/admin-order-create.model';
+import { SuccessResponse } from '../../../../../core/models/api-response.model';
+import { Order } from '../../../models/order.model';
+import { ErrorMessages } from '../../../../../core/constants/error-messages';
 
 @Component({
   selector: 'app-order-form',
   standalone: true,
   imports: [
     ReactiveFormsModule,
+    RouterLink,
     RaffleSelectionComponent,
     TicketSelectionComponent,
     CustomerInformationComponent,
@@ -33,28 +43,38 @@ export class OrderFormComponent implements OnInit, OnDestroy {
 
   constructor(
     private fb: FormBuilder,
-    private ticketSelectionService: TicketSelectionService
+    private ticketSelectionService: TicketSelectionService,
+    private router: Router,
+    private orderService: OrderService,
+    private cartService: CartService,
+    private authService: AuthService,
+    private errorHandler: ErrorHandlerService
   ) {
     this.orderForm = this.fb.group({
       raffleSelection: this.fb.group({
         raffleId: [this.raffleId || '', this.raffleId ? [] : [Validators.required]]
       }),
       ticketSelection: this.fb.group({
-        ticketNumber: ['', Validators.required],
+        ticketNumber: ['', [Validators.required]],
         ticketSearchType: ['specific'],
         quantity: [1, [Validators.required, Validators.min(1)]]
       }),
       customerInformation: this.fb.group({
-        fullName: ['', Validators.required],
-        email: ['', [Validators.required, Validators.email]],
+        fullName: ['', [Validators.required, Validators.maxLength(100)]],
+        email: ['', [Validators.required, Validators.email, Validators.maxLength(100)]],
         phoneNumber: this.fb.group({
-          countryCode: ['', Validators.required],
-          nationalNumber: ['', Validators.required]
+          countryCode: ['', [Validators.required, Validators.pattern(/^\+\d{1,3}$/)]],
+          nationalNumber: ['', [Validators.required, Validators.pattern(/^\d{1,14}$/)]]
         })
       }),
       additionalInformation: this.fb.group({
         comment: ['', Validators.maxLength(500)]
       })
+    });
+
+    effect(() => {
+      this.ticketSelectionService.getSelectedTickets()();
+      this.updateTicketNumberValidation();
     });
   }
 
@@ -69,14 +89,14 @@ export class OrderFormComponent implements OnInit, OnDestroy {
       
       this.selectedRaffleId.set(newRaffleId);
       
-      // Clear selected tickets when raffle is deselected or changed
       if (!newRaffleId || (previousRaffleId && previousRaffleId !== newRaffleId)) {
         this.ticketSelectionService.clearTickets();
-        // Reset ticket selection form fields
         this.ticketSelectionGroup.get('ticketNumber')?.setValue('');
         this.ticketSelectionGroup.get('quantity')?.setValue(1);
       }
     });
+
+    this.updateTicketNumberValidation();
   }
 
   ngOnDestroy(): void {
@@ -124,5 +144,115 @@ export class OrderFormComponent implements OnInit, OnDestroy {
 
   get selectedTicketCount(): number {
     return this.ticketSelectionService.getSelectedTickets()().length;
+  }
+
+  get formValidationStatus(): { [key: string]: boolean } {
+    return {
+      raffleSelectionValid: this.raffleSelectionGroup.valid,
+      ticketSelectionValid: this.ticketSelectionGroup.valid,
+      customerInformationValid: this.customerInformationGroup.valid,
+      additionalInformationValid: this.additionalInformationGroup.valid,
+      overallFormValid: this.orderForm.valid
+    };
+  }
+
+  get createOrderButtonStatus(): { 
+    isFormValid: boolean;
+    hasTickets: boolean;
+    isNotLoading: boolean;
+    canCreateOrder: boolean;
+  } {
+    const isFormValid = this.orderForm.valid;
+    const hasTickets = this.hasSelectedTickets;
+    const isNotLoading = !this.isLoading();
+    
+    return {
+      isFormValid,
+      hasTickets,
+      isNotLoading,
+      canCreateOrder: isFormValid && hasTickets && isNotLoading
+    };
+  }
+
+  private updateTicketNumberValidation(): void {
+    const ticketNumberControl = this.ticketSelectionGroup.get('ticketNumber');
+    const hasSelectedTickets = this.hasSelectedTickets;
+    
+    if (ticketNumberControl) {
+      if (hasSelectedTickets) {
+        ticketNumberControl.setValidators([]);
+      } else {
+        ticketNumberControl.setValidators([Validators.required]);
+      }
+      
+      ticketNumberControl.updateValueAndValidity({ emitEvent: false });
+    }
+  }
+
+  onSubmit(): void {
+    if (!this.orderForm.valid || !this.hasSelectedTickets) {
+      this.orderForm.markAllAsTouched();
+      return;
+    }
+
+    const rawFormValue = this.orderForm.value;
+    const selectedTickets = this.ticketSelectionService.getSelectedTickets()();
+    const currentCartSignal = this.cartService.getCurrentCart();
+    const currentCart = currentCartSignal();
+
+    if (!currentCart || !currentCart.id) {
+      this.errorMessage.set(ErrorMessages.dedicated['order']!['CART_NOT_FOUND']!);
+      return;
+    }
+
+    const orderData: AdminOrderCreate = {
+      cartId: currentCart.id,
+      raffleId: Number(rawFormValue.raffleSelection.raffleId),
+      ticketIds: selectedTickets.map(ticket => ticket.id),
+      customer: {
+        fullName: rawFormValue.customerInformation.fullName,
+        email: rawFormValue.customerInformation.email || null,
+        phoneNumber: rawFormValue.customerInformation.phoneNumber.countryCode && 
+                     rawFormValue.customerInformation.phoneNumber.nationalNumber 
+          ? {
+              prefix: rawFormValue.customerInformation.phoneNumber.countryCode,
+              nationalNumber: rawFormValue.customerInformation.phoneNumber.nationalNumber
+            } 
+          : null
+      },
+      comment: rawFormValue.additionalInformation.comment || null
+    };
+
+    const associationId = this.authService.getAssociationId();
+    if (!associationId) {
+      this.authService.logout();
+      return;
+    }
+
+    this.isLoading.set(true);
+    this.resetErrors();
+
+    this.orderService.createOrder(associationId, orderData).subscribe({
+      next: (response: SuccessResponse<Order>) => {
+        console.log('Order created successfully', response);
+        this.cartService.clearCart();
+        this.ticketSelectionService.clearTickets();
+        if (response.data?.id) {
+          this.router.navigate(['/orders', response.data.id]);
+        }
+      },
+      error: (error: unknown) => {
+        this.errorMessage.set(this.errorHandler.getErrorMessage(error));
+        if (this.errorHandler.isValidationError(error)) {
+          const validationErrors = this.errorHandler.getValidationErrors(error);
+          this.fieldErrors.set(validationErrors);
+          this.applyFieldErrors(validationErrors);
+        }
+        this.isLoading.set(false);
+      },
+      complete: () => {
+        this.isLoading.set(false);
+      }
+    });
   }
 }

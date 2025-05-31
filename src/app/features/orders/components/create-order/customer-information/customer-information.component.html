@@ -45,6 +45,11 @@
                     [ngClass]="{'border-red-500': getErrorMessage('phoneNumber.nationalNumber')}"
                     id="phoneNumber.nationalNumber" placeholder="Phone number">
             </div>
+            @if(getErrorMessage('phoneNumber.countryCode')) {
+            <div class="text-red-500 text-xs">
+                {{ getErrorMessage('phoneNumber.countryCode') }}
+            </div>
+            }
             @if(getErrorMessage('phoneNumber.nationalNumber')) {
             <div class="text-red-500 text-xs">
                 {{ getErrorMessage('phoneNumber.nationalNumber') }}

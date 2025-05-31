@@ -1,4 +1,4 @@
-import { Component, OnInit, signal, effect } from '@angular/core';
+import { Component, OnInit, signal, computed } from '@angular/core';
 import { CommonModule } from '@angular/common'; 
 import { RouterModule } from '@angular/router';
 import { OrdersToolbarComponent } from '../../components/orders-toolbar/orders-toolbar.component';
@@ -23,7 +23,7 @@ import { ErrorHandlerService } from '../../../../core/services/error-handler.ser
     templateUrl: './orders-page.component.html',
 })
 export class OrdersPageComponent implements OnInit {        
-    isLoading = signal<boolean>(false);
+    isLoading = computed(() => this.ordersService.isLoading$());
     error = signal<string | null>(null);
     orders = signal<Order[]>([]);
     pagination = signal<{
@@ -44,9 +44,7 @@ export class OrdersPageComponent implements OnInit {
     constructor(
         private ordersService: OrdersService,
         private errorHandler: ErrorHandlerService
-    ) {
-        effect(() => this.isLoading.set(this.ordersService.isLoading$()));
-    }
+    ) {}
     
     min(a: number, b: number): number {
         return Math.min(a, b);
@@ -63,10 +61,8 @@ export class OrdersPageComponent implements OnInit {
                 this.handleOrdersResponse(response);
             },
             error: (error: unknown) => {
+                console.error(error);
                 this.error.set(this.errorHandler.getErrorMessage(error));
-            },
-            complete: () => {
-                this.isLoading.set(false);
             }
         });
     }

@@ -93,6 +93,35 @@ export const ErrorMessages: {
             SERVER_ERROR: 'Server error occurred while searching for tickets. Please try again.',
             CONNECTION_ERROR: 'Connection error. Please check your internet connection.',
             SEARCH_ERROR: 'Failed to search for tickets. Please try again.'
+        },
+        'order': {
+            CREATION_FAILED: 'Failed to create order. Please try again.',
+            CART_NOT_FOUND: 'No active cart found. Please refresh and try again.',
+            CART_EXPIRED: 'Your cart has expired. Please start a new order.',
+            INVALID_CART: 'Invalid cart. Please refresh and try again.',
+            NO_TICKETS_SELECTED: 'Please select at least one ticket before creating an order.'
+        },
+        'customer': {
+            PHONE_INVALID: 'Please enter a valid phone number',
+            EMAIL_ALREADY_EXISTS: 'A customer with this email already exists',
+            PHONE_ALREADY_EXISTS: 'A customer with this phone number already exists'
+        },
+        'customerInformation.phoneNumber.countryCode': {
+            PATTERN: 'Country code must start with + followed by 1-3 digits',
+            REQUIRED: 'Country code is required'
+        },
+        'customerInformation.phoneNumber.nationalNumber': {
+            PATTERN: 'Phone number must contain only digits (1-14 digits)',
+            REQUIRED: 'Phone number is required'
+        },
+        'customerInformation.fullName': {
+            REQUIRED: 'Full name is required',
+            MAXLENGTH: 'Full name must be less than 100 characters'
+        },
+        'customerInformation.email': {
+            REQUIRED: 'Email is required',
+            INVALID_EMAIL: 'Please enter a valid email address',
+            MAXLENGTH: 'Email must be less than 100 characters'
         }
     }
 };
