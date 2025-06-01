@@ -1,4 +1,4 @@
-import { Component, Input, Output, EventEmitter, signal } from '@angular/core';
+import { Component, Input, Output, EventEmitter, signal, HostListener } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { ButtonComponent } from '../button/button.component';
 
@@ -30,6 +30,14 @@ export class ConfirmationDialogComponent {
   @Output() confirmed = new EventEmitter<void>();
   @Output() cancelled = new EventEmitter<void>();
 
+  @HostListener('document:keydown.escape', ['$event'])
+  onEscapeKey(event: KeyboardEvent): void {
+    if (this.isOpen()) {
+      event.preventDefault();
+      this.onCancel();
+    }
+  }
+
   onConfirm(): void {
     this.confirmed.emit();
   }
@@ -43,4 +51,4 @@ export class ConfirmationDialogComponent {
       this.onCancel();
     }
   }
-} 
+}

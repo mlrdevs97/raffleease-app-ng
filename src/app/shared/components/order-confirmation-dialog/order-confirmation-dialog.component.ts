@@ -1,4 +1,4 @@
-import { Component, Input, Output, EventEmitter, signal } from '@angular/core';
+import { Component, Input, Output, EventEmitter, signal, HostListener } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { FormBuilder, FormGroup, ReactiveFormsModule, Validators } from '@angular/forms';
 import { DropdownSelectComponent } from '../dropdown-select/dropdown-select.component';
@@ -44,6 +44,14 @@ export class OrderConfirmationDialogComponent {
     });
   }
 
+  @HostListener('document:keydown.escape', ['$event'])
+  onEscapeKey(event: KeyboardEvent): void {
+    if (this.isOpen()) {
+      event.preventDefault();
+      this.onCancel();
+    }
+  }
+
   onConfirm(): void {
     if (this.data.requiresPaymentMethod) {
       if (this.form.valid) {
@@ -77,4 +85,4 @@ export class OrderConfirmationDialogComponent {
     }
     return null;
   }
-} 
+}

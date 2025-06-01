@@ -17,7 +17,6 @@
         </div>
     </div>
 
-    <!-- Payment Method Selection for Order Completion -->
     @if (data.requiresPaymentMethod) {
     <div class="py-4">
         <form [formGroup]="form" (ngSubmit)="onConfirm()">
