@@ -1,4 +1,4 @@
-<div class="space-y-12">
+<div class="space-y-8">
     <app-back-link label="Raffles" routePath="/raffles" />
 
     @if (isLoading()) {
@@ -21,6 +21,8 @@
             />
         </div>
     </div>
+
+    <div class="shrink-0 bg-slate-100 h-[1px] w-full sm:hidden"></div>
 
     <div>
         <app-raffle-statistics [raffle]="raffle()!" />

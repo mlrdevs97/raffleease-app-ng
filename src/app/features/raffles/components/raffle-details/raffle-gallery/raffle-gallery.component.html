@@ -1,12 +1,16 @@
 <div class="flex flex-col gap-3">
     <div class="relative w-full aspect-square overflow-hidden rounded-lg shadow-sm">
-        <img [src]="images[0].url" alt="Main image" class="object-cover absolute inset-0 w-full h-full" />
+        <img [src]="selectedImage.url" [alt]="selectedImage.fileName || 'Main image'" class="object-cover absolute inset-0 w-full h-full" />
     </div>
-    <div class="flex gap-2 overflow-x-auto pb-1">
-        @for (image of images; track image) {
-        <button class="relative w-16 h-16 flex-shrink-0 overflow-hidden rounded-md ring-1 ring-gray-200"
-            aria-label="Select image">
-            <img [src]="image.url" class="object-cover absolute inset-0 w-full h-full" />
+    <div class="flex gap-3 overflow-x-auto pb-2 px-2">
+        @for (image of images; track image.id) {
+        <button 
+            class="relative w-16 h-16 flex-shrink-0 rounded-md ring-2 ring-slate-100 transition-all duration-200 m-0.5"
+            [class.ring-blue-200]="isSelected($index)"
+            [attr.aria-label]="'Select image ' + ($index + 1)"
+            [attr.aria-pressed]="isSelected($index)"
+            (click)="selectImage($index)">
+            <img [src]="image.url" [alt]="image.fileName || 'Thumbnail ' + ($index + 1)" class="object-cover w-full h-full rounded-sm" />
         </button>
         }
     </div>
