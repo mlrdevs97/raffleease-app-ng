@@ -1,6 +1,6 @@
 import { Injectable, signal } from '@angular/core';
 import { HttpClient } from '@angular/common/http';
-import { Observable, map, tap, throwError } from 'rxjs';
+import { Observable, map, tap, throwError, catchError } from 'rxjs';
 import { Cart } from '../../../core/models/cart.model';
 import { SuccessResponse } from '../../../core/models/api-response.model';
 import { environment } from '../../../../environments/environment';
@@ -16,6 +16,7 @@ export class CartService {
   private currentCart = signal<Cart | null>(null);
   private isCreatingCart = signal(false);
   private isReservingTickets = signal(false);
+  private isReleasingTickets = signal(false);
 
   constructor(
     private http: HttpClient,
@@ -41,6 +42,13 @@ export class CartService {
    */
   getIsReservingTickets() {
     return this.isReservingTickets.asReadonly();
+  }
+
+  /**
+   * Get the ticket release loading state
+   */
+  getIsReleasingTickets() {
+    return this.isReleasingTickets.asReadonly();
   }
 
   /**
@@ -87,6 +95,35 @@ export class CartService {
   }
 
   /**
+   * Release tickets from the current cart
+   * @param ticketIds Array of ticket IDs to release
+   * @returns Observable with success response
+   */
+  releaseTickets(ticketIds: number[]): Observable<void> {
+    const cart = this.currentCart();
+    if (!cart) {
+      return throwError(() => new Error('No cart available for releasing tickets'));
+    }
+
+    const associationId = this.authService.requireAssociationId();
+    this.isReleasingTickets.set(true);
+
+    return this.http.put<SuccessResponse<void>>(
+      `${this.baseUrl}/${associationId}/carts/${cart.id}/reservations`,
+      { ticketIds }
+    ).pipe(
+      map(response => response.data!),
+      tap(() => {
+        this.isReleasingTickets.set(false);
+      }),
+      catchError(error => {
+        this.isReleasingTickets.set(false);
+        return throwError(() => error);
+      })
+    );
+  }
+
+  /**
    * Clear the current cart state
    */
   clearCart(): void {
@@ -105,6 +142,13 @@ export class CartService {
    */
   resetReservingState(): void {
     this.isReservingTickets.set(false);
+  }
+
+  /**
+   * Reset the releasing tickets loading state
+   */
+  resetReleasingState(): void {
+    this.isReleasingTickets.set(false);
   }
 
   /**

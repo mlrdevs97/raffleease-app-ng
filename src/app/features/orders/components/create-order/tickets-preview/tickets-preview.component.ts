@@ -1,7 +1,8 @@
-import { Component, Output, EventEmitter, computed, Input, signal } from '@angular/core';
+import { Component, Output, EventEmitter, computed, Input, signal, inject } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { OrderTicket, TicketStatus } from '../../../../../core/models/ticket.model';
 import { TicketSelectionService } from '../../../services/ticket-selection.service';
+import { CartService } from '../../../services/cart.service';
 
 export interface TicketsPreviewConfig {
   mode: 'preview' | 'readonly';
@@ -29,7 +30,10 @@ export class TicketsPreviewComponent {
 
   private useService = signal(true);
 
-  constructor(private ticketSelectionService: TicketSelectionService) {}
+  constructor(
+    private ticketSelectionService: TicketSelectionService,
+    private cartService: CartService
+  ) {}
 
   ngOnInit(): void {
     if (this.ticketsData && this.ticketsData.length > 0) {
@@ -42,6 +46,10 @@ export class TicketsPreviewComponent {
       return this.ticketSelectionService.getSelectedTickets();
     }
     return signal(this.ticketsData);
+  }
+
+  get isRemovingTickets() {
+    return this.cartService.getIsReleasingTickets();
   }
 
   calculateTotalPrice(): number {
@@ -59,7 +67,7 @@ export class TicketsPreviewComponent {
   }
 
   removeTicket(ticketNumber: string): void {
-    if (this.config.mode === 'preview') {
+    if (this.config.mode === 'preview' && !this.isRemovingTickets()) {
       this.ticketSelectionService.removeTicket(ticketNumber);
       this.ticketRemoved.emit(ticketNumber);
     }
@@ -78,7 +86,7 @@ export class TicketsPreviewComponent {
   }
 
   clearTickets(): void {
-    if (this.config.mode === 'preview') {
+    if (this.config.mode === 'preview' && !this.isRemovingTickets()) {
       this.ticketSelectionService.clearTickets();
     }
   }

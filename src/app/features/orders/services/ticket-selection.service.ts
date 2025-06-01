@@ -1,11 +1,15 @@
-import { Injectable, signal } from '@angular/core';
+import { Injectable, signal, inject } from '@angular/core';
 import { OrderTicket } from '../../../core/models/ticket.model';
+import { CartService } from './cart.service';
+import { ErrorHandlerService } from '../../../core/services/error-handler.service';
 
 @Injectable({
   providedIn: 'root'
 })
 export class TicketSelectionService {
   private selectedTickets = signal<OrderTicket[]>([]);
+  private cartService = inject(CartService);
+  private errorHandler = inject(ErrorHandlerService);
 
   /**
    * Get the current selected tickets as a signal
@@ -42,19 +46,77 @@ export class TicketSelectionService {
   }
 
   /**
-   * Remove a ticket from the selection
+   * Remove a ticket from the selection and release it from the cart
    */
   removeTicket(ticketNumber: string): void {
-    this.selectedTickets.update(currentTickets => 
-      currentTickets.filter(ticket => ticket.ticketNumber !== ticketNumber)
-    );
+    const currentTickets = this.selectedTickets();
+    const ticketToRemove = currentTickets.find(t => t.ticketNumber === ticketNumber);
+    
+    if (!ticketToRemove) {
+      return;
+    }
+ 
+    if (ticketToRemove.id) {
+      this.cartService.releaseTickets([ticketToRemove.id]).subscribe({
+        next: () => {
+          this.selectedTickets.update(tickets => tickets.filter(t => t.ticketNumber !== ticketNumber));
+        },
+        error: error => {
+          const errorMessage = this.errorHandler.getErrorMessage(error);
+        }
+      });
+    }
   }
 
   /**
-   * Clear all selected tickets
+   * Remove multiple tickets from the selection and release them from the cart
+   */
+  removeTickets(ticketNumbers: string[]): void {
+    const currentTickets = this.selectedTickets();
+    const ticketsToRemove = currentTickets.filter(t => ticketNumbers.includes(t.ticketNumber));
+    
+    if (ticketsToRemove.length === 0) {
+      return;
+    }
+
+    const ticketIdsToRelease = ticketsToRemove
+      .filter(ticket => ticket.id)
+      .map(ticket => ticket.id);
+
+    if (ticketIdsToRelease.length > 0) {
+      this.cartService.releaseTickets(ticketIdsToRelease).subscribe({
+        next: () => {
+          this.selectedTickets.update(tickets => tickets.filter(ticket => !ticketNumbers.includes(ticket.ticketNumber)));
+        },
+        error: error => {
+          const errorMessage = this.errorHandler.getErrorMessage(error);
+        }
+      });
+    }
+  }
+
+  /**
+   * Clear all selected tickets and release them from the cart
    */
   clearTickets(): void {
+    const currentTickets = this.selectedTickets();
+    const ticketIdsToRelease = currentTickets
+      .filter(ticket => ticket.id)
+      .map(ticket => ticket.id);
+
     this.selectedTickets.set([]);
+
+    if (ticketIdsToRelease.length > 0) {
+      this.cartService.releaseTickets(ticketIdsToRelease).subscribe({
+        next: () => {
+          this.selectedTickets.set([]);
+        },
+        error: error => {
+          const errorMessage = this.errorHandler.getErrorMessage(error);
+          console.error('Failed to release all tickets:', errorMessage, error);
+        }
+      });
+    }
   }
 
   /**
