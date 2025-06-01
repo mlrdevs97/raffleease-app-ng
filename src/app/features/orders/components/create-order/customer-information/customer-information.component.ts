@@ -1,7 +1,7 @@
 import { Component, Input, ViewChild, AfterViewInit } from '@angular/core';
 import { FormGroup, ReactiveFormsModule } from '@angular/forms';
 import { CommonModule } from '@angular/common';
-import { DropdownSelectComponent } from '../../../../../layout/components/dropdown-select/dropdown-select.component';
+import { DropdownSelectComponent } from '../../../../../shared/components/dropdown-select/dropdown-select.component';
 import { ClientValidationMessages } from '../../../../../core/constants/client-validation-messages';
 
 interface CountryCode {

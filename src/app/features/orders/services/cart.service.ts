@@ -51,10 +51,7 @@ export class CartService {
     
     this.isCreatingCart.set(true);
 
-    return this.http.post<SuccessResponse<Cart>>(
-      `${this.baseUrl}/${associationId}/carts`,
-      {} // Empty body for POST request
-    ).pipe(
+    return this.http.post<SuccessResponse<Cart>>(`${this.baseUrl}/${associationId}/carts`, {}).pipe(
       map(response => response.data!),
       tap(cart => {
         this.currentCart.set(cart);

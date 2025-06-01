@@ -8,21 +8,75 @@
       for="comment">
       Comment
     </label>
-    <textarea 
-      class="flex min-h-[80px] rounded-md border border-input bg-background px-3 py-2 text-sm ring-offset-background placeholder:text-muted-foreground focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2 disabled:cursor-not-allowed disabled:opacity-50 mt-2 w-full" 
-      id="comment" 
-      placeholder="Add a comment for this order..." 
-      rows="4"
-      [(ngModel)]="commentText">
-    </textarea>
     
-    <div class="mt-2 flex justify-end">
-      <button 
-        class="inline-flex items-center justify-center gap-2 whitespace-nowrap rounded-md text-sm font-medium ring-offset-background transition-colors focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2 disabled:pointer-events-none disabled:opacity-50 h-10 px-4 py-2 bg-black text-white hover:bg-black/90" 
-        [disabled]="!commentText"
-        (click)="onSaveComment()">
-        Save Comment
-      </button>
+    <div class="relative">
+      <textarea 
+        [class]="textareaClasses()"
+        id="comment" 
+        [placeholder]="hasComment() ? 'Edit your comment...' : 'Add a comment for this order...'"
+        rows="4"
+        [ngModel]="commentText()"
+        (ngModelChange)="commentText.set($event)"
+        (focus)="onTextareaFocus()"
+        (blur)="onTextareaBlur()"
+        [disabled]="isLoading()">
+      </textarea>
+      
+      @if (hasComment() && !isEditing()) {
+        <!-- Pencil icon in top right corner -->
+        <div class="absolute top-3 right-3 pointer-events-none">
+          <svg class="h-4 w-4 text-zinc-400" fill="none" stroke="currentColor" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg">
+            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M11 5H6a2 2 0 00-2 2v11a2 2 0 002 2h11a2 2 0 002-2v-5m-1.414-9.414a2 2 0 112.828 2.828L11.828 15H9v-2.828l8.586-8.586z"></path>
+          </svg>
+        </div>
+      }
     </div>
+    
+    @if (!hasComment()) {
+      <!-- Save comment button for new comments -->
+      <div class="mt-2 flex justify-end">
+        <app-button 
+          variant="primary"
+          size="md"
+          [disabled]="!commentText().trim() || isLoading()"
+          [loading]="isLoading()"
+          loadingText="Saving..."
+          (clicked)="onSaveComment()">
+          Save Comment
+        </app-button>
+      </div>
+    } @else {
+      <!-- Edit and Delete buttons for existing comments -->
+      <div class="mt-2 flex justify-end gap-2">
+        <app-button 
+          variant="secondary"
+          size="md"
+          [disabled]="isLoading()"
+          [loading]="isLoading() && pendingOperation === 'delete'"
+          loadingText="Deleting..."
+          (clicked)="onDeleteComment()">
+          Delete Comment
+        </app-button>
+        
+        <app-button 
+          variant="primary"
+          size="md"
+          [disabled]="!isTextChanged() || isLoading()"
+          [loading]="isLoading() && pendingOperation === 'edit'"
+          loadingText="Updating..."
+          (clicked)="onEditComment()">
+          Update Comment
+        </app-button>
+      </div>
+    }
   </div>
-</div> 
+</div>
+
+<!-- Confirmation Dialog -->
+<app-confirmation-dialog
+  [isOpen]="showConfirmDialog"
+  [data]="confirmDialogData()"
+  [isLoading]="isLoading"
+  (confirmed)="onConfirmAction()"
+  (cancelled)="onCancelAction()">
+</app-confirmation-dialog> 

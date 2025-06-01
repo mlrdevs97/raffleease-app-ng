@@ -15,6 +15,7 @@ import { AdminOrderCreate } from '../../../models/admin-order-create.model';
 import { Order } from '../../../models/order.model';
 import { ErrorMessages } from '../../../../../core/constants/error-messages';
 import { OrdersService } from '../../../services/orders.service';
+import { ButtonComponent } from '../../../../../shared/components/button/button.component';
 
 @Component({
   selector: 'app-order-form',
@@ -25,7 +26,8 @@ import { OrdersService } from '../../../services/orders.service';
     RaffleSelectionComponent,
     TicketSelectionComponent,
     CustomerInformationComponent,
-    AdditionalInformationComponent
+    AdditionalInformationComponent,
+    ButtonComponent
   ],
   templateUrl: './order-form.component.html'
 })
@@ -49,6 +51,13 @@ export class OrderFormComponent implements OnInit, OnDestroy {
     private authService: AuthService,
     private errorHandler: ErrorHandlerService
   ) {
+    effect(() => {
+      this.ticketSelectionService.getSelectedTickets()();
+      this.updateTicketNumberValidation();
+    });
+  }
+
+  ngOnInit(): void {
     this.orderForm = this.fb.group({
       raffleSelection: this.fb.group({
         raffleId: [this.raffleId || '', this.raffleId ? [] : [Validators.required]]
@@ -60,10 +69,10 @@ export class OrderFormComponent implements OnInit, OnDestroy {
       }),
       customerInformation: this.fb.group({
         fullName: ['', [Validators.required, Validators.maxLength(100)]],
-        email: ['', [Validators.required, Validators.email, Validators.maxLength(100)]],
+        email: ['', [Validators.email, Validators.maxLength(100)]],
         phoneNumber: this.fb.group({
-          countryCode: ['', [Validators.required, Validators.pattern(/^\+\d{1,3}$/)]],
-          nationalNumber: ['', [Validators.required, Validators.pattern(/^\d{1,14}$/)]]
+          countryCode: ['', [Validators.pattern(/^\+\d{1,3}$/)]],
+          nationalNumber: ['', [Validators.pattern(/^\d{1,14}$/)]]
         })
       }),
       additionalInformation: this.fb.group({
@@ -71,15 +80,10 @@ export class OrderFormComponent implements OnInit, OnDestroy {
       })
     });
 
-    effect(() => {
-      this.ticketSelectionService.getSelectedTickets()();
-      this.updateTicketNumberValidation();
-    });
-  }
-
-  ngOnInit(): void {
     if (this.raffleId) {
       this.selectedRaffleId.set(this.raffleId);
+      // Also set the form value so the raffle-selection component receives it
+      this.raffleSelectionGroup.get('raffleId')?.setValue(this.raffleId);
     }
     
     this.raffleSubscription = this.raffleSelectionGroup.get('raffleId')?.valueChanges.subscribe(raffleId => {

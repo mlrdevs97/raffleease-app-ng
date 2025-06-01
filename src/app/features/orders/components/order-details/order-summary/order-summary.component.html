@@ -3,19 +3,28 @@
   <hr class="mt-4 w-full border-t border-zinc-950/10 dark:border-white/10">
   
   <dl class="mt-0 grid grid-cols-1 text-base/6 sm:grid-cols-[min(50%,_15rem)_auto] sm:text-sm/6">
+    <!-- Order Reference -->
+    <dt class="col-start-1 border-t border-zinc-950/5 pt-3 text-zinc-500 dark:border-white/5 dark:text-zinc-400">
+      Order Reference
+    </dt>
+    <dd class="pt-1 pb-3 text-zinc-950 sm:border-t sm:border-zinc-950/5 sm:pt-3 sm:dark:border-white/5 dark:text-white">
+      {{ order.orderReference }}
+    </dd>
+
     <!-- Customer -->
     <dt class="col-start-1 border-t border-zinc-950/5 pt-3 text-zinc-500 dark:border-white/5 dark:text-zinc-400">
       Customer
     </dt>
     <dd class="pt-1 pb-3 text-zinc-950 sm:border-t sm:border-zinc-950/5 sm:pt-3 sm:dark:border-white/5 dark:text-white">
-      {{ customerFullName }}
+      {{ customerFullName | titlecase}}
     </dd>
     
     <!-- Raffle -->
     <dt class="col-start-1 border-t border-zinc-950/5 pt-3 text-zinc-500 dark:border-white/5 dark:text-zinc-400">
       Raffle
     </dt>
-    <dd class="flex items-center gap-2 pt-1 pb-3 text-zinc-950 sm:border-t sm:border-zinc-950/5 sm:pt-3 sm:dark:border-white/5 dark:text-white">
+    <dd class="summary-cell flex items-center gap-2 pt-1 pb-3 text-zinc-950 sm:border-t sm:border-zinc-950/5 sm:pt-3 sm:dark:border-white/5 dark:text-white hover:bg-slate-100 transition-colors">
+      <a [routerLink]="['/raffles', order.raffleSummary.id]" class="cell-link"></a>
       <div class="relative h-6 w-6 overflow-hidden rounded-full">
         <img 
           [alt]="order.raffleSummary.title" 
@@ -26,6 +35,14 @@
           style="position: absolute; height: 100%; width: 100%; inset: 0px; color: transparent;">
       </div>
       <span>{{ order.raffleSummary.title }}</span>
+    </dd>
+    
+    <!-- Tickets -->
+    <dt class="col-start-1 border-t border-zinc-950/5 pt-3 text-zinc-500 dark:border-white/5 dark:text-zinc-400">
+      Tickets
+    </dt>
+    <dd class="pt-1 pb-3 text-zinc-950 sm:border-t sm:border-zinc-950/5 sm:pt-3 sm:dark:border-white/5 dark:text-white">
+      {{ ticketCount }}
     </dd>
     
     <!-- Amount -->

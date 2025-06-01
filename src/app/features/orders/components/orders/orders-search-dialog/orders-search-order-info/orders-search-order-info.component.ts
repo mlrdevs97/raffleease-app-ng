@@ -2,7 +2,7 @@ import { Component, Input, Output, EventEmitter, OnInit, OnChanges, SimpleChange
 import { CommonModule } from '@angular/common';
 import { FormBuilder, FormGroup, ReactiveFormsModule } from '@angular/forms';
 import { OrderStatus, OrderSearchFilters } from '../../../../models/order.model';
-import { DropdownSelectComponent } from '../../../../../../layout/components/dropdown-select/dropdown-select.component';
+import { DropdownSelectComponent } from '../../../../../../shared/components/dropdown-select/dropdown-select.component';
 import { positiveNumberValidator } from '../../../../../../core/validators/number.validators';
 import { ClientValidationMessages } from '../../../../../../core/constants/client-validation-messages';
 

@@ -42,99 +42,82 @@
                 <span><span class="font-semibold text-gray-700 mr-1">End:</span>{{ raffle.endDate | date }}</span>
             </div>
             <div class="flex items-center gap-2 text-gray-500">
-                <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 20 20" fill="currentColor"
-                    class="h-5 w-5 text-zinc-500">
+                <svg xmlns="http://www.w3.org/2000/svg" viewBox="2 3 16 14" fill="currentColor"
+                    class="h-4 w-4 text-zinc-500">
                     <path fill-rule="evenodd"
                         d="M15.75 3A2.25 2.25 0 0 1 18 5.25v1.214c0 .423-.277.788-.633 1.019A2.997 2.997 0 0 0 16 10c0 1.055.544 1.982 1.367 2.517.356.231.633.596.633 1.02v1.213A2.25 2.25 0 0 1 15.75 17H4.25A2.25 2.25 0 0 1 2 14.75v-1.213c0-.424.277-.789.633-1.02A2.998 2.998 0 0 0 4 10a2.997 2.997 0 0 0-1.367-2.517C2.277 7.252 2 6.887 2 6.463V5.25A2.25 2.25 0 0 1 4.25 3h11.5ZM13.5 7.396a.75.75 0 0 0-1.5 0v1.042a.75.75 0 0 0 1.5 0V7.396Zm0 4.167a.75.75 0 0 0-1.5 0v1.041a.75.75 0 0 0 1.5 0v-1.041Z"
                         clip-rule="evenodd"></path>
                 </svg>
-                <span><span class="font-semibold text-gray-700 mr-1">Price:</span>{{ raffle.ticketPrice |
-                    currency
-                    }}</span>
+                <span><span class="font-semibold text-gray-700 mr-1">Price:</span>
+                    {{ raffle.ticketPrice |currency}}
+                </span>
             </div>
             <div class="flex items-center gap-2 text-gray-500">
-                <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 20 20" fill="currentColor"
-                    class="h-5 w-5 text-zinc-500">
+                <svg xmlns="http://www.w3.org/2000/svg" viewBox="2 3 16 14" fill="currentColor"
+                    class="h-4 w-4 text-zinc-500">
                     <path fill-rule="evenodd"
                         d="M15.75 3A2.25 2.25 0 0 1 18 5.25v1.214c0 .423-.277.788-.633 1.019A2.997 2.997 0 0 0 16 10c0 1.055.544 1.982 1.367 2.517.356.231.633.596.633 1.02v1.213A2.25 2.25 0 0 1 15.75 17H4.25A2.25 2.25 0 0 1 2 14.75v-1.213c0-.424.277-.789.633-1.02A2.998 2.998 0 0 0 4 10a2.997 2.997 0 0 0-1.367-2.517C2.277 7.252 2 6.887 2 6.463V5.25A2.25 2.25 0 0 1 4.25 3h11.5ZM13.5 7.396a.75.75 0 0 0-1.5 0v1.042a.75.75 0 0 0 1.5 0V7.396Zm0 4.167a.75.75 0 0 0-1.5 0v1.041a.75.75 0 0 0 1.5 0v-1.041Z"
                         clip-rule="evenodd"></path>
                 </svg>
-                <span><span class="font-semibold text-gray-700 mr-1">Numbers:</span>{{
-                    raffle.firstTicketNumber }}
-                    to {{ raffle.totalTickets - 1 }}</span>
+                <span>
+                    <span class="font-semibold text-gray-700 mr-1">Numbers:</span>
+                    {{ raffle.firstTicketNumber }} to {{ raffle.totalTickets - 1 }}
+                </span>
             </div>
         </div>
     </div>
 
-    <!-- Action Buttons - Always Visible -->
     <div class="flex gap-2 w-full sm:w-auto">
-        <!-- Edit Button - Always Present -->
-        <button type="button"
-            class="h-9 px-3 rounded-md border bg-background hover:bg-accent hover:text-accent-foreground text-sm flex-1 md:flex-initial"
-            (click)="onEditClicked()">
+        <app-button
+            variant="secondary"
+            size="sm"
+            customClasses="flex-1 md:flex-initial"
+            (clicked)="onEditClicked()">
             Edit
-        </button>
+        </app-button>
 
-        <!-- Status-specific Action Button -->
         @if (raffle.status === RaffleStatus.PENDING) {
-            <button type="button"
-                class="h-9 px-3 rounded-md bg-black text-white hover:bg-black/90 text-sm flex-1 md:flex-initial font-bold disabled:opacity-50 disabled:cursor-not-allowed"
-                [disabled]="isUpdatingStatus()" (click)="onActivateClicked()">
-                @if (isUpdatingStatus() && currentAction() === 'activate') {
-                    <svg class="animate-spin -ml-1 mr-2 h-4 w-4 text-white inline" xmlns="http://www.w3.org/2000/svg"
-                        fill="none" viewBox="0 0 24 24">
-                        <circle class="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" stroke-width="4"></circle>
-                        <path class="opacity-75" fill="currentColor"
-                            d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4zm2 5.291A7.962 7.962 0 014 12H0c0 3.042 1.135 5.824 3 7.938l3-2.647z">
-                        </path>
-                    </svg>
-                    Activating...
-                } @else {
-                    Activate
-                }
-            </button>
+        <app-button
+            variant="primary"
+            size="sm"
+            customClasses="flex-1 md:flex-initial"
+            [disabled]="isUpdatingStatus()"
+            [loading]="isUpdatingStatus() && currentAction() === 'activate'"
+            loadingText="Activating..."
+            (clicked)="onActivateClicked()">
+            Activate
+        </app-button>
         }
 
         @if (raffle.status === RaffleStatus.ACTIVE) {
-            <button type="button"
-                class="h-9 px-3 rounded-md bg-black text-white hover:bg-black/90 text-sm flex-1 md:flex-initial font-bold disabled:opacity-50 disabled:cursor-not-allowed"
-                [disabled]="isUpdatingStatus()" (click)="onPauseClicked()">
-                @if (isUpdatingStatus() && currentAction() === 'pause') {
-                    <svg class="animate-spin -ml-1 mr-2 h-4 w-4 text-white inline" xmlns="http://www.w3.org/2000/svg"
-                        fill="none" viewBox="0 0 24 24">
-                        <circle class="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" stroke-width="4"></circle>
-                        <path class="opacity-75" fill="currentColor"
-                            d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4zm2 5.291A7.962 7.962 0 714 12H0c0 3.042 1.135 5.824 3 7.938l3-2.647z">
-                        </path>
-                    </svg>
-                    Pausing...
-                } @else {
-                    Pause
-                }
-            </button>
+        <app-button
+            variant="primary"
+            size="sm"
+            customClasses="flex-1 md:flex-initial"
+            [disabled]="isUpdatingStatus()"
+            [loading]="isUpdatingStatus() && currentAction() === 'pause'"
+            loadingText="Pausing..."
+            (clicked)="onPauseClicked()">
+            Pause
+        </app-button>
         }
 
         @if (raffle.status === RaffleStatus.PAUSED) {
-            <button type="button"
-                class="h-9 px-3 rounded-md bg-black text-white hover:bg-black/90 text-sm flex-1 md:flex-initial font-bold disabled:opacity-50 disabled:cursor-not-allowed"
-                [disabled]="isUpdatingStatus()" (click)="onReactivateClicked()">
-                @if (isUpdatingStatus() && currentAction() === 'reactivate') {
-                    <svg class="animate-spin -ml-1 mr-2 h-4 w-4 text-white inline" xmlns="http://www.w3.org/2000/svg"
-                        fill="none" viewBox="0 0 24 24">
-                        <circle class="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" stroke-width="4"></circle>
-                        <path class="opacity-75" fill="currentColor"
-                            d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4zm2 5.291A7.962 7.962 0 714 12H0c0 3.042 1.135 5.824 3 7.938l3-2.647z">
-                        </path>
-                    </svg>
-                    Reactivating...
-                } @else {
-                    Reactivate
-                }
-            </button>
+        <app-button
+            variant="primary"
+            size="sm"
+            customClasses="flex-1 md:flex-initial"
+            [disabled]="isUpdatingStatus()"
+            [loading]="isUpdatingStatus() && currentAction() === 'reactivate'"
+            loadingText="Reactivating..."
+            (clicked)="onReactivateClicked()">
+            Reactivate
+        </app-button>
         }
     </div>
 
     <!-- Confirmation Dialog -->
     <app-confirmation-dialog [isOpen]="showConfirmationDialog" [data]="confirmationDialogData"
-        [isLoading]="isUpdatingStatus" (confirmed)="onConfirmationConfirmed()" (cancelled)="onConfirmationCancelled()" />
+        [isLoading]="isUpdatingStatus" (confirmed)="onConfirmationConfirmed()"
+        (cancelled)="onConfirmationCancelled()" />
 </div>

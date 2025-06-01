@@ -1,6 +1,6 @@
 import { Component, Output, EventEmitter, computed, Input, signal } from '@angular/core';
 import { CommonModule } from '@angular/common';
-import { OrderTicket } from '../../../../../core/models/ticket.model';
+import { OrderTicket, TicketStatus } from '../../../../../core/models/ticket.model';
 import { TicketSelectionService } from '../../../services/ticket-selection.service';
 
 export interface TicketsPreviewConfig {
@@ -32,15 +32,11 @@ export class TicketsPreviewComponent {
   constructor(private ticketSelectionService: TicketSelectionService) {}
 
   ngOnInit(): void {
-    // If ticketsData is provided, use it instead of the service
     if (this.ticketsData && this.ticketsData.length > 0) {
       this.useService.set(false);
     }
   }
 
-  /**
-   * Get the tickets to display - either from service or from input
-   */
   get tickets() {
     if (this.useService()) {
       return this.ticketSelectionService.getSelectedTickets();
@@ -48,9 +44,6 @@ export class TicketsPreviewComponent {
     return signal(this.ticketsData);
   }
 
-  /**
-   * Calculate the total price of all tickets
-   */
   calculateTotalPrice(): number {
     if (this.useService()) {
       return this.ticketSelectionService.getTotalPrice();
@@ -58,9 +51,6 @@ export class TicketsPreviewComponent {
     return this.ticketsData.reduce((sum, ticket) => sum + ticket.price, 0);
   }
 
-  /**
-   * Get the number of tickets
-   */
   get ticketCount(): number {
     if (this.useService()) {
       return this.tickets()?.length || 0;
@@ -68,9 +58,6 @@ export class TicketsPreviewComponent {
     return this.ticketsData.length;
   }
 
-  /**
-   * Remove a ticket from the preview (only in preview mode)
-   */
   removeTicket(ticketNumber: string): void {
     if (this.config.mode === 'preview') {
       this.ticketSelectionService.removeTicket(ticketNumber);
@@ -78,58 +65,55 @@ export class TicketsPreviewComponent {
     }
   }
 
-  /**
-   * Add a ticket to the preview (for external use in preview mode)
-   */
   addTicket(ticket: OrderTicket): void {
     if (this.config.mode === 'preview') {
       this.ticketSelectionService.addTicket(ticket);
     }
   }
 
-  /**
-   * Add multiple tickets to the preview (for external use in preview mode)
-   */
   addTickets(tickets: OrderTicket[]): void {
     if (this.config.mode === 'preview') {
       this.ticketSelectionService.addTickets(tickets);
     }
   }
 
-  /**
-   * Clear all tickets from the preview (only in preview mode)
-   */
   clearTickets(): void {
     if (this.config.mode === 'preview') {
       this.ticketSelectionService.clearTickets();
     }
   }
 
-  /**
-   * Format price display
-   */
   formatPrice(price: number): string {
     return `$${price.toFixed(2)}`;
   }
 
-  /**
-   * Get display title
-   */
   get displayTitle(): string {
     return this.config.title || 'Tickets';
   }
 
-  /**
-   * Check if actions should be shown
-   */
   get shouldShowActions(): boolean {
     return this.config.showActions !== false && this.config.mode === 'preview';
   }
 
-  /**
-   * Check if status should be shown
-   */
   get shouldShowStatus(): boolean {
     return this.config.showStatus === true;
+  }
+
+  getStatusClasses(status: string): string {
+    const statusUpper = status.toUpperCase();
+    
+    switch (statusUpper) {
+      case TicketStatus.RESERVED:
+      case 'RESERVED':
+        return 'bg-yellow-100 text-yellow-800 border-transparent';
+      case TicketStatus.AVAILABLE:
+      case 'AVAILABLE':
+        return 'bg-blue-100 text-blue-800 border-transparent';
+      case TicketStatus.SOLD:
+      case 'SOLD':
+        return 'bg-green-100 text-green-800 border-transparent';
+      default:
+        return 'bg-gray-100 text-gray-800 border-transparent';
+    }
   }
 } 

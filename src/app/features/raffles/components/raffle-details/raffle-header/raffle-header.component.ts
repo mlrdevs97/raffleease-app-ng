@@ -9,10 +9,12 @@ import { SuccessMessages } from '../../../../../core/constants/success-messages'
 import { ClientValidationMessages } from '../../../../../core/constants/client-validation-messages';
 import { SuccessResponse } from '../../../../../core/models/api-response.model';
 import { Raffle } from '../../../models/raffle.model';
+import { ConfirmationMessages } from '../../../../../core/constants/confirmation-messages';
+import { ButtonComponent } from '../../../../../shared/components/button/button.component';
 
 @Component({
   selector: 'app-raffle-header',
-  imports: [CommonModule, RaffleStatusLabelComponent, ConfirmationDialogComponent],
+  imports: [CommonModule, RaffleStatusLabelComponent, ConfirmationDialogComponent, ButtonComponent],
   standalone: true,
   templateUrl: './raffle-header.component.html'
 })
@@ -43,13 +45,13 @@ export class RaffleHeaderComponent {
     const action = this.currentAction();
     switch (action) {
       case 'activate':
-        return ClientValidationMessages.raffle.confirmActivation;
+        return ConfirmationMessages.raffle.confirmActivation;
       case 'pause':
-        return ClientValidationMessages.raffle.confirmPause;
+        return ConfirmationMessages.raffle.confirmPause;
       case 'reactivate':
-        return ClientValidationMessages.raffle.confirmReactivation;
+        return ConfirmationMessages.raffle.confirmReactivation;
       default:
-        return ClientValidationMessages.raffle.confirmActivation; // fallback
+        return ConfirmationMessages.raffle.confirmActivation;
     }
   }
 

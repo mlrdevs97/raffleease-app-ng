@@ -1,18 +1,33 @@
 import { Component, Input } from '@angular/core';
 import { CommonModule } from '@angular/common';
+import { RouterLink } from '@angular/router';
 import { Order } from '../../../models/order.model';
 
 @Component({
   selector: 'app-order-summary',
   standalone: true,
-  imports: [CommonModule],
-  templateUrl: './order-summary.component.html'
+  imports: [CommonModule, RouterLink],
+  templateUrl: './order-summary.component.html',
+  styles: [`
+    .summary-cell {
+      @apply relative;
+    }
+    
+    .cell-link {
+      @apply absolute inset-0 focus:outline-none focus:ring-2 focus:ring-blue-500 focus:ring-inset;
+    }
+  `]
 })
 export class OrderSummaryComponent {
   @Input() order!: Order;
 
   get customerFullName(): string {
     return this.order?.customer?.fullName || '';
+  }
+
+  get ticketCount(): string {
+    const count = this.order?.orderItems?.length || 0;
+    return count === 1 ? '1 ticket sold' : `${count} tickets sold`;
   }
 
   get formattedAmount(): string {
@@ -22,8 +37,7 @@ export class OrderSummaryComponent {
   get paymentMethodDisplay(): string {
     const payment = this.order?.payment;
     if (payment?.paymentMethod) {
-      // For this demo, we'll show a credit card format
-      return 'American Express •••• 1254';
+      return payment.paymentMethod;
     }
     return 'Unknown';
   }

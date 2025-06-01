@@ -1,15 +1,24 @@
-import { Component, Input } from '@angular/core';
+import { Component, Input, Output, EventEmitter, signal } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { Order, OrderStatus } from '../../../models/order.model';
+import { ButtonComponent } from '../../../../../shared/components/button/button.component';
 
 @Component({
   selector: 'app-order-detail-header',
   standalone: true,
-  imports: [CommonModule],
+  imports: [CommonModule, ButtonComponent],
   templateUrl: './order-detail-header.component.html'
 })
 export class OrderDetailHeaderComponent {
   @Input() order!: Order;
+  @Input() isUpdatingOrder = signal(false);
+  @Input() currentAction = signal<'complete' | 'cancel' | 'setUnpaid' | null>(null);
+
+  @Output() completeOrderRequested = new EventEmitter<void>();
+  @Output() cancelOrderRequested = new EventEmitter<void>();
+  @Output() setUnpaidRequested = new EventEmitter<void>();
+
+  readonly OrderStatus = OrderStatus;
 
   get statusClass(): string {
     switch (this.order?.status) {
@@ -20,17 +29,41 @@ export class OrderDetailHeaderComponent {
       case OrderStatus.CANCELLED:
         return 'border-transparent bg-red-100 text-red-800 hover:bg-red-100';
       case OrderStatus.REFUNDED:
-        return 'border-transparent bg-gray-100 text-gray-800 hover:bg-gray-100';
-      default:
+      case OrderStatus.UNPAID:
+        default:
         return 'border-transparent bg-gray-100 text-gray-800 hover:bg-gray-100';
     }
   }
 
-  onCancelOrder(): void {
-    console.log('Cancel order:', this.order.id);
+  get primaryButtonText(): string {
+    return this.order?.status === OrderStatus.COMPLETED ? 'Set to Unpaid' : 'Complete Order';
   }
 
-  onRefundOrder(): void {
-    console.log('Refund order:', this.order.id);
+  get primaryButtonLoadingText(): string {
+    return this.order?.status === OrderStatus.COMPLETED ? 'Setting to Unpaid...' : 'Completing...';
+  }
+
+  get primaryButtonAction(): string {
+    return this.order?.status === OrderStatus.COMPLETED ? 'setUnpaid' : 'complete';
+  }
+
+  onCancelOrder(): void {
+    this.cancelOrderRequested.emit();
+  }
+
+  onCompleteOrder(): void {
+    this.completeOrderRequested.emit();
+  }
+
+  onSetUnpaid(): void {
+    this.setUnpaidRequested.emit();
+  }
+
+  onPrimaryAction(): void {
+    if (this.order?.status === OrderStatus.COMPLETED) {
+      this.onSetUnpaid();
+    } else {
+      this.onCompleteOrder();
+    }
   }
 } 

@@ -8,7 +8,7 @@ export const routes: Routes = [
   },
   {
     path: '',
-    loadComponent: () => import('./layout/main-container/main-container.component').then(c => c.MainLayoutComponent),
+    loadComponent: () => import('./shared/layout/main-container/main-container.component').then(c => c.MainLayoutComponent),
     children: [
       {
         path: '',

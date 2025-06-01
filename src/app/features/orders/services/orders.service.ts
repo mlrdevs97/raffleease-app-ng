@@ -3,6 +3,8 @@ import { HttpClient, HttpParams } from '@angular/common/http';
 import { Observable, finalize, map, of, tap, throwError } from 'rxjs';
 import { OrderSearchFilters, Order } from '../models/order.model';
 import { AdminOrderCreate } from '../models/admin-order-create.model';
+import { OrderComplete } from '../models/order-complete.model';
+import { CommentRequest } from '../models/comment-request.model';
 import { SuccessResponse } from '../../../core/models/api-response.model';
 import { PageResponse } from '../../../core/models/pagination.model';
 import { environment } from '../../../../environments/environment';
@@ -111,6 +113,115 @@ export class OrdersService {
             `${this.baseUrl}/${associationId}/orders/${orderId}`
         ).pipe(
             map(response => response.data!)
+        );
+    }
+
+    /**
+     * Complete an order with payment method
+     * @param orderId The order ID
+     * @param orderComplete The completion data including payment method
+     * @returns Observable with the updated order
+     */
+    completeOrder(orderId: number, orderComplete: OrderComplete): Observable<Order> {
+        const associationId = this.authService.requireAssociationId();
+        return this.http.put<SuccessResponse<Order>>(
+            `${this.baseUrl}/${associationId}/orders/${orderId}/complete`,
+            orderComplete
+        ).pipe(
+            map(response => response.data!),
+            tap(() => {
+                this.clearCache();
+            })
+        );
+    }
+
+    /**
+     * Cancel an order
+     * @param orderId The order ID
+     * @returns Observable with the updated order
+     */
+    cancelOrder(orderId: number): Observable<Order> {
+        const associationId = this.authService.requireAssociationId();
+        return this.http.put<SuccessResponse<Order>>(
+            `${this.baseUrl}/${associationId}/orders/${orderId}/cancel`,
+            {}
+        ).pipe(
+            map(response => response.data!),
+            tap(() => {
+                this.clearCache();
+            })
+        );
+    }
+
+    /**
+     * Set an order to unpaid status
+     * @param orderId The order ID
+     * @returns Observable with the updated order
+     */
+    setOrderUnpaid(orderId: number): Observable<Order> {
+        const associationId = this.authService.requireAssociationId();
+        return this.http.put<SuccessResponse<Order>>(
+            `${this.baseUrl}/${associationId}/orders/${orderId}/unpaid`,
+            {}
+        ).pipe(
+            map(response => response.data!),
+            tap(() => {
+                this.clearCache();
+            })
+        );
+    }
+
+    /**
+     * Add a comment to an order
+     * @param orderId The order ID
+     * @param commentRequest The comment data
+     * @returns Observable with the updated order
+     */
+    addComment(orderId: number, commentRequest: CommentRequest): Observable<Order> {
+        const associationId = this.authService.requireAssociationId();
+        return this.http.post<SuccessResponse<Order>>(
+            `${this.baseUrl}/${associationId}/orders/${orderId}/comment`,
+            commentRequest
+        ).pipe(
+            map(response => response.data!),
+            tap(() => {
+                this.clearCache();
+            })
+        );
+    }
+
+    /**
+     * Edit a comment on an order
+     * @param orderId The order ID
+     * @param commentRequest The comment data
+     * @returns Observable with the updated order
+     */
+    editComment(orderId: number, commentRequest: CommentRequest): Observable<Order> {
+        const associationId = this.authService.requireAssociationId();
+        return this.http.put<SuccessResponse<Order>>(
+            `${this.baseUrl}/${associationId}/orders/${orderId}/comment`,
+            commentRequest
+        ).pipe(
+            map(response => response.data!),
+            tap(() => {
+                this.clearCache();
+            })
+        );
+    }
+
+    /**
+     * Delete a comment from an order
+     * @param orderId The order ID
+     * @returns Observable with void (204 No Content)
+     */
+    deleteComment(orderId: number): Observable<void> {
+        const associationId = this.authService.requireAssociationId();
+        return this.http.delete<void>(
+            `${this.baseUrl}/${associationId}/orders/${orderId}/comment`
+        ).pipe(
+            tap(() => {
+                this.clearCache();
+            })
         );
     }
 

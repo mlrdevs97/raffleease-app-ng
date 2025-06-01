@@ -4,5 +4,5 @@
         <img [alt]="eventName" loading="lazy" width="24" height="24" decoding="async" data-nimg="1" class="size-full"
             [src]="imageUrl" style="color: transparent;">
     </span>
-    <span>{{ eventName }}</span>
+    <span>{{ eventName | truncate:20 }}</span>
 </div>

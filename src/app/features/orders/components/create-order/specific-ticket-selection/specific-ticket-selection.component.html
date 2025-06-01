@@ -22,12 +22,13 @@
                     (suggestionSelected)="onSuggestionSelected($event)">
                 </app-ticket-search>
             </div>
-            <button 
-                type="button"
+            <app-button 
+                variant="primary"
+                size="md"
                 [disabled]="disabled || !raffleId || isLoading"
-                class="inline-flex items-center justify-center gap-2 whitespace-nowrap rounded-md text-sm font-medium ring-offset-background transition-colors focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2 disabled:pointer-events-none h-10 px-4 py-2 bg-zinc-900 text-white hover:bg-slate-800 disabled:opacity-50">
+                (clicked)="onEnterPressed(parentFormGroup.get('ticketNumber')?.value || '')">
                 Select Ticket
-            </button>
+            </app-button>
         </div>
 
         @if (isLoading) {

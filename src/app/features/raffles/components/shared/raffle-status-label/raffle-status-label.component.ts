@@ -17,10 +17,10 @@ export class RaffleStatusLabelComponent {
 
   get statusClasses(): Record<string, boolean> {
     return {
-      'bg-lime-400/20 text-lime-700': this.status === RaffleStatus.ACTIVE,
-      'bg-amber-400/20 text-amber-700': this.status === RaffleStatus.PENDING,
-      'bg-zinc-400/20 text-zinc-700': this.status === RaffleStatus.PAUSED,
-      'bg-blue-400/20 text-blue-700': this.status === RaffleStatus.COMPLETED
+      'bg-green-100 text-green-800': this.status === RaffleStatus.ACTIVE,
+      'bg-yellow-100 text-yellow-800': this.status === RaffleStatus.PENDING,
+      'bg-blue-100 text-blue-800': this.status === RaffleStatus.PAUSED,
+      'bg-gray-100 text-gray-800': this.status === RaffleStatus.COMPLETED
     };
   }
 } 

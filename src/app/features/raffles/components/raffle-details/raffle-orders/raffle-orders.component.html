@@ -2,9 +2,9 @@
     <div class="mb-4 flex items-center justify-between">
         <h2 class="text-lg font-semibold">Raffle orders</h2>
         <a [routerLink]="['/orders/create']" [queryParams]="{ raffle: raffleId }">
-            <button class="h-10 px-4 py-2 rounded-md bg-black text-white font-bold text-sm hover:bg-black/90">
+            <app-button variant="primary" size="md">
                 Create order
-            </button>
+            </app-button>
         </a>
     </div>
 

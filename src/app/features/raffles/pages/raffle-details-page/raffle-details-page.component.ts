@@ -5,7 +5,7 @@ import { EMPTY } from 'rxjs';
 import { RaffleStatisticsComponent } from '../../components/raffle-details/raffle-statistics/raffle-statistics.component';
 import { RaffleGalleryComponent } from '../../components/raffle-details/raffle-gallery/raffle-gallery.component';
 import { RaffleHeaderComponent } from '../../components/raffle-details/raffle-header/raffle-header.component';
-import { BackLinkComponent } from '../../../../layout/components/back-link/back-link.component';
+import { BackLinkComponent } from '../../../../shared/components/back-link/back-link.component';
 import { Raffle } from '../../models/raffle.model';
 import { RaffleQueryService } from '../../services/raffle-query.service';
 import { ErrorHandlerService } from '../../../../core/services/error-handler.service';

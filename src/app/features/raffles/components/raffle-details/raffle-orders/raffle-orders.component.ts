@@ -6,10 +6,11 @@ import { OrdersTableComponent } from '../../../../orders/components/shared/order
 import { OrdersService } from '../../../../orders/services/orders.service';
 import { ErrorHandlerService } from '../../../../../core/services/error-handler.service';
 import { Order } from '../../../../orders/models/order.model';
+import { ButtonComponent } from '../../../../../shared/components/button/button.component';
 
 @Component({
   selector: 'app-raffle-orders',
-  imports: [CommonModule, RouterLink, OrdersTableComponent],
+  imports: [CommonModule, RouterLink, OrdersTableComponent, ButtonComponent],
   standalone: true,
   templateUrl: './raffle-orders.component.html'
 })

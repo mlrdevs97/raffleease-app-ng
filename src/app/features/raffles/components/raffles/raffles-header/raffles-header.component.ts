@@ -2,10 +2,11 @@ import { Component, EventEmitter, Input, Output } from '@angular/core';
 import { RafflesToolbarComponent } from '../raffles-toolbar/raffles-toolbar.component';
 import { RouterLink } from '@angular/router';
 import { Raffle } from '../../../models/raffle.model';
+import { ButtonComponent } from '../../../../../shared/components/button/button.component';
 
 @Component({
     standalone: true,
-    imports: [RafflesToolbarComponent, RouterLink],
+    imports: [RafflesToolbarComponent, RouterLink, ButtonComponent],
     selector: 'app-raffles-header',
     templateUrl: './raffles-header.component.html',
 })

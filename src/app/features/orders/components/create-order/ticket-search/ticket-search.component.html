@@ -18,14 +18,10 @@
         <div class="flex justify-center items-center p-4">
             <div class="animate-spin rounded-full h-5 w-5 border-b-2 border-gray-900"></div>
         </div>
-        } @else if (noResults) {
-        <div class="p-4 text-sm text-gray-500 text-center">
-            No tickets found
-        </div>
-        } @else {
-        <ul class="py-1" role="presentation">
+        } @else if (suggestions.length > 0) {
+        <ul class="py-1">
             @for (ticket of suggestions; track ticket.id; let i = $index) {
-            <li role="presentation">
+            <li>
                 <button type="button" (click)="selectSuggestion(ticket)" [id]="'suggestion-' + i" role="option"
                     [attr.aria-selected]="false"
                     class="w-full px-4 py-2 text-left text-sm transition-colors duration-150"

@@ -7,7 +7,7 @@ import { PageResponse } from '../../../../core/models/pagination.model';
 import { ErrorHandlerService } from '../../../../core/services/error-handler.service';
 import { OrdersTableComponent } from '../../components/shared/orders-table/orders-table.component';
 import { OrdersSearchDialogComponent, SearchResult } from '../../components/orders/orders-search-dialog/orders-search-dialog.component';
-import { OrdersToolbarComponent } from '../../components/orders-toolbar/orders-toolbar.component';
+import { OrdersToolbarComponent } from '../../components/orders/orders-toolbar/orders-toolbar.component';
 
 @Component({
     selector: 'app-orders-page',

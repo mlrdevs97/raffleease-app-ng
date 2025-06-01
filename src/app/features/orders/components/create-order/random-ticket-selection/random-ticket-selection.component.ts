@@ -12,13 +12,15 @@ import { Ticket } from '../../../../../core/models/ticket.model';
 import { Raffle } from '../../../../raffles/models/raffle.model';
 import { Cart } from '../../../../../core/models/cart.model';
 import { createOrderTickets } from '../../../../../core/utils/ticket.utils';
+import { ButtonComponent } from '../../../../../shared/components/button/button.component';
 
 @Component({
     selector: 'app-random-ticket-selection',
     standalone: true,
     imports: [
         ReactiveFormsModule,
-        CommonModule
+        CommonModule,
+        ButtonComponent
     ],
     templateUrl: './random-ticket-selection.component.html'
 })

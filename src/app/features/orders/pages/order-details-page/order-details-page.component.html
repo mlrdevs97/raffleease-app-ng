@@ -1,10 +1,8 @@
-<div class="mx-auto max-w-4xl">
-  <!-- Back link -->
-  <div class="mb-6">
+<div class="mx-auto max-w-4xl space-y-6">
+  <div>
     <app-back-link routePath="/orders" label="Orders"></app-back-link>
   </div>
 
-  <!-- Loading state -->
   @if (isLoading()) {
     <div class="flex items-center justify-center py-12">
       <div class="text-center">
@@ -15,8 +13,27 @@
   }
 
   @else if (order()) {
+    @if (successMessage()) {
+      <div class="bg-green-50 text-green-800 p-3 mb-6 rounded-md border border-green-200 text-sm">
+        {{ successMessage() }}
+      </div>
+    }
+
+    @if (errorMessage()) {
+      <div class="bg-rose-100 text-rose-700 p-3 mb-6 rounded-md border border-rose-200 text-sm">
+        {{ errorMessage() }}
+      </div>
+    }
+
     <div>
-      <app-order-detail-header [order]="order()!"></app-order-detail-header>
+      <app-order-detail-header 
+        [order]="order()!"
+        [isUpdatingOrder]="isUpdatingOrder"
+        [currentAction]="currentAction"
+        (completeOrderRequested)="onCompleteOrderClicked()"
+        (cancelOrderRequested)="onCancelOrderClicked()"
+        (setUnpaidRequested)="onSetUnpaidRequested()">
+      </app-order-detail-header>
     </div>
 
     <div>
@@ -24,7 +41,10 @@
     </div>
 
     <div>
-      <app-order-comment [order]="order()!"></app-order-comment>
+      <app-order-comment 
+        [order]="order()!" 
+        (orderUpdated)="onOrderUpdated($event)">
+      </app-order-comment>
     </div>
 
     <div class="mt-12">
@@ -37,5 +57,13 @@
         </app-tickets-preview>
       </div>
     </div>
+
+    <app-order-confirmation-dialog
+      [isOpen]="showConfirmationDialog"
+      [data]="confirmationDialogData"
+      [isLoading]="isUpdatingOrder"
+      (confirmed)="onConfirmationConfirmed($event)"
+      (cancelled)="onConfirmationCancelled()"
+    />
   }
 </div> 

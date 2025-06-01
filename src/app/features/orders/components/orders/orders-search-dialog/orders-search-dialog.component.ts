@@ -6,6 +6,7 @@ import { OrdersService } from '../../../services/orders.service';
 import { PageResponse } from '../../../../../core/models/pagination.model';
 import { ClientValidationMessages } from '../../../../../core/constants/client-validation-messages';
 import { ErrorHandlerService } from '../../../../../core/services/error-handler.service';
+import { ButtonComponent } from '../../../../../shared/components/button/button.component';
 
 export interface SearchResult<T> {
     filters: OrderSearchFilters;
@@ -17,7 +18,8 @@ export interface SearchResult<T> {
     standalone: true,
     imports: [
         CommonModule,
-        OrdersSearchTabsComponent
+        OrdersSearchTabsComponent,
+        ButtonComponent
     ],
     templateUrl: './orders-search-dialog.component.html',
 })

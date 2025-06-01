@@ -1,5 +1,6 @@
 import { Component, Input, Output, EventEmitter, signal } from '@angular/core';
 import { CommonModule } from '@angular/common';
+import { ButtonComponent } from '../button/button.component';
 
 export interface ConfirmationDialogData {
   title: string;
@@ -12,7 +13,7 @@ export interface ConfirmationDialogData {
 @Component({
   selector: 'app-confirmation-dialog',
   standalone: true,
-  imports: [CommonModule],
+  imports: [CommonModule, ButtonComponent],
   templateUrl: './confirmation-dialog.component.html'
 })
 export class ConfirmationDialogComponent {
@@ -40,19 +41,6 @@ export class ConfirmationDialogComponent {
   onBackdropClick(event: Event): void {
     if (event.target === event.currentTarget) {
       this.onCancel();
-    }
-  }
-
-  get confirmButtonClasses(): string {
-    const baseClasses = 'px-4 py-2 rounded-md text-sm font-medium focus:outline-none focus:ring-2 focus:ring-offset-2 disabled:opacity-50 disabled:cursor-not-allowed';
-    
-    switch (this.data.variant) {
-      case 'destructive':
-        return `${baseClasses} bg-red-600 text-white hover:bg-red-700 focus:ring-red-500`;
-      case 'warning':
-        return `${baseClasses} bg-yellow-600 text-white hover:bg-yellow-700 focus:ring-yellow-500`;
-      default:
-        return `${baseClasses} bg-black text-white hover:bg-black/90 focus:ring-gray-500`;
     }
   }
 } 

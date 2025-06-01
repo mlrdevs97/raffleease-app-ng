@@ -1,7 +1,7 @@
 import { Component, OnInit, OnDestroy, signal } from '@angular/core';
 import { ActivatedRoute } from '@angular/router';
 import { OrderFormComponent } from '../../components/create-order/order-form/order-form.component';
-import { BackLinkComponent } from '../../../../layout/components/back-link/back-link.component';
+import { BackLinkComponent } from '../../../../shared/components/back-link/back-link.component';
 import { CartService } from '../../services/cart.service';
 import { TicketSelectionService } from '../../services/ticket-selection.service';
 import { ErrorHandlerService } from '../../../../core/services/error-handler.service';
@@ -16,7 +16,7 @@ import { CommonModule } from '@angular/common';
 })
 export class CreateOrderPageComponent implements OnInit, OnDestroy {
   raffleId = signal<number | undefined>(undefined);
-  cartError = signal<string | null>(null);
+  errorMessage = signal<string | null>(null);
   
   constructor(
     private route: ActivatedRoute,
@@ -26,17 +26,15 @@ export class CreateOrderPageComponent implements OnInit, OnDestroy {
   ) {}
   
   ngOnInit(): void {
-    // Parse raffle ID from query parameters
     this.route.queryParams.subscribe(params => {
       if (params['raffle']) {
-        const raffleIdFromQuery = parseInt(params['raffle'], 10);
-        if (!isNaN(raffleIdFromQuery)) {
-          this.raffleId.set(raffleIdFromQuery);
+        const raffleId = parseInt(params['raffle'], 10);
+        if (!isNaN(raffleId)) {
+          this.raffleId.set(raffleId);
         }
       }
     });
 
-    // Create cart when page loads
     this.createCart();
   }
 
@@ -44,35 +42,15 @@ export class CreateOrderPageComponent implements OnInit, OnDestroy {
     this.ticketSelectionService.clearTickets();
   }
 
-  /**
-   * Retry cart creation after an error
-   */
-  retryCartCreation(): void {
-    this.cartError.set(null);
-    this.createCart();
-  }
-
-  /**
-   * Create a new cart for this order session
-   * Reason: Each order creation process requires a dedicated cart to hold temporary ticket reservations
-   */
   private createCart(): void {
     this.cartService.createCart().subscribe({
       next: (cart: Cart) => {
-        this.cartError.set(null);
+        this.errorMessage.set(null);
       },
       error: (error) => {
         this.cartService.resetCreatingState();
-        const errorMessage = this.errorHandler.getErrorMessage(error);
-        this.cartError.set(errorMessage);
+        this.errorMessage.set(this.errorHandler.getErrorMessage(error));
       }
     });
-  }
-
-  /**
-   * Get the current cart error state
-   */
-  getCartError() {
-    return this.cartError.asReadonly();
   }
 }

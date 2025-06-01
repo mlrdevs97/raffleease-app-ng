@@ -13,6 +13,7 @@ import { Ticket, TicketStatus } from '../../../../../core/models/ticket.model';
 import { Raffle } from '../../../../raffles/models/raffle.model';
 import { Cart } from '../../../../../core/models/cart.model';
 import { createOrderTicket } from '../../../../../core/utils/ticket.utils';
+import { ButtonComponent } from '../../../../../shared/components/button/button.component';
 
 @Component({
     selector: 'app-specific-ticket-selection',
@@ -20,7 +21,8 @@ import { createOrderTicket } from '../../../../../core/utils/ticket.utils';
     imports: [
         ReactiveFormsModule,
         CommonModule,
-        TicketSearchComponent
+        TicketSearchComponent,
+        ButtonComponent
     ],
     templateUrl: './specific-ticket-selection.component.html'
 })

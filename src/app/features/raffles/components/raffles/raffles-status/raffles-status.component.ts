@@ -1,6 +1,6 @@
 import { Component, EventEmitter, Output } from '@angular/core';
 import { FormsModule } from '@angular/forms';
-import { DropdownSelectComponent } from '../../../../../layout/components/dropdown-select/dropdown-select.component';
+import { DropdownSelectComponent } from '../../../../../shared/components/dropdown-select/dropdown-select.component';
 
 @Component({
   selector: 'app-raffles-status',

@@ -1,6 +1,6 @@
 import { Component } from '@angular/core';
 import { RaffleFormComponent } from '../../components/create-raffles/raffle-form/raffle-form.component';
-import { BackLinkComponent } from '../../../../layout/components/back-link/back-link.component';
+import { BackLinkComponent } from '../../../../shared/components/back-link/back-link.component';
 
 @Component({
   selector: 'app-create-raffle-page',

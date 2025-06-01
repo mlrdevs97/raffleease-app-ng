@@ -9,54 +9,27 @@
                 Fill in the details to create a new order.
             </p>
         </div>
-        
+
         <!-- Cart Loading State -->
         @if (cartService.getIsCreatingCart()()) {
-            <div class="p-6 pt-0">
-                <div class="flex items-center justify-center space-x-2 text-slate-600">
-                    <div class="animate-spin rounded-full h-5 w-5 border-b-2 border-indigo-600"></div>
-                    <span class="text-sm">Initializing order session...</span>
-                </div>
+        <div class="p-6 pt-0">
+            <div class="flex items-center justify-center space-x-2 text-slate-600">
+                <div class="animate-spin rounded-full h-5 w-5 border-b-2 border-indigo-600"></div>
+                <span class="text-sm">Initializing order session...</span>
             </div>
+        </div>
         }
-        
-        <!-- Cart Error State -->
-        @if (cartError()) {
-            <div class="p-6 pt-0">
-                <div class="rounded-md bg-red-50 p-4">
-                    <div class="flex">
-                        <div class="ml-3 flex-1">
-                            <h3 class="text-sm font-medium text-red-800">
-                                Failed to initialize order session
-                            </h3>
-                            <div class="mt-2 text-sm text-red-700">
-                                <p>{{ cartError() }}</p>
-                                <p class="mt-2">Please try again or contact support if the problem persists.</p>
-                            </div>
-                            <div class="mt-4">
-                                <button
-                                    type="button"
-                                    class="inline-flex items-center px-3 py-2 border border-transparent text-sm leading-4 font-medium rounded-md text-red-700 bg-red-100 hover:bg-red-200 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-red-500"
-                                    (click)="retryCartCreation()"
-                                    [disabled]="cartService.getIsCreatingCart()()">
-                                    @if (cartService.getIsCreatingCart()()) {
-                                        <div class="animate-spin rounded-full h-4 w-4 border-b-2 border-red-700 mr-2"></div>
-                                        Retrying...
-                                    } @else {
-                                        Try Again
-                                    }
-                                </button>
-                            </div>
-                        </div>
-                    </div>
-                </div>
-            </div>
+
+        @if (errorMessage()) {
+        <div class="bg-rose-100 text-rose-700 p-3 mb-6 rounded-md border border-rose-200 text-sm">
+            {{ errorMessage() }}
+        </div>
         }
-        
-        @if (cartService.getCurrentCart()() && !cartService.getIsCreatingCart()() && !cartError()) {
-            <div class="p-6 pt-0">
-                <app-order-form [raffleId]="raffleId()" />
-            </div>
+
+        @if (cartService.getCurrentCart()() && !cartService.getIsCreatingCart()() && !errorMessage()) {
+        <div class="p-6 pt-0">
+            <app-order-form [raffleId]="raffleId()" />
+        </div>
         }
     </div>
 </div>

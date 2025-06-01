@@ -54,6 +54,7 @@ export const SuccessMessages = {
   order: {
     created: 'Your order has been created successfully.',
     completed: 'Your order has been completed successfully.',
-    cancelled: 'Your order has been cancelled successfully.'
+    cancelled: 'Your order has been cancelled successfully.',
+    setUnpaid: 'Order has been set to unpaid successfully.'
   }
 }; 

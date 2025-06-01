@@ -12,11 +12,12 @@ import { Router } from '@angular/router';
 import { SuccessResponse } from '../../../../../core/models/api-response.model';
 import { Raffle } from '../../../models/raffle.model';
 import { SuccessMessages } from '../../../../../core/constants/success-messages';
+import { ButtonComponent } from '../../../../../shared/components/button/button.component';
 
 @Component({
   selector: 'app-raffle-form',
   standalone: true,
-  imports: [ReactiveFormsModule, RaffleDetailsComponent, RaffleTicketsComponent, RaffleImagesUploadComponent],
+  imports: [ReactiveFormsModule, RaffleDetailsComponent, RaffleTicketsComponent, RaffleImagesUploadComponent, ButtonComponent],
   templateUrl: './raffle-form.component.html'
 })
 export class RaffleFormComponent {
