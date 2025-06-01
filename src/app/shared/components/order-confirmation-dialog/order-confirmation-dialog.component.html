@@ -44,7 +44,7 @@
         <app-button
             variant="primary"
             size="md"
-            [disabled]="isLoading() || (data.requiresPaymentMethod && form.invalid)"
+            [disabled]="(isLoading() || (data.requiresPaymentMethod && form.invalid)) ?? true"
             [loading]="isLoading()"
             (clicked)="onConfirm()">
             {{ data.confirmText }}

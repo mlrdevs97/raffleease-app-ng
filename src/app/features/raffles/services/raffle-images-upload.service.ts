@@ -15,15 +15,27 @@ export class RaffleImagesUploadService {
     private readonly authService: AuthService
   ) {}
 
-  uploadImages(files: File[]): Observable<SuccessResponse<ImageResponse>> {
+  uploadImages(files: File[], raffleId?: number): Observable<SuccessResponse<ImageResponse>> {
     const associationId = this.authService.requireAssociationId();
     const formData = new FormData();
     files.forEach(file => formData.append('files', file));
-    return this.http.post<SuccessResponse<ImageResponse>>(`${this.baseUrl}/${associationId}/images`, formData);
+    
+    // Use different endpoints based on whether we're in create or edit mode
+    const endpoint = raffleId 
+      ? `${this.baseUrl}/${associationId}/raffles/${raffleId}/images`  // Edit mode: raffle-specific endpoint
+      : `${this.baseUrl}/${associationId}/images`;  // Create mode: general images endpoint
+    
+    return this.http.post<SuccessResponse<ImageResponse>>(endpoint, formData);
   }
 
-  deleteImage(imageId: number): Observable<void> {
+  deleteImage(imageId: number, raffleId?: number): Observable<void> {
     const associationId = this.authService.requireAssociationId();
-    return this.http.delete<void>(`${this.baseUrl}/${associationId}/images/${imageId}`);
+    
+    // Use different endpoints based on whether we're in create or edit mode
+    const endpoint = raffleId
+      ? `${this.baseUrl}/${associationId}/raffles/${raffleId}/images/${imageId}`  // Edit mode: raffle-specific endpoint
+      : `${this.baseUrl}/${associationId}/images/${imageId}`;  // Create mode: general images endpoint
+    
+    return this.http.delete<void>(endpoint);
   }
 } 

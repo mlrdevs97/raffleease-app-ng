@@ -1,4 +1,4 @@
-import { Component, Input, signal, inject, Output, EventEmitter } from '@angular/core';
+import { Component, Input, signal, Output, EventEmitter, OnInit } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { RaffleStatusLabelComponent } from '../../shared/raffle-status-label/raffle-status-label.component';
 import { ConfirmationDialogComponent, ConfirmationDialogData } from '../../../../../shared/components/confirmation-dialog/confirmation-dialog.component';
@@ -6,7 +6,6 @@ import { RaffleStatus } from '../../../models/raffle.model';
 import { RaffleService } from '../../../services/raffle.service';
 import { ErrorHandlerService } from '../../../../../core/services/error-handler.service';
 import { SuccessMessages } from '../../../../../core/constants/success-messages';
-import { ClientValidationMessages } from '../../../../../core/constants/client-validation-messages';
 import { SuccessResponse } from '../../../../../core/models/api-response.model';
 import { Raffle } from '../../../models/raffle.model';
 import { ConfirmationMessages } from '../../../../../core/constants/confirmation-messages';
@@ -18,8 +17,9 @@ import { ButtonComponent } from '../../../../../shared/components/button/button.
   standalone: true,
   templateUrl: './raffle-header.component.html'
 })
-export class RaffleHeaderComponent {
+export class RaffleHeaderComponent implements OnInit {
   @Input() raffle!: Raffle;
+  @Input() initialSuccessMessage?: string | null;
   @Output() raffleUpdated = new EventEmitter<Raffle>();
   @Output() editRequested = new EventEmitter<void>();
 
@@ -36,6 +36,13 @@ export class RaffleHeaderComponent {
     private raffleService: RaffleService,
     private errorHandler: ErrorHandlerService
   ) {}
+
+  ngOnInit(): void {
+    if (this.initialSuccessMessage) {
+      this.successMessage.set(this.initialSuccessMessage);
+      setTimeout(() => this.successMessage.set(null), 5000);
+    }
+  }
 
   get formattedStatus(): string {
     return this.raffle.status.charAt(0) + this.raffle.status.slice(1).toLowerCase();

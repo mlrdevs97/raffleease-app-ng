@@ -31,7 +31,7 @@ export const SuccessMessages = {
    * Raffle success messages
    */
   raffle: {
-    created: 'Your raffle has been created successfully. Redirecting to raffle details...',
+    created: 'Your raffle has been created successfully.',
     updated: 'Your raffle has been updated successfully.',
     deleted: 'Your raffle has been deleted successfully.',
     activated: 'Your raffle has been activated successfully and is now available for ticket sales.',

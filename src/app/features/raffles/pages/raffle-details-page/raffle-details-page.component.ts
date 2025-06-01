@@ -28,6 +28,7 @@ import { ErrorMessages } from '../../../../core/constants/error-messages';
 export class RaffleDetailsPageComponent implements OnInit {
   raffle = signal<Raffle | null>(null);
   isLoading = signal(false);
+  initialSuccessMessage = signal<string | null>(null);
 
   timePassed = computed(() => {
     const raffleData = this.raffle();
@@ -47,6 +48,17 @@ export class RaffleDetailsPageComponent implements OnInit {
   ) { }
 
   ngOnInit(): void {
+    this.route.queryParams.subscribe(params => {
+      if (params['success']) {
+        this.initialSuccessMessage.set(params['success']);
+        this.router.navigate([], {
+          relativeTo: this.route,
+          queryParams: {},
+          replaceUrl: true
+        });
+      }
+    });
+
     this.route.params.subscribe({
       next: (params: Params) => {
         const raffleId = parseInt(params['id'], 10);

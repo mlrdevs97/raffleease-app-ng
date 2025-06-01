@@ -10,6 +10,10 @@ export const RAFFLES_ROUTES: Routes = [
     loadComponent: () => import('./pages/create-raffles/create-raffle-page.component').then(c => c.CreateRafflePageComponent)
   },
   {
+    path: ':id/edit',
+    loadComponent: () => import('./pages/edit-raffle/edit-raffle-page.component').then(c => c.EditRafflePageComponent)
+  },
+  {
     path: ':id',
     loadComponent: () => import('./pages/raffle-details-page/raffle-details-page.component').then(c => c.RaffleDetailsPageComponent),
   }

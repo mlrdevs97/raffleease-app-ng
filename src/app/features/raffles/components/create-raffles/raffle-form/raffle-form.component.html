@@ -11,7 +11,12 @@
         <app-raffle-tickets [formGroup]="ticketsInfoFormGroup" [fieldErrors]="fieldErrors()"></app-raffle-tickets>
     </div>
     <div>
-        <app-raffle-images-upload [control]="imagesControl" [fieldErrors]="fieldErrors()"></app-raffle-images-upload>
+        <app-raffle-images-upload 
+            [control]="imagesControl" 
+            [fieldErrors]="fieldErrors()"
+            [initialImages]="mode === 'edit' ? raffleData?.images : undefined"
+            [raffleId]="mode === 'edit' ? raffleData?.id : undefined">
+        </app-raffle-images-upload>
     </div>
 
     <div class="flex items-center justify-end space-x-4 pt-4">
@@ -27,8 +32,8 @@
             type="submit" 
             [disabled]="isLoading()"
             [loading]="isLoading()"
-            loadingText="Loading...">
-            Create Raffle
+            [loadingText]="loadingText">
+            {{ buttonText }}
         </app-button>
     </div>
 </form>

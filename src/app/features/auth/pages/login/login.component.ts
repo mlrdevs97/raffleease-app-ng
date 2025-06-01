@@ -103,6 +103,7 @@ export class LoginComponent {
     this.successMessage.set(null);
     this.authService.login(identifier, password).subscribe({
       error: (error: unknown) => {
+        console.error('Login error:', error);
         this.errorMessage.set(this.errorHandler.getErrorMessage(error));
         if (this.errorHandler.isValidationError(error)) {
           const validationErrors = this.errorHandler.getValidationErrors(error);
