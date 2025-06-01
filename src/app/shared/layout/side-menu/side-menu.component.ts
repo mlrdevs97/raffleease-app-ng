@@ -1,8 +1,12 @@
-import { Component, inject } from '@angular/core';
-import { Router, NavigationEnd, RouterLink, RouterLinkActive } from '@angular/router';
+import { Component, inject, signal, OnInit } from '@angular/core';
+import { Router, NavigationEnd, RouterLink } from '@angular/router';
 import { CommonModule } from '@angular/common';
 import { DomSanitizer, SafeHtml } from '@angular/platform-browser';
 import { filter, map, startWith } from 'rxjs/operators';
+import { RaffleQueryService } from '../../../features/raffles/services/raffle-query.service';
+import { Raffle } from '../../../features/raffles/models/raffle.model';
+import { PageResponse } from '../../../core/models/pagination.model';
+import { ErrorHandlerService } from '../../../core/services/error-handler.service';
 
 export interface MenuItem {
   href: string;
@@ -11,17 +15,30 @@ export interface MenuItem {
   exactMatch?: boolean;
 }
 
+export interface UpcomingRaffleItem {
+  href: string;
+  label: string;
+}
+
 @Component({
   selector: 'app-side-menu',
   standalone: true,
-  imports: [CommonModule, RouterLink, RouterLinkActive],
+  imports: [CommonModule, RouterLink],
   templateUrl: './side-menu.component.html',
 })
-export class SideMenuComponent {
+export class SideMenuComponent implements OnInit {
   private router = inject(Router);
   private sanitizer = inject(DomSanitizer);
+  private raffleQueryService = inject(RaffleQueryService);
+  private errorHandler = inject(ErrorHandlerService);
 
-  // Menu items configuration to avoid repetition
+  upcomingRaffles = signal<UpcomingRaffleItem[]>([]);
+  isLoadingRaffles = signal<boolean>(false);
+  rafflesError = signal<string | null>(null);
+
+  readonly loadingMessage = 'Loading...';
+  readonly noRafflesMessage = 'No recent raffles available';
+
   mainMenuItems: MenuItem[] = [
     {
       href: '/',
@@ -55,19 +72,36 @@ export class SideMenuComponent {
     }
   ];
 
-  upcomingRaffles = [
-    { href: '/raffles/1', label: 'Bear Hug: Live in Concert' },
-    { href: '/raffles/2', label: 'Six Fingers — DJ Set' },
-    { href: '/raffles/3', label: 'We All Look The Same' },
-    { href: '/raffles/4', label: 'Viking People' }
-  ];
-
   // Track current URL for active state
   currentUrl$ = this.router.events.pipe(
     filter(event => event instanceof NavigationEnd),
     map((event: NavigationEnd) => event.urlAfterRedirects),
     startWith(this.router.url)
   );
+
+  ngOnInit(): void {
+    this.loadRecentRaffles();
+  }
+
+  private loadRecentRaffles(): void {
+    this.isLoadingRaffles.set(true);
+    this.rafflesError.set(null);
+    this.raffleQueryService.search({}, 0, 4, 'createdAt,desc').subscribe({
+      next: (response: PageResponse<Raffle>) => {
+        const upcomingItems: UpcomingRaffleItem[] = response.content.map((raffle: Raffle) => ({
+          href: `/raffles/${raffle.id}`,
+          label: raffle.title
+        }));
+        this.upcomingRaffles.set(upcomingItems);
+        this.isLoadingRaffles.set(false);
+      },
+      error: (error: unknown) => {
+        this.rafflesError.set(this.errorHandler.getErrorMessage(error));
+        this.isLoadingRaffles.set(false);
+        this.upcomingRaffles.set([]);
+      }
+    });
+  }
 
   /**
    * Safely returns sanitized HTML for icons
@@ -91,8 +125,6 @@ export class SideMenuComponent {
       return currentUrl === href;
     }
     
-    // For non-exact matches, check if current URL starts with href
-    // Special case: avoid matching root '/' for non-root paths
     if (href === '/') {
       return currentUrl === '/';
     }

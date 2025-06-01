@@ -21,19 +21,39 @@
             }
         </ul>
 
-        <!-- Upcoming raffles -->
+        <!-- Last raffles -->
         <div class="max-lg:hidden mt-8">
-            <h3 class="mb-2 px-2 text-xs font-medium text-zinc-500">Upcoming Raffles</h3>
-            <ul class="flex flex-col gap-1 text-sm font-medium text-zinc-950">
-                @for (raffle of upcomingRaffles; track raffle.href) {
-                    <li>
-                        <a [routerLink]="raffle.href" 
-                           [class]="isActive(raffle.href) ? 'block rounded-lg px-2 py-2.5 text-zinc-950 bg-zinc-950/5 hover:bg-zinc-950/10' : 'block rounded-lg px-2 py-2.5 hover:bg-zinc-950/5'">
-                            {{ raffle.label }}
-                        </a>
-                    </li>
-                }
-            </ul>
+            <h3 class="mb-2 px-2 text-xs font-medium text-zinc-500">Last raffles</h3>
+            
+            @if (isLoadingRaffles()) {
+                <!-- Loading state -->
+                <div class="px-2 py-2.5 text-sm text-zinc-500">
+                    {{ loadingMessage }}
+                </div>
+            } @else if (rafflesError()) {
+                <!-- Error state -->
+                <div class="px-2 py-2.5 text-sm text-red-600">
+                    {{ rafflesError() }}
+                </div>
+            } @else if (upcomingRaffles().length === 0) {
+                <!-- Empty state -->
+                <div class="px-2 py-2.5 text-sm text-zinc-500">
+                    {{ noRafflesMessage }}
+                </div>
+            } @else {
+                <!-- Raffles list -->
+                <ul class="flex flex-col gap-1 text-sm font-medium text-zinc-950">
+                    @for (raffle of upcomingRaffles(); track raffle.href) {
+                        <li>
+                            <a [routerLink]="raffle.href" 
+                               [class]="isActive(raffle.href) ? 'block rounded-lg px-2 py-2.5 text-zinc-950 bg-zinc-950/5 hover:bg-zinc-950/10' : 'block rounded-lg px-2 py-2.5 hover:bg-zinc-950/5'"
+                               [title]="raffle.label">
+                                <span class="truncate">{{ raffle.label }}</span>
+                            </a>
+                        </li>
+                    }
+                </ul>
+            }
         </div>
 
         <!-- Push bottom content down -->
