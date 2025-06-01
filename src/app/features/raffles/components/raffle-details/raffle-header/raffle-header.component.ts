@@ -1,11 +1,13 @@
-import { Component, Input, signal, Output, EventEmitter, OnInit } from '@angular/core';
+import { Component, Input, signal, inject, Output, EventEmitter, OnInit } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { RaffleStatusLabelComponent } from '../../shared/raffle-status-label/raffle-status-label.component';
 import { ConfirmationDialogComponent, ConfirmationDialogData } from '../../../../../shared/components/confirmation-dialog/confirmation-dialog.component';
 import { RaffleStatus } from '../../../models/raffle.model';
 import { RaffleService } from '../../../services/raffle.service';
+import { RaffleQueryService } from '../../../services/raffle-query.service';
 import { ErrorHandlerService } from '../../../../../core/services/error-handler.service';
 import { SuccessMessages } from '../../../../../core/constants/success-messages';
+import { ClientValidationMessages } from '../../../../../core/constants/client-validation-messages';
 import { SuccessResponse } from '../../../../../core/models/api-response.model';
 import { Raffle } from '../../../models/raffle.model';
 import { ConfirmationMessages } from '../../../../../core/constants/confirmation-messages';
@@ -34,6 +36,7 @@ export class RaffleHeaderComponent implements OnInit {
 
   constructor(
     private raffleService: RaffleService,
+    private raffleQueryService: RaffleQueryService,
     private errorHandler: ErrorHandlerService
   ) {}
 
@@ -101,6 +104,8 @@ export class RaffleHeaderComponent implements OnInit {
         if (response.data) {
           // Update the local raffle data to reflect the status change
           this.raffle = { ...this.raffle, status: response.data.status };
+          // Update cache with the new raffle data
+          this.raffleQueryService.updateRaffleCache(this.raffle.id, response.data);
           // Emit the updated raffle data to parent components
           this.raffleUpdated.emit(response.data);
         }

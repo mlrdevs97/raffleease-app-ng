@@ -5,6 +5,7 @@ import { RaffleImagesUploadComponent } from '../raffle-images-upload/raffle-imag
 import { FormBuilder, FormControl, FormGroup, ReactiveFormsModule, Validators } from '@angular/forms';
 import { signal } from '@angular/core';
 import { RaffleService } from '../../../services/raffle.service';
+import { RaffleQueryService } from '../../../services/raffle-query.service';
 import { RaffleCreate } from '../../../models/raffle-create.model';
 import { RaffleEdit } from '../../../models/raffle-edit.model';
 import { ErrorHandlerService } from '../../../../../core/services/error-handler.service';
@@ -32,8 +33,10 @@ export class RaffleFormComponent implements OnInit, OnChanges {
 
   constructor(
     private fb: FormBuilder, 
-    private raffleService: RaffleService, 
+    private raffleService: RaffleService,
+    private raffleQueryService: RaffleQueryService,
     private errorHandler: ErrorHandlerService,
+    private authService: AuthService,
     private router: Router
   ) {
     this.raffleForm = this.createForm();
@@ -119,7 +122,13 @@ export class RaffleFormComponent implements OnInit, OnChanges {
 
     this.raffleService.createRaffle(raffleData).subscribe({
       next: (response: SuccessResponse<Raffle>) => {
+        console.log(SuccessMessages.raffle.created, response);
         if (response.data?.id) {
+          // Clear search cache since a new raffle was created
+          this.raffleQueryService.clearSearchCache();
+          // Add the new raffle to cache
+          this.raffleQueryService.updateRaffleCache(response.data.id, response.data);
+          
           this.router.navigate(['/raffles', response.data.id], {
             queryParams: { success: SuccessMessages.raffle.created }
           });
@@ -152,6 +161,9 @@ export class RaffleFormComponent implements OnInit, OnChanges {
       next: (response: SuccessResponse<Raffle>) => {
         console.log(SuccessMessages.raffle.updated, response);
         if (response.data?.id) {
+          // Update cache with the edited raffle data
+          this.raffleQueryService.updateRaffleCache(response.data.id, response.data);
+          
           this.router.navigate(['/raffles', response.data.id], {
             queryParams: { success: SuccessMessages.raffle.updated }
           });

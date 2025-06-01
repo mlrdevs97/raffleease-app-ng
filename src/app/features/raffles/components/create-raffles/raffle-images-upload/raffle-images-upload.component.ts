@@ -21,6 +21,11 @@ export class RaffleImagesUploadComponent implements OnInit, OnChanges {
   isLoading = signal(false);
   errorMessage = signal<string | null>(null);
   private draggedIndex: number | null = null;
+  
+  // Touch/mobile drag properties
+  private touchStartIndex: number | null = null;
+  private isDragging = false;
+  private placeholder: HTMLElement | null = null;
 
   constructor(
     private readonly uploadService: RaffleImagesUploadService,
@@ -83,6 +88,11 @@ export class RaffleImagesUploadComponent implements OnInit, OnChanges {
   }
   
   deleteImage(index: number, imageId: number): void {
+    // Prevent deletion if currently dragging
+    if (this.isDragging) {
+      return;
+    }
+
     this.isLoading.set(true);
     this.errorMessage.set(null);
 
@@ -102,6 +112,7 @@ export class RaffleImagesUploadComponent implements OnInit, OnChanges {
     });
   }
 
+  // Desktop drag and drop handlers
   onDragStart(event: DragEvent, index: number): void {
     this.draggedIndex = index;
     event.dataTransfer?.setData('text/plain', index.toString());
@@ -113,18 +124,92 @@ export class RaffleImagesUploadComponent implements OnInit, OnChanges {
 
   onDrop(event: DragEvent, index: number): void {
     event.preventDefault();
-    const draggedIndex = this.draggedIndex;
-    if (draggedIndex === null || draggedIndex === index) return;
+    this.reorderImages(this.draggedIndex, index);
+    this.draggedIndex = null;
+  }
 
-    const draggedImage = this.images[draggedIndex];
-    this.images.splice(draggedIndex, 1);
-    this.images.splice(index, 0, draggedImage);
+  // Touch handlers for mobile devices
+  onTouchStart(event: TouchEvent, index: number): void {
+    event.preventDefault();
+    this.touchStartIndex = index;
+    this.isDragging = true;
+    
+    const target = event.target as HTMLElement;
+    const imageContainer = target.closest('.group') as HTMLElement;
+    
+    if (imageContainer) {
+      // Add visual feedback
+      imageContainer.style.opacity = '0.7';
+      imageContainer.style.transform = 'scale(1.05)';
+      imageContainer.style.zIndex = '1000';
+    }
+  }
+
+  onTouchMove(event: TouchEvent): void {
+    if (!this.isDragging || this.touchStartIndex === null) return;
+    
+    event.preventDefault();
+    const touch = event.touches[0];
+    const elementBelow = document.elementFromPoint(touch.clientX, touch.clientY);
+    const targetContainer = elementBelow?.closest('.group') as HTMLElement;
+    
+    if (targetContainer) {
+      // Find the index of the target container
+      const containers = Array.from(document.querySelectorAll('.group'));
+      const targetIndex = containers.indexOf(targetContainer);
+      
+      if (targetIndex !== -1 && targetIndex !== this.touchStartIndex) {
+        // Add visual feedback to drop target
+        containers.forEach(container => {
+          (container as HTMLElement).style.backgroundColor = '';
+        });
+        targetContainer.style.backgroundColor = 'rgba(59, 130, 246, 0.1)';
+      }
+    }
+  }
+
+  onTouchEnd(event: TouchEvent): void {
+    if (!this.isDragging || this.touchStartIndex === null) return;
+    
+    event.preventDefault();
+    this.isDragging = false;
+    
+    const touch = event.changedTouches[0];
+    const elementBelow = document.elementFromPoint(touch.clientX, touch.clientY);
+    const targetContainer = elementBelow?.closest('.group') as HTMLElement;
+    
+    // Reset all visual feedback
+    const containers = Array.from(document.querySelectorAll('.group'));
+    containers.forEach(container => {
+      const element = container as HTMLElement;
+      element.style.opacity = '';
+      element.style.transform = '';
+      element.style.zIndex = '';
+      element.style.backgroundColor = '';
+    });
+    
+    if (targetContainer) {
+      const targetIndex = containers.indexOf(targetContainer);
+      if (targetIndex !== -1 && targetIndex !== this.touchStartIndex) {
+        this.reorderImages(this.touchStartIndex, targetIndex);
+      }
+    }
+    
+    this.touchStartIndex = null;
+  }
+
+  // Shared reorder logic for both drag and touch
+  private reorderImages(fromIndex: number | null, toIndex: number): void {
+    if (fromIndex === null || fromIndex === toIndex) return;
+
+    const draggedImage = this.images[fromIndex];
+    this.images.splice(fromIndex, 1);
+    this.images.splice(toIndex, 0, draggedImage);
 
     this.images.forEach((image, idx) => {
       image.imageOrder = idx;
     });
 
     this.control.setValue(this.images);
-    this.draggedIndex = null;
   }
 }
