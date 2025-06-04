@@ -6,9 +6,10 @@ import { environment } from '../../../../environments/environment';
 import { Observable, tap, map } from 'rxjs';
 import { SuccessResponse } from '../../../core/models/api-response.model';
 import { jwtDecode } from 'jwt-decode';
+import { ClientValidationMessages } from '../../../core/constants/client-validation-messages';
 
 interface DecodedToken {
-  exp: number; 
+  exp: number;
 }
 
 @Injectable({
@@ -57,7 +58,7 @@ export class AuthService {
       tap((response: SuccessResponse<AuthResponse>) => {
         const authResponse = response?.data;
         if (!authResponse) {
-          throw new Error('Invalid server response');
+          throw new Error(ClientValidationMessages.auth.invalidServerResponse);
         }
 
         localStorage.setItem('accessToken', authResponse.accessToken);
@@ -104,7 +105,7 @@ export class AuthService {
     const associationId = this.authState().associationId;
     if (!associationId) {
       this.closeSession();
-      throw new Error('Authentication required. Please log in again.');
+      throw new Error(ClientValidationMessages.auth.authenticationRequired);
     }
     return associationId;
   }
@@ -137,7 +138,6 @@ export class AuthService {
         }
       },
       error: (error) => {
-        console.error('Failed to refresh token', error);
         this.closeSession();
       }
     });
@@ -184,7 +184,6 @@ export class AuthService {
 
       this.setTokenRefreshTimer(storedToken);
     } catch (error) {
-      console.error('Error parsing stored auth data:', error);
       this.clearStoredAuth();
     }
   }
