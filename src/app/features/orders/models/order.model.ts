@@ -1,6 +1,5 @@
 import { Customer } from "../../../core/models/customer.model";
-import { Payment } from "../../../core/models/payment.model";
-import { PaymentMethods } from "../../../core/models/payment.model";
+import { Payment, PaymentMethod } from "../../../core/models/payment.model";
 
 export enum OrderStatus {
     PENDING = 'PENDING',
@@ -47,7 +46,7 @@ export interface EventDisplayDetails {
 
 export interface OrderSearchFilters {
     status?: OrderStatus;
-    paymentMethod?: PaymentMethods;
+    paymentMethod?: PaymentMethod;
     orderReference?: string;
     customerName?: string;
     customerEmail?: string;

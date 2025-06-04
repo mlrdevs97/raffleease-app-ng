@@ -8,6 +8,7 @@ export enum CartStatus {
 
 export interface Cart {
   id: number;
+  userId: number;
   tickets: Ticket[]; 
   status: CartStatus;
   createdAt: string;

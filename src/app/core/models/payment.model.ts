@@ -1,15 +1,13 @@
 export interface Payment {
-    paymentMethod: PaymentMethods;
+    id: number;
+    orderId: number;
+    paymentMethod: PaymentMethod;
     total: number;
-    currencyCode?: string;
-    paymentIntentId: string;
     createdAt: string;
     updatedAt: string;
-    completedAt?: string | null;
-    cancelledAt?: string | null;
 }
 
-export enum PaymentMethods {
+export enum PaymentMethod {
     CARD = 'CARD',
     PAYPAL = 'PAYPAL',
     BIZUM = 'BIZUM',

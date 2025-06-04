@@ -4,7 +4,6 @@ export interface Raffle {
   id: number;
   title: string;
   description: string;
-  url: string;
   startDate: Date;
   endDate: Date;
   createdAt: Date;
@@ -17,9 +16,14 @@ export interface Raffle {
   availableTickets: number;
   totalTickets: number;
   soldTickets: number;
+  closedSells: number;
+  failedSells: number;
+  refundTickets: number;
+  unpaidTickets: number;
   revenue: number;
   completionReason: CompletionReason | null;
   winningTicketId: number | null;
+  associationId: number;
 } 
 
 export enum RaffleStatus {
