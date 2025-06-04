@@ -38,13 +38,13 @@ export const ConfirmationMessages = {
     },
     confirmCancellation: {
       title: 'Cancel Order',
-      message: 'Are you sure you want to cancel this order? This will release all reserved tickets and cannot be undone.',
+      message: 'Are you sure you want to cancel this order?',
       confirmText: 'Cancel Order',
       cancelText: 'Keep Order'
     },
     confirmSetUnpaid: {
       title: 'Set Order to Unpaid',
-      message: 'Are you sure you want to set this order to unpaid? This will change the order status and may affect ticket availability.',
+      message: 'Are you sure you want to set this order to unpaid?',
       confirmText: 'Set to Unpaid',
       cancelText: 'Cancel',
       variant: 'warning' as const
@@ -64,7 +64,7 @@ export const ConfirmationMessages = {
     },
     confirmDelete: {
       title: 'Delete Comment',
-      message: 'Are you sure you want to delete this comment? This action cannot be undone.',
+      message: 'Are you sure you want to delete this comment?',
       confirmText: 'Delete',
       cancelText: 'Cancel',
       variant: 'destructive' as const
