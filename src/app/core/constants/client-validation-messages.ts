@@ -17,6 +17,16 @@ export const ClientValidationMessages = {
   },
   
   /**
+   * Authentication validation error messages
+   */
+  auth: {
+    sessionExpired: 'Your session has expired. Please log in again.',
+    authenticationRequired: 'Authentication required. Please log in again.',
+    invalidSession: 'Invalid session. Please log in again.',
+    invalidServerResponse: 'Invalid server response. Please try again.'
+  },
+  
+  /**
    * Number validation error messages
    */
   number: {
