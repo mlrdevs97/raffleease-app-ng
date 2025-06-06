@@ -1,6 +1,6 @@
 import { Injectable, signal } from '@angular/core';
 import { HttpClient } from '@angular/common/http';
-import { Observable, map, tap, throwError, catchError } from 'rxjs';
+import { Observable, map, tap, throwError, catchError, finalize, of } from 'rxjs';
 import { Cart } from '../../../core/models/cart.model';
 import { SuccessResponse } from '../../../core/models/api-response.model';
 import { environment } from '../../../../environments/environment';
@@ -102,7 +102,8 @@ export class CartService {
   releaseTickets(ticketIds: number[]): Observable<void> {
     const cart = this.currentCart();
     if (!cart) {
-      return throwError(() => new Error('No cart available for releasing tickets'));
+      this.clearCart();
+      return of(undefined);
     }
 
     const associationId = this.authService.requireAssociationId();
@@ -113,14 +114,62 @@ export class CartService {
       { ticketIds }
     ).pipe(
       map(response => response.data!),
-      tap(() => {
+      finalize(() => {
         this.isReleasingTickets.set(false);
+        this.clearCart();
       }),
-      catchError(error => {
-        this.isReleasingTickets.set(false);
-        return throwError(() => error);
-      })
     );
+  }
+
+  /**
+   * Release all tickets from the current cart and clear it
+   * @returns Observable with success response
+   */
+  releaseAllTicketsAndClearCart(): Observable<void> {
+    const cart = this.currentCart();
+    if (!cart) {
+      this.clearCart();
+      return of(undefined);
+    }
+
+    const associationId = this.authService.requireAssociationId();
+    this.isReleasingTickets.set(true);
+
+    const allTicketIds = cart.tickets?.map(ticket => ticket.id) || [];
+    if (allTicketIds.length === 0) {
+      this.clearCart();
+      this.isReleasingTickets.set(false);
+      return of(undefined);
+    }
+
+    return this.http.put<SuccessResponse<void>>(
+      `${this.baseUrl}/${associationId}/carts/${cart.id}/reservations`,
+      { ticketIds: allTicketIds }
+    ).pipe(
+      map((response: SuccessResponse<void>) => response.data!),
+      finalize(() => {
+        this.isReleasingTickets.set(false);
+        this.clearCart();
+      }),
+    );
+  }
+
+  /**
+   * Get current cart from server to check for existing reservations
+   * This is useful when page reloads and we need to check server state
+   */
+  getUserActiveCart(): Observable<Cart | null> {
+    const associationId = this.authService.requireAssociationId();
+    return this.http.get<SuccessResponse<Cart>>(`${this.baseUrl}/${associationId}/carts/active`).pipe(
+      map((response: SuccessResponse<Cart>) => response.data!),
+      tap((cart: Cart) => this.currentCart.set(cart)),
+      catchError(error => {
+        if (error.status === 404) {
+          return of(null);
+        }
+        throw error;
+      })
+    ) as Observable<Cart | null>;
   }
 
   /**
@@ -157,4 +206,4 @@ export class CartService {
   getCartId(): number | null {
     return this.currentCart()?.id || null;
   }
-} 
+}
