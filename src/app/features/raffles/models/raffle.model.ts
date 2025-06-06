@@ -1,5 +1,25 @@
 import { Image } from "./image.model";
 
+export interface RaffleStatistics {
+  id: number;
+  raffleId: number;
+  availableTickets: number;
+  soldTickets: number;
+  revenue: number;
+  averageOrderValue: number;
+  totalOrders: number;
+  completedOrders: number;
+  pendingOrders: number;
+  cancelledOrders: number;
+  unpaidOrders: number;
+  refundedOrders: number;
+  participants: number;
+  ticketsPerParticipant: number;
+  firstSaleDate: Date | null;
+  lastSaleDate: Date | null;
+  dailySalesVelocity: number | null;
+}
+
 export interface Raffle {
   id: number;
   title: string;
@@ -13,17 +33,11 @@ export interface Raffle {
   images: Image[];
   ticketPrice: number;
   firstTicketNumber: number;
-  availableTickets: number;
   totalTickets: number;
-  soldTickets: number;
-  closedSells: number;
-  failedSells: number;
-  refundTickets: number;
-  unpaidTickets: number;
-  revenue: number;
   completionReason: CompletionReason | null;
   winningTicketId: number | null;
   associationId: number;
+  statistics: RaffleStatistics;
 } 
 
 export enum RaffleStatus {

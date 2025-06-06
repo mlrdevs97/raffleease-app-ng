@@ -19,102 +19,115 @@ export class RaffleStatisticsComponent {
   }[] = [];
 
   ngOnChanges(): void {
-    if (!this.raffle) return;
+    if (!this.raffle || !this.raffle.statistics) return;
 
     const {
-      soldTickets,
+      statistics: {
+        soldTickets,
+        revenue,
+        averageOrderValue,
+        totalOrders,
+        completedOrders,
+        participants,
+        ticketsPerParticipant,
+        dailySalesVelocity,
+        firstSaleDate
+      },
       totalTickets,
-      ticketPrice,
-      revenue,
       startDate,
       endDate,
     } = this.raffle;
-
-    console.log(startDate, endDate);
 
     const now = new Date();
     const start = startDate ? new Date(startDate) : null;
     const end = new Date(endDate);
 
-    // Check if raffle has started (startDate exists and is in the past)
-    const hasStarted = start !== null && now >= start;
-
-    // Calculate tickets sold percentage
+    // 1. Sales Progress 
     const ticketsSoldPercentage = totalTickets > 0 
       ? ((soldTickets / totalTickets) * 100).toFixed(1)
       : '0.0';
 
-    // Calculate revenue percentage
-    const maxRevenue = totalTickets * Number(ticketPrice);
-    const revenuePercentage = maxRevenue > 0 
-      ? ((Number(revenue) / maxRevenue) * 100).toFixed(1)
-      : '0.0';
-
-    // Calculate time elapsed and remaining
-    let timeElapsedValue = 'N/A';
+    // 2. Time Progress 
+    let timeProgressPercentage = '0';
     let timeRemainingValue = 'N/A';
-
-    if (start === null) {
-      timeElapsedValue = 'N/A';
-      timeRemainingValue = '- days left';
-    } else if (hasStarted) {
-      // Raffle has started - calculate elapsed time
-      const timeElapsedMs = now.getTime() - start.getTime();
-      const timeElapsedDays = Math.floor(timeElapsedMs / (1000 * 60 * 60 * 24));
-      timeElapsedValue = this.formatTimeString(timeElapsedDays);
-
+    
+    if (start && end) {
+      const totalDuration = end.getTime() - start.getTime();
+      const elapsed = Math.max(0, now.getTime() - start.getTime());
+      timeProgressPercentage = totalDuration > 0 
+        ? Math.min(100, (elapsed / totalDuration) * 100).toFixed(0)
+        : '0';
+      
       const timeRemainingMs = Math.max(0, end.getTime() - now.getTime());
       const timeRemainingDays = Math.ceil(timeRemainingMs / (1000 * 60 * 60 * 24));
       
       if (timeRemainingMs <= 0) {
         timeRemainingValue = 'Ended';
-      } else if (timeRemainingDays > 30) {
-        timeRemainingValue = '+30d left';
       } else {
-        timeRemainingValue = `${timeRemainingDays}d left`;
+        timeRemainingValue = `${timeRemainingDays} day${timeRemainingDays !== 1 ? 's' : ''} left`;
       }
-    } else {
-      // Raffle hasn't started yet but has a start date
-      timeElapsedValue = '-';
-      
-      const timeRemainingMs = Math.max(0, end.getTime() - now.getTime());
-      const timeRemainingDays = Math.ceil(timeRemainingMs / (1000 * 60 * 60 * 24));
-      
-      if (timeRemainingDays > 30) {
-        timeRemainingValue = '+30d left';
-      } else {
-        timeRemainingValue = `${timeRemainingDays}d left`;
-      }
+    }
+
+    // 3. Revenue Generated 
+    const formattedRevenue = `€${Number(revenue).toFixed(2)}`;
+    const formattedAverageOrder = `€${Number(averageOrderValue).toFixed(2)} / order`;
+
+    // 4. Order Health 
+    const orderSuccessRate = totalOrders > 0 
+      ? ((completedOrders / totalOrders) * 100).toFixed(1)
+      : '100.0';
+
+    // 5. Community Reach 
+    const formattedTicketsPerParticipant = `~${Number(ticketsPerParticipant).toFixed(1)} tickets / person`;
+
+    // 6. Sales Velocity 
+    const formattedVelocity = dailySalesVelocity !== null 
+      ? `~${Number(dailySalesVelocity).toFixed(0)} tickets / day`
+      : 'No data';
+    
+    let velocityContext = 'No sales data';
+    if (firstSaleDate) {
+      const salesDuration = Math.max(1, Math.floor((now.getTime() - new Date(firstSaleDate).getTime()) / (1000 * 60 * 60 * 24)));
+      velocityContext = `Over ${salesDuration} day${salesDuration !== 1 ? 's' : ''} of sales`;
     }
 
     this.stats = [
       {
-        label: 'Tickets Sold',
+        label: 'Sales Progress',
         value: `${soldTickets} / ${totalTickets}`,
-        delta: `${ticketsSoldPercentage}% sold`,
-        isPositive: true,
+        delta: `${ticketsSoldPercentage}% of tickets sold`,
+        isPositive: Number(ticketsSoldPercentage) > 50,
       },
       {
-        label: 'Revenue',
-        value: `€${Number(revenue).toFixed(2)}`,
-        delta: `${revenuePercentage}% of goal`,
-        isPositive: true,
+        label: 'Revenue Generated',
+        value: formattedRevenue,
+        delta: formattedAverageOrder,
+        isPositive: Number(revenue) > 0,
       },
       {
-        label: 'Time Elapsed',
-        value: timeElapsedValue,
+        label: 'Order Health',
+        value: `${completedOrders} / ${totalOrders}`,
+        delta: `${orderSuccessRate}%`,
+        isPositive: Number(orderSuccessRate) >= 90,
+      },
+      {
+        label: 'Time Progress',
+        value: `${timeProgressPercentage}%`,
         delta: timeRemainingValue,
-        isPositive: false,
+        isPositive: timeRemainingValue !== 'Ended',
+      },
+      {
+        label: 'Community Reach',
+        value: `${participants} Participants`,
+        delta: formattedTicketsPerParticipant,
+        isPositive: participants > 0,
+      },
+      {
+        label: 'Sales Velocity',
+        value: formattedVelocity,
+        delta: velocityContext,
+        isPositive: dailySalesVelocity !== null && dailySalesVelocity > 0,
       }
     ];
-  }
-
-  private formatTimeString(days: number): string {
-    if (days >= 30) {
-      const months = Math.floor(days / 30);
-      const remainingDays = days % 30;
-      return remainingDays > 0 ? `${months}m, ${remainingDays}d` : `${months}m`;
-    }
-    return `${days}d`;
   }
 }
