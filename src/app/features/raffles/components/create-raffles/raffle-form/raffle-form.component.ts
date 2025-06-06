@@ -1,4 +1,4 @@
-import { Component, Input, OnInit, OnChanges, SimpleChanges } from '@angular/core';
+import { Component, Input, OnInit, OnChanges, SimpleChanges, OnDestroy } from '@angular/core';
 import { RaffleDetailsComponent } from '../raffle-details/raffle-details.component';
 import { RaffleTicketsComponent } from '../raffle-tickets/raffle-tickets.component';
 import { RaffleImagesUploadComponent } from '../raffle-images-upload/raffle-images-upload.component';
@@ -6,10 +6,11 @@ import { FormBuilder, FormControl, FormGroup, ReactiveFormsModule, Validators } 
 import { signal } from '@angular/core';
 import { RaffleService } from '../../../services/raffle.service';
 import { RaffleQueryService } from '../../../services/raffle-query.service';
+import { RaffleImagesUploadService } from '../../../services/raffle-images-upload.service';
 import { RaffleCreate } from '../../../models/raffle-create.model';
 import { RaffleEdit } from '../../../models/raffle-edit.model';
+import { Image } from '../../../models/image.model';
 import { ErrorHandlerService } from '../../../../../core/services/error-handler.service';
-import { AuthService } from '../../../../auth/services/auth.service';
 import { Router } from '@angular/router';
 import { SuccessResponse } from '../../../../../core/models/api-response.model';
 import { Raffle } from '../../../models/raffle.model';
@@ -22,21 +23,22 @@ import { ButtonComponent } from '../../../../../shared/components/button/button.
   imports: [ReactiveFormsModule, RaffleDetailsComponent, RaffleTicketsComponent, RaffleImagesUploadComponent, ButtonComponent],
   templateUrl: './raffle-form.component.html'
 })
-export class RaffleFormComponent implements OnInit, OnChanges {
+export class RaffleFormComponent implements OnInit, OnChanges, OnDestroy {
   @Input() mode: 'create' | 'edit' = 'create';
   @Input() raffleData?: Raffle;
 
   isLoading = signal(false);
   errorMessage = signal<string | null>(null);
   fieldErrors = signal<Record<string, string>>({});
-  raffleForm: FormGroup;
+  raffleForm: FormGroup;  
+  private uploadedImageIds: number[] = [];
 
   constructor(
     private fb: FormBuilder, 
     private raffleService: RaffleService,
     private raffleQueryService: RaffleQueryService,
+    private raffleImagesUploadService: RaffleImagesUploadService,
     private errorHandler: ErrorHandlerService,
-    private authService: AuthService,
     private router: Router
   ) {
     this.raffleForm = this.createForm();
@@ -105,6 +107,11 @@ export class RaffleFormComponent implements OnInit, OnChanges {
 
     this.isLoading.set(true);
     this.resetErrors();
+    
+    if (this.mode === 'create') {
+      const currentImages = this.raffleForm.get('images')?.value as Image[] || [];
+      this.uploadedImageIds = currentImages.map(img => img.id);
+    }
 
     if (this.mode === 'create') {
       this.createRaffle();
@@ -122,23 +129,48 @@ export class RaffleFormComponent implements OnInit, OnChanges {
 
     this.raffleService.createRaffle(raffleData).subscribe({
       next: (response: SuccessResponse<Raffle>) => {
-        console.log(SuccessMessages.raffle.created, response);
         if (response.data?.id) {
-          // Clear search cache since a new raffle was created
+          this.uploadedImageIds = [];
           this.raffleQueryService.clearSearchCache();
-          // Add the new raffle to cache
-          this.raffleQueryService.updateRaffleCache(response.data.id, response.data);
-          
+          this.raffleQueryService.updateRaffleCache(response.data.id, response.data);          
           this.router.navigate(['/raffles', response.data.id], {
             queryParams: { success: SuccessMessages.raffle.created }
           });
         }
       },
       error: (error: unknown) => {
+        // Clean up uploaded images when raffle creation fails.
+        // Only applicable in create mode where images are uploaded to a temporary location
+        // before being associated with the raffle. In edit mode, images are already
+        // associated with the existing raffle, so no cleanup is needed.
+        this.cleanupUploadedImages();
         this.handleError(error);
       },
       complete: () => {
         this.isLoading.set(false);
+      }
+    });
+  }
+
+  /**
+   * Clean up uploaded images when raffle creation fails.
+   * Only applicable in create mode where images are uploaded to a temporary location
+   * before being associated with the raffle. In edit mode, images are already
+   * associated with the existing raffle, so no cleanup is needed.
+   */
+  private cleanupUploadedImages(): void {
+    if (this.mode !== 'create' || this.uploadedImageIds.length === 0) {
+      return;
+    }
+
+    // Delete uploaded images in the background
+    // Don't block the error handling flow
+    this.raffleImagesUploadService.deleteMultipleImages(this.uploadedImageIds).subscribe({
+      next: () => {
+        this.uploadedImageIds = [];
+      },
+      error: (error) => {
+        this.uploadedImageIds = [];
       }
     });
   }
@@ -208,4 +240,12 @@ export class RaffleFormComponent implements OnInit, OnChanges {
   get imagesControl(): FormControl {
     return this.raffleForm.get('images') as FormControl;
   }  
+
+  ngOnDestroy(): void {
+    // Clean up any uploaded images if user navigates away without creating raffle
+    if (this.mode === 'create' && this.uploadedImageIds.length > 0) {
+      // Note: This cleanup happens in the background and doesn't block navigation
+      this.raffleImagesUploadService.deleteMultipleImages(this.uploadedImageIds);
+    }
+  }
 } 

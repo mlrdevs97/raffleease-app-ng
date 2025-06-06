@@ -1,6 +1,6 @@
 import { Injectable } from '@angular/core';
 import { HttpClient } from '@angular/common/http';
-import { Observable } from 'rxjs';
+import { EMPTY, Observable, catchError, forkJoin, of } from 'rxjs';
 import { ImageResponse } from '../models/image-response.model';
 import { SuccessResponse } from '../../../core/models/api-response.model';
 import { environment } from '../../../../environments/environment';
@@ -37,5 +37,24 @@ export class RaffleImagesUploadService {
       : `${this.baseUrl}/${associationId}/images/${imageId}`;  // Create mode: general images endpoint
     
     return this.http.delete<void>(endpoint);
+  }
+
+  deleteMultipleImages(imageIds: number[]): Observable<void[]> {
+    const associationId = this.authService.requireAssociationId();
+    
+    if (imageIds.length === 0) {
+      return of([]);
+    }
+    
+    const deleteRequests: Observable<void>[] = imageIds.map(imageId => 
+      this.http.delete<void>(`${this.baseUrl}/${associationId}/images/${imageId}`).pipe(
+        catchError((error: any) => {
+          console.warn(`Failed to delete image ${imageId} during cleanup:`, error);
+          return EMPTY; 
+        })
+      )
+    );
+    
+    return forkJoin(deleteRequests);
   }
 } 
