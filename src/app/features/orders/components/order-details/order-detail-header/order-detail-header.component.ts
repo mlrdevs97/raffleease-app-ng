@@ -1,6 +1,7 @@
 import { Component, Input, Output, EventEmitter, signal } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { Order, OrderStatus } from '../../../models/order.model';
+import { RaffleStatus } from '../../../../raffles/models/raffle.model';
 import { ButtonComponent } from '../../../../../shared/components/button/button.component';
 
 @Component({
@@ -12,13 +13,15 @@ import { ButtonComponent } from '../../../../../shared/components/button/button.
 export class OrderDetailHeaderComponent {
   @Input() order!: Order;
   @Input() isUpdatingOrder = signal(false);
-  @Input() currentAction = signal<'complete' | 'cancel' | 'setUnpaid' | null>(null);
+  @Input() currentAction = signal<'complete' | 'cancel' | 'setUnpaid' | 'refund' | null>(null);
 
   @Output() completeOrderRequested = new EventEmitter<void>();
   @Output() cancelOrderRequested = new EventEmitter<void>();
   @Output() setUnpaidRequested = new EventEmitter<void>();
+  @Output() refundOrderRequested = new EventEmitter<void>();
 
   readonly OrderStatus = OrderStatus;
+  readonly RaffleStatus = RaffleStatus;
 
   get statusClass(): string {
     switch (this.order?.status) {
@@ -30,21 +33,85 @@ export class OrderDetailHeaderComponent {
         return 'border-transparent bg-red-100 text-red-800 hover:bg-red-100';
       case OrderStatus.REFUNDED:
       case OrderStatus.UNPAID:
-        default:
+      default:
         return 'border-transparent bg-gray-100 text-gray-800 hover:bg-gray-100';
     }
   }
 
-  get primaryButtonText(): string {
-    return this.order?.status === OrderStatus.COMPLETED ? 'Set to Unpaid' : 'Complete Order';
-  }
+  /**
+   * Determines which buttons should be shown based on order and raffle status
+   */
+  get availableActions(): Array<{
+    action: 'complete' | 'cancel' | 'setUnpaid' | 'refund';
+    text: string;
+    variant: 'primary' | 'secondary' | 'gray';
+    loadingText: string;
+  }> {
+    const orderStatus = this.order?.status;
+    const raffleStatus = this.order?.raffleSummary?.status;
+    
+    if (!orderStatus || !raffleStatus) return [];
 
-  get primaryButtonLoadingText(): string {
-    return this.order?.status === OrderStatus.COMPLETED ? 'Setting to Unpaid...' : 'Completing...';
-  }
+    // No buttons when raffle is PENDING or PAUSED
+    if (raffleStatus === RaffleStatus.PENDING || raffleStatus === RaffleStatus.PAUSED) {
+      return [];
+    }
 
-  get primaryButtonAction(): string {
-    return this.order?.status === OrderStatus.COMPLETED ? 'setUnpaid' : 'complete';
+    // Order cancelled: No buttons
+    if (orderStatus === OrderStatus.CANCELLED) {
+      return [];
+    }
+
+    // Raffle ACTIVE + Order pending: Cancel and Complete Order buttons
+    if (raffleStatus === RaffleStatus.ACTIVE && orderStatus === OrderStatus.PENDING) {
+      return [
+        {
+          action: 'cancel',
+          text: 'Cancel Order',
+          variant: 'secondary',
+          loadingText: 'Cancelling...'
+        },
+        {
+          action: 'complete',
+          text: 'Complete Order',
+          variant: 'primary',
+          loadingText: 'Completing...'
+        }
+      ];
+    }
+
+    // Order completed + Raffle active: Only Refund
+    if (orderStatus === OrderStatus.COMPLETED && raffleStatus === RaffleStatus.ACTIVE) {
+      return [
+        {
+          action: 'refund',
+          text: 'Refund Order',
+          variant: 'gray',
+          loadingText: 'Refunding...'
+        }
+      ];
+    }
+
+    // Both raffle and order completed: Refund and Set Unpaid
+    if (orderStatus === OrderStatus.COMPLETED && raffleStatus === RaffleStatus.COMPLETED) {
+      return [
+        {
+          action: 'refund',
+          text: 'Refund Order',
+          variant: 'gray',
+          loadingText: 'Refunding...'
+        },
+        {
+          action: 'setUnpaid',
+          text: 'Set to Unpaid',
+          variant: 'secondary',
+          loadingText: 'Setting to Unpaid...'
+        }
+      ];
+    }
+
+    // Default: no actions available
+    return [];
   }
 
   onCancelOrder(): void {
@@ -59,11 +126,24 @@ export class OrderDetailHeaderComponent {
     this.setUnpaidRequested.emit();
   }
 
-  onPrimaryAction(): void {
-    if (this.order?.status === OrderStatus.COMPLETED) {
-      this.onSetUnpaid();
-    } else {
-      this.onCompleteOrder();
+  onRefundOrder(): void {
+    this.refundOrderRequested.emit();
+  }
+
+  onActionClicked(action: 'complete' | 'cancel' | 'setUnpaid' | 'refund'): void {
+    switch (action) {
+      case 'complete':
+        this.onCompleteOrder();
+        break;
+      case 'cancel':
+        this.onCancelOrder();
+        break;
+      case 'setUnpaid':
+        this.onSetUnpaid();
+        break;
+      case 'refund':
+        this.onRefundOrder();
+        break;
     }
   }
 } 

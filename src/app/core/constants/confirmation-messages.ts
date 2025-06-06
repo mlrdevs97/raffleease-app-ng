@@ -48,6 +48,13 @@ export const ConfirmationMessages = {
       confirmText: 'Set to Unpaid',
       cancelText: 'Cancel',
       variant: 'warning' as const
+    },
+    confirmRefund: {
+      title: 'Refund Order',
+      message: 'Are you sure you want to refund this order?',
+      confirmText: 'Refund Order',
+      cancelText: 'Cancel',
+      variant: 'destructive' as const
     }
   },
 

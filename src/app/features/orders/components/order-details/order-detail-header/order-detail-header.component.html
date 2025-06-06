@@ -1,34 +1,29 @@
 <div class="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-4">
-  <div class="flex items-center gap-4">
+
+  <div class="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-4 mb-4 sm:mb-0">
     <h1 class="text-2xl/8 font-semibold text-zinc-950">
-      Order {{ order.orderReference }}
+      Order {{ order.orderReference }}  
     </h1>
-    <div
-      class="inline-flex items-center rounded-full border px-2.5 py-0.5 text-xs font-semibold transition-colors focus:outline-none focus:ring-2 focus:ring-ring focus:ring-offset-2"
-      [class]="statusClass">
-      {{ order.status }}
+    <div class="flex">
+      <div class="inline-flex items-center rounded-full border px-2.5 py-0.5 text-xs font-semibold transition-colors focus:outline-none focus:ring-2 focus:ring-ring focus:ring-offset-2 bg-yellow-100 border-transparent hover:bg-yellow-100 text-yellow-800"> 
+        {{ order.status }}
+      </div>
     </div>
   </div>
 
-  <div class="flex gap-2">
-    <app-button 
-      variant="secondary"
-      size="md"
-      [disabled]="isUpdatingOrder()" 
-      [loading]="isUpdatingOrder() && currentAction() === 'cancel'"
-      loadingText="Cancelling..."
-      (clicked)="onCancelOrder()">
-      Cancel Order
-    </app-button>
-
-    <app-button
-      variant="primary"
-      size="md"
-      [disabled]="isUpdatingOrder()" 
-      [loading]="isUpdatingOrder() && (currentAction() === 'complete' || currentAction() === 'setUnpaid')"
-      [loadingText]="primaryButtonLoadingText"
-      (clicked)="onPrimaryAction()">
-      {{ primaryButtonText }}
-    </app-button>
-  </div>
+  @if (availableActions.length > 0) {
+    <div class="flex gap-2">
+      @for (action of availableActions; track action.action) {
+        <app-button 
+          [variant]="action.variant"
+          size="md"
+          [disabled]="isUpdatingOrder()" 
+          [loading]="isUpdatingOrder() && currentAction() === action.action"
+          [loadingText]="action.loadingText"
+          (clicked)="onActionClicked(action.action)">
+          {{ action.text }}
+        </app-button>
+      }
+    </div>
+  }
 </div>

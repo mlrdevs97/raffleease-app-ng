@@ -82,7 +82,6 @@ export class OrderFormComponent implements OnInit, OnDestroy {
 
     if (this.raffleId) {
       this.selectedRaffleId.set(this.raffleId);
-      // Also set the form value so the raffle-selection component receives it
       this.raffleSelectionGroup.get('raffleId')?.setValue(this.raffleId);
     }
     
@@ -225,8 +224,6 @@ export class OrderFormComponent implements OnInit, OnDestroy {
       },
       comment: rawFormValue.additionalInformation.comment || null
     };
-
-    const associationId = this.authService.requireAssociationId();
 
     this.isLoading.set(true);
     this.resetErrors();

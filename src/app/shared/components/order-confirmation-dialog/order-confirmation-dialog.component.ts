@@ -2,7 +2,7 @@ import { Component, Input, Output, EventEmitter, signal, HostListener } from '@a
 import { CommonModule } from '@angular/common';
 import { FormBuilder, FormGroup, ReactiveFormsModule, Validators } from '@angular/forms';
 import { DropdownSelectComponent } from '../dropdown-select/dropdown-select.component';
-import { PaymentMethods } from '../../../core/models/payment.model';
+import { PaymentMethod } from '../../../core/models/payment.model';
 import { ConfirmationDialogData } from '../confirmation-dialog/confirmation-dialog.component';
 import { ClientValidationMessages } from '../../../core/constants/client-validation-messages';
 import { ButtonComponent } from '../button/button.component';
@@ -12,7 +12,7 @@ export interface OrderConfirmationData extends ConfirmationDialogData {
 }
 
 export interface OrderConfirmationResult {
-  paymentMethod?: PaymentMethods;
+  paymentMethod?: PaymentMethod;
 }
 
 @Component({
@@ -36,7 +36,7 @@ export class OrderConfirmationDialogComponent {
   @Output() cancelled = new EventEmitter<void>();
 
   form: FormGroup;
-  paymentMethodOptions = Object.values(PaymentMethods);
+  paymentMethodOptions = Object.values(PaymentMethod);
 
   constructor(private fb: FormBuilder) {
     this.form = this.fb.group({

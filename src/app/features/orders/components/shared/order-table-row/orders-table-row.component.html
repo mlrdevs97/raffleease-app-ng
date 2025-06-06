@@ -34,5 +34,5 @@
 <td class="table-cell-base text-right">
   <a [routerLink]="['/orders', order.id]" class="cell-link">
   </a>
-  {{ order.payment.total | currency:(order.payment.currencyCode || 'EUR') }}
+  {{ order.payment.total | currency:('EUR') }}
 </td>

@@ -37,7 +37,7 @@ export class OrderDetailsPageComponent implements OnInit {
   readonly isLoading = signal(false);
   readonly isUpdatingOrder = signal(false);
   readonly showConfirmationDialog = signal(false);
-  readonly currentAction = signal<'complete' | 'cancel' | 'setUnpaid' | null>(null);
+  readonly currentAction = signal<'complete' | 'cancel' | 'setUnpaid' | 'refund' | null>(null);
   readonly errorMessage = signal<string | null>(null);
   readonly successMessage = signal<string | null>(null);
 
@@ -78,22 +78,27 @@ export class OrderDetailsPageComponent implements OnInit {
 
   get confirmationDialogData(): OrderConfirmationData {
     const action = this.currentAction();
-    if (action === 'complete') {
-      return {
-        ...ConfirmationMessages.order.confirmCompletion,
-        requiresPaymentMethod: true
-      };
-    } else if (action === 'cancel') {
-      return {
-        ...ConfirmationMessages.order.confirmCancellation,
-        variant: 'destructive'
-      };
-    } else if (action === 'setUnpaid') {
-      return {
-        ...ConfirmationMessages.order.confirmSetUnpaid
-      };
+    switch (action) {
+      case 'complete':
+        return {
+          ...ConfirmationMessages.order.confirmCompletion,
+          requiresPaymentMethod: true
+        };
+      case 'cancel':
+        return {
+          ...ConfirmationMessages.order.confirmCancellation,
+        };
+      case 'setUnpaid':
+        return {
+          ...ConfirmationMessages.order.confirmSetUnpaid
+        };
+      case 'refund':
+        return {
+          ...ConfirmationMessages.order.confirmRefund
+        };
+      default:
+        return ConfirmationMessages.order.confirmCompletion;
     }
-    return ConfirmationMessages.order.confirmCompletion;
   }
 
   /**
@@ -131,6 +136,12 @@ export class OrderDetailsPageComponent implements OnInit {
 
   onSetUnpaidRequested(): void {
     this.currentAction.set('setUnpaid');
+    this.showConfirmationDialog.set(true);
+    this.resetMessages();
+  }
+
+  onRefundRequested(): void {
+    this.currentAction.set('refund');
     this.showConfirmationDialog.set(true);
     this.resetMessages();
   }
@@ -193,6 +204,24 @@ export class OrderDetailsPageComponent implements OnInit {
       this.ordersService.setOrderUnpaid(currentOrder.id).subscribe({
         next: (updatedOrder: Order) => {
           this.successMessage.set(SuccessMessages.order.setUnpaid);
+          this.order.set(updatedOrder);
+          this.isUpdatingOrder.set(false);
+          this.currentAction.set(null);
+          
+          setTimeout(() => this.successMessage.set(null), 5000);
+        },
+        error: (error: unknown) => {
+          this.errorMessage.set(this.errorHandler.getErrorMessage(error));
+          this.isUpdatingOrder.set(false);
+          this.currentAction.set(null);
+          
+          setTimeout(() => this.errorMessage.set(null), 8000);
+        }
+      });
+    } else if (action === 'refund') {
+      this.ordersService.refundOrder(currentOrder.id).subscribe({
+        next: (updatedOrder: Order) => {
+          this.successMessage.set(SuccessMessages.order.refunded);
           this.order.set(updatedOrder);
           this.isUpdatingOrder.set(false);
           this.currentAction.set(null);

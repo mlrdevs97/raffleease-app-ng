@@ -1,7 +1,7 @@
 import { Component, Input, Output, EventEmitter, OnChanges, SimpleChanges, OnInit } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { FormBuilder, FormGroup, ReactiveFormsModule } from '@angular/forms';
-import { PaymentMethods } from '../../../../../../core/models/payment.model';
+import { PaymentMethod } from '../../../../../../core/models/payment.model';
 import { OrderSearchFilters } from '../../../../models/order.model';
 import { DropdownSelectComponent } from '../../../../../../shared/components/dropdown-select/dropdown-select.component';
 import { nonNegativeNumberValidator, minMaxValidator } from '../../../../../../core/validators/number.validators';
@@ -18,7 +18,7 @@ export class OrdersSearchPaymentInfoComponent implements OnInit, OnChanges {
     @Input() fieldErrors: Record<string, string> = {};
     @Output() criteriaChange = new EventEmitter<Partial<OrderSearchFilters>>();
     
-    paymentMethodOptions = Object.values(PaymentMethods);
+    paymentMethodOptions = Object.values(PaymentMethod);
     
     searchForm: FormGroup;
     validationMessages = ClientValidationMessages;

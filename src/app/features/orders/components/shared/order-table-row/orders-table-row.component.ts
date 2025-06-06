@@ -2,7 +2,7 @@ import { Component, Input } from '@angular/core';
 import { CommonModule, CurrencyPipe, DatePipe, TitleCasePipe } from '@angular/common';
 import { RouterModule } from '@angular/router';
 import { OrderRafflePreviewComponent } from '../order-raffle-preview/order-raffle-preview.component';
-import { Order, OrderStatus, EventDisplayDetails, OrderRaffleSummary } from '../../../models/order.model';
+import { Order, OrderStatus, OrderRaffleSummary } from '../../../models/order.model';
 
 @Component({
   selector: 'app-orders-table-row',

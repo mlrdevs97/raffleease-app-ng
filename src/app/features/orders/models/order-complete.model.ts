@@ -1,5 +1,5 @@
-import { PaymentMethods } from '../../../core/models/payment.model';
+import { PaymentMethod } from '../../../core/models/payment.model';
 
 export interface OrderComplete {
-  paymentMethod: PaymentMethods;
+  paymentMethod: PaymentMethod;
 } 

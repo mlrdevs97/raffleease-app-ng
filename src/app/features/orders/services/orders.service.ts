@@ -172,6 +172,24 @@ export class OrdersService {
     }
 
     /**
+     * Refund an order
+     * @param orderId The order ID
+     * @returns Observable with the updated order
+     */
+    refundOrder(orderId: number): Observable<Order> {
+        const associationId = this.authService.requireAssociationId();
+        return this.http.put<SuccessResponse<Order>>(
+            `${this.baseUrl}/${associationId}/orders/${orderId}/refund`,
+            {}
+        ).pipe(
+            map(response => response.data!),
+            tap(() => {
+                this.clearCache();
+            })
+        );
+    }
+
+    /**
      * Add a comment to an order
      * @param orderId The order ID
      * @param commentRequest The comment data

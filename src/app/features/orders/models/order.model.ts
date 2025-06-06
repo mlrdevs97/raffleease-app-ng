@@ -1,5 +1,6 @@
 import { Customer } from "../../../core/models/customer.model";
 import { Payment, PaymentMethod } from "../../../core/models/payment.model";
+import { RaffleStatus } from "../../raffles/models/raffle.model";
 
 export enum OrderStatus {
     PENDING = 'PENDING',
@@ -37,6 +38,7 @@ export interface OrderRaffleSummary {
     id: number;
     title: string;
     imageURL: string;
+    status: RaffleStatus;
 }
 
 export interface EventDisplayDetails {
