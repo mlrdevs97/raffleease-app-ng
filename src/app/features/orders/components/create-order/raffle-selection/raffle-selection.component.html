@@ -20,6 +20,12 @@
             </app-raffles-search>
         </div>
 
+        @if (noActiveRafflesMessage !== null) {
+        <div class="p-3 bg-blue-50 border border-blue-200 rounded-md">
+            <p class="text-sm text-blue-800">{{ noActiveRafflesMessage }}</p>
+        </div>
+        }
+
         @if (getErrorMessage('raffleId')) {
         <div class="text-red-500 text-sm">
             {{ getErrorMessage('raffleId') }}
@@ -34,7 +40,7 @@
 
         <div>
             <app-raffle-card [raffle]="selectedRaffle()!" mode="clearSelection" clearSelectionLabel="Change"
-                (clearSelection)="clearSelection()">
+                [showStatus]="true" (clearSelection)="clearSelection()">
             </app-raffle-card>
         </div>
 

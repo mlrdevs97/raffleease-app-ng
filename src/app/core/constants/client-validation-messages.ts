@@ -96,5 +96,16 @@ export const ClientValidationMessages = {
    */
   paymentMethod: {
     required: 'Please select a payment method to continue'
+  },
+
+  /**
+   * Raffle validation error messages
+   */
+  raffle: {
+    selectionRequired: 'Please select a raffle to continue',
+    notAvailableForOrders: 'Only active raffles allow creating orders.',
+    statusPending: 'Cannot create orders for pending raffles.',
+    statusPaused: 'Cannot create orders for paused raffles.',
+    statusCompleted: 'Cannot create orders for completed raffles.'
   }
 }; 

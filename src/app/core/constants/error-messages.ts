@@ -78,6 +78,7 @@ export const ErrorMessages: {
             INACTIVE: 'This raffle is not currently active and tickets cannot be selected.',
             INSUFFICIENT_TICKETS: 'Not enough tickets are available for this request.',
             SELECTION_REQUIRED: 'Please select a raffle first to generate random tickets',
+            NOT_AVAILABLE_FOR_ORDERS: 'Only active raffles allow creating new orders.'
         },
         'tickets': {
             NOT_FOUND: 'The requested ticket was not found or is no longer available.',

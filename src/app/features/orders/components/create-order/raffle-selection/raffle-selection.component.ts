@@ -4,7 +4,7 @@ import { CommonModule } from '@angular/common';
 import { RafflesSearchComponent } from '../../../../raffles/components/raffles/raffles-search/raffles-search.component';
 import { RaffleQueryService } from '../../../../raffles/services/raffle-query.service';
 import { RaffleSearchService } from '../../../../raffles/services/raffle-search.service';
-import { Raffle } from '../../../../raffles/models/raffle.model';
+import { Raffle, RaffleStatus } from '../../../../raffles/models/raffle.model';
 import { ClientValidationMessages } from '../../../../../core/constants/client-validation-messages';
 import { RaffleCardComponent } from '../../../../raffles/components/raffles/raffle-card/raffle-card.component';
 
@@ -51,14 +51,23 @@ export class RaffleSelectionComponent implements OnInit, OnDestroy {
     this.isLoadingPreselected.set(true);
     this.raffleQueryService.getById(raffleId).subscribe({
       next: (raffle: Raffle) => {
-        this.selectedRaffle.set(raffle);
-        this.raffleSelectionForm.get('raffleId')?.setValue(raffle.id);
+        if (this.isRaffleAvailableForOrders(raffle)) {
+          this.selectedRaffle.set(raffle);
+          this.raffleSelectionForm.get('raffleId')?.setValue(raffle.id);
+        } else {
+          this.selectedRaffle.set(null);
+          this.raffleSelectionForm.get('raffleId')?.setValue('');
+        }
         this.isLoadingPreselected.set(false);
       },
       error: () => {
         this.isLoadingPreselected.set(false);
       }
     });
+  }
+
+  private isRaffleAvailableForOrders(raffle: Raffle): boolean {
+    return raffle.status === RaffleStatus.ACTIVE;
   }
   
   onSearchChange(searchTerm: string): void {
@@ -70,6 +79,9 @@ export class RaffleSelectionComponent implements OnInit, OnDestroy {
   }
     
   onSuggestionSelected(raffle: Raffle): void {
+    if (!this.isRaffleAvailableForOrders(raffle)) {
+      return;
+    }
     this.selectedRaffle.set(raffle);
     this.raffleSelectionForm.get('raffleId')?.setValue(raffle.id);
     this.raffleSearchService.clearSuggestions();
@@ -90,7 +102,7 @@ export class RaffleSelectionComponent implements OnInit, OnDestroy {
   }
 
   get suggestions() {
-    return this.raffleSearchService.suggestions();
+    return this.raffleSearchService.suggestions().filter(raffle => this.isRaffleAvailableForOrders(raffle));
   }
 
   get isSearchLoading() {
@@ -99,6 +111,17 @@ export class RaffleSelectionComponent implements OnInit, OnDestroy {
 
   get noSearchResults() {
     return this.raffleSearchService.noSearchResults();
+  }
+
+  get noActiveRafflesMessage(): string | null {
+    const allSuggestions = this.raffleSearchService.suggestions();
+    const activeSuggestions = this.suggestions;
+    
+    if (allSuggestions.length > 0 && activeSuggestions.length === 0) {
+      return this.clientValidationMessages.raffle.notAvailableForOrders;
+    }
+    
+    return null;
   }
 
   getErrorMessage(fieldName: string): string | null {
