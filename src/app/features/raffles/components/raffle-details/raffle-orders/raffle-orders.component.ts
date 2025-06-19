@@ -7,6 +7,7 @@ import { OrdersService } from '../../../../orders/services/orders.service';
 import { ErrorHandlerService } from '../../../../../core/services/error-handler.service';
 import { Order } from '../../../../orders/models/order.model';
 import { ButtonComponent } from '../../../../../shared/components/button/button.component';
+import { Raffle, RaffleStatus } from '../../../models/raffle.model';
 
 @Component({
   selector: 'app-raffle-orders',
@@ -16,12 +17,17 @@ import { ButtonComponent } from '../../../../../shared/components/button/button.
 })
 export class RaffleOrdersComponent implements OnInit {
   @Input() raffleId!: number;
+  @Input() raffle?: Raffle;
 
   orders = signal<Order[]>([]);
   isLoading = signal(false);
   errorMessage = signal<string | null>(null);
   raffleOrders = computed(() => this.orders().slice(0, 5));
   hasMoreOrders = computed(() => this.orders().length > 5);
+  
+  isRaffleActiveForOrders = computed(() => {
+    return this.raffle?.status === RaffleStatus.ACTIVE;
+  });
 
   constructor(
     private ordersService: OrdersService,

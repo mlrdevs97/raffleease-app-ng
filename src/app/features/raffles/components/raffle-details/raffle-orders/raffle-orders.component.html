@@ -1,8 +1,14 @@
 <div>
     <div class="mb-4 flex items-center justify-between">
         <h2 class="text-lg font-semibold">Raffle orders</h2>
-        <a [routerLink]="['/orders/create']" [queryParams]="{ raffle: raffleId }">
-            <app-button variant="primary" size="md">
+        <a [routerLink]="isRaffleActiveForOrders() ? ['/orders/create'] : null" 
+           [queryParams]="isRaffleActiveForOrders() ? { raffle: raffleId } : null"
+           [class.pointer-events-none]="!isRaffleActiveForOrders()">
+            <app-button 
+                variant="primary" 
+                size="md"
+                [class.opacity-50]="!isRaffleActiveForOrders()"
+                [class.cursor-not-allowed]="!isRaffleActiveForOrders()">
                 Create order
             </app-button>
         </a>

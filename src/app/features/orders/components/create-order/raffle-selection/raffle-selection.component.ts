@@ -26,7 +26,8 @@ export class RaffleSelectionComponent implements OnInit, OnDestroy {
   @Input() fieldErrors: Record<string, string> = {};
   
   selectedRaffle = signal<Raffle | null>(null);
-  isLoadingPreselected = signal(false);
+  isLoading = signal(false);
+  preselectedRaffleNotActive = signal(false);
   clientValidationMessages = ClientValidationMessages;
   
   constructor(
@@ -48,20 +49,23 @@ export class RaffleSelectionComponent implements OnInit, OnDestroy {
   }
 
   private loadPreselectedRaffle(raffleId: number): void {
-    this.isLoadingPreselected.set(true);
+    this.isLoading.set(true);
     this.raffleQueryService.getById(raffleId).subscribe({
       next: (raffle: Raffle) => {
         if (this.isRaffleAvailableForOrders(raffle)) {
           this.selectedRaffle.set(raffle);
           this.raffleSelectionForm.get('raffleId')?.setValue(raffle.id);
+          this.preselectedRaffleNotActive.set(false);
         } else {
           this.selectedRaffle.set(null);
           this.raffleSelectionForm.get('raffleId')?.setValue('');
+          this.preselectedRaffleNotActive.set(true);
         }
-        this.isLoadingPreselected.set(false);
+        this.isLoading.set(false);
       },
       error: () => {
-        this.isLoadingPreselected.set(false);
+        this.isLoading.set(false);
+        this.preselectedRaffleNotActive.set(false);
       }
     });
   }
@@ -85,12 +89,14 @@ export class RaffleSelectionComponent implements OnInit, OnDestroy {
     this.selectedRaffle.set(raffle);
     this.raffleSelectionForm.get('raffleId')?.setValue(raffle.id);
     this.raffleSearchService.clearSuggestions();
+    this.preselectedRaffleNotActive.set(false);
   }
   
   clearSelection(): void {
     this.selectedRaffle.set(null);
     this.raffleSelectionForm.get('raffleId')?.setValue('');
     this.raffleSearchService.resetSearch();
+    this.preselectedRaffleNotActive.set(false);
   }
 
   get showSearchSection(): boolean {
@@ -98,7 +104,7 @@ export class RaffleSelectionComponent implements OnInit, OnDestroy {
   }
 
   get showSelectedSection(): boolean {
-    return !!this.selectedRaffle() && !this.isLoadingPreselected();
+    return !!this.selectedRaffle() && !this.isLoading();
   }
 
   get suggestions() {
@@ -114,6 +120,10 @@ export class RaffleSelectionComponent implements OnInit, OnDestroy {
   }
 
   get noActiveRafflesMessage(): string | null {
+    if (this.preselectedRaffleNotActive()) {
+      return this.clientValidationMessages.raffle.notAvailableForOrders;
+    }
+    
     const allSuggestions = this.raffleSearchService.suggestions();
     const activeSuggestions = this.suggestions;
     
@@ -122,6 +132,11 @@ export class RaffleSelectionComponent implements OnInit, OnDestroy {
     }
     
     return null;
+  }
+
+  get shouldShowToast(): boolean {
+    return this.preselectedRaffleNotActive() || 
+           (this.raffleSearchService.suggestions().length > 0 && this.suggestions.length === 0);
   }
 
   getErrorMessage(fieldName: string): string | null {
