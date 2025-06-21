@@ -15,15 +15,24 @@ export class RaffleImagesUploadService {
     private readonly authService: AuthService
   ) {}
 
+  getUserImages(): Observable<SuccessResponse<ImageResponse>> {
+    const associationId = this.authService.requireAssociationId();
+    return this.http.get<SuccessResponse<ImageResponse>>(`${this.baseUrl}/${associationId}/images/images`);
+  }
+
+  getUserImagesForRaffle(raffleId: number): Observable<SuccessResponse<ImageResponse>> {
+    const associationId = this.authService.requireAssociationId();
+    return this.http.get<SuccessResponse<ImageResponse>>(`${this.baseUrl}/${associationId}/raffles/${raffleId}/images`);
+  }
+
   uploadImages(files: File[], raffleId?: number): Observable<SuccessResponse<ImageResponse>> {
     const associationId = this.authService.requireAssociationId();
     const formData = new FormData();
     files.forEach(file => formData.append('files', file));
     
-    // Use different endpoints based on whether we're in create or edit mode
     const endpoint = raffleId 
-      ? `${this.baseUrl}/${associationId}/raffles/${raffleId}/images`  // Edit mode: raffle-specific endpoint
-      : `${this.baseUrl}/${associationId}/images`;  // Create mode: general images endpoint
+      ? `${this.baseUrl}/${associationId}/raffles/${raffleId}/images`
+      : `${this.baseUrl}/${associationId}/images`;
     
     return this.http.post<SuccessResponse<ImageResponse>>(endpoint, formData);
   }
@@ -31,10 +40,9 @@ export class RaffleImagesUploadService {
   deleteImage(imageId: number, raffleId?: number): Observable<void> {
     const associationId = this.authService.requireAssociationId();
     
-    // Use different endpoints based on whether we're in create or edit mode
     const endpoint = raffleId
-      ? `${this.baseUrl}/${associationId}/raffles/${raffleId}/images/${imageId}`  // Edit mode: raffle-specific endpoint
-      : `${this.baseUrl}/${associationId}/images/${imageId}`;  // Create mode: general images endpoint
+      ? `${this.baseUrl}/${associationId}/raffles/${raffleId}/images/${imageId}`
+      : `${this.baseUrl}/${associationId}/images/${imageId}`;
     
     return this.http.delete<void>(endpoint);
   }

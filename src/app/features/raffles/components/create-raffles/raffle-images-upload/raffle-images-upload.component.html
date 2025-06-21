@@ -14,7 +14,7 @@
         <div class="flex flex-col items-center justify-center rounded-lg border-2 border-dashed border-gray-300 p-6 cursor-pointer hover:border-gray-400 hover:bg-gray-50"
             (click)="fileInput.click()">
             <!-- Hidden file input -->
-            <input #fileInput accept="image/png,.png,image/jpeg,.jpg,.jpeg,image/gif,.gif,image/webp,.webp" multiple
+            <input #fileInput [accept]="fileUploadLimits.ACCEPTED_EXTENSIONS" multiple
                 type="file" hidden (change)="onFileSelected($event)" />
 
             <!-- Upload Icon and Text -->
@@ -28,7 +28,7 @@
                     <line x1="12" x2="12" y1="3" y2="15"></line>
                 </svg>
                 <p class="mb-1 text-sm font-medium">Click to upload or drag and drop</p>
-                <p class="text-xs text-gray-500">PNG, JPG, GIF, WEBP up to 10MB</p>
+                <p class="text-xs text-gray-500">PNG, JPG, GIF, WEBP up to {{ fileUploadLimits.MAX_FILE_SIZE_DISPLAY }}</p>
             </div>
         </div>
 

@@ -7,6 +7,11 @@ export const ErrorMessages: {
     dedicated: Record<string, Partial<Record<string, string>>>;
 } = {
     status: {
+        400: 'Invalid request. Please check your input and try again.',
+        413: 'File size too large. Please select smaller files.',
+        415: 'Unsupported file type. Please check the file format.',
+        422: 'Request validation failed. Please check your input.',
+        429: 'Too many requests. Please wait a moment and try again.',
         500: 'Something went wrong on our end. Please try again later.',
         502: 'The server is down or being restarted. Please wait a moment.',
         503: 'The service is temporarily unavailable. Please try again shortly.'
@@ -18,7 +23,8 @@ export const ErrorMessages: {
         EMAIL_VERIFICATION_FAILED: 'Email verification failed. The token may be invalid or expired.',
         NOT_FOUND: 'The requested resource was not found.',
         CONFLICT: 'A conflict occurred. The operation could not be completed.',
-        BUSINESS_ERROR: 'The operation could not be completed due to a business rule violation.'
+        BUSINESS_ERROR: 'The operation could not be completed due to a business rule violation.',
+        IMAGE_LIMIT_EXCEEDED: 'You have reached the maximum limit of 10 images per raffle. Please remove some images before uploading new ones.'
     },
     validation: {
         REQUIRED: 'This field is required',
@@ -70,7 +76,13 @@ export const ErrorMessages: {
             REQUIRED: 'Phone number is required'
         },
         'files': {
-            REQUIRED: 'You must upload at least one image'
+            REQUIRED: 'You must upload at least one image',
+            UPLOAD_FAILED: 'Failed to upload images. Please try again.',
+            FILE_TOO_LARGE: 'File size is too large. Please select smaller images.',
+            UNSUPPORTED_FILE_TYPE: 'Unsupported file type. Please upload PNG, JPG, GIF, or WEBP images only.',
+            INVALID_REQUEST: 'Invalid file upload request. Please check your files and try again.',
+            VALIDATION_ERROR: 'File validation failed. Please ensure files meet the requirements.',
+            TOO_MANY_REQUESTS: 'Too many upload requests. Please wait a moment and try again.'
         },
         'raffle': {
             CANNOT_DELETE: 'Only raffles with PENDING status can be deleted',

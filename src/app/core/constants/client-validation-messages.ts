@@ -107,5 +107,15 @@ export const ClientValidationMessages = {
     statusPending: 'Cannot create orders for pending raffles.',
     statusPaused: 'Cannot create orders for paused raffles.',
     statusCompleted: 'Cannot create orders for completed raffles.'
+  },
+
+  /**
+   * File upload validation error messages
+   */
+  fileUpload: {
+    fileTooLarge: (filename: string, maxSize: string) => `File "${filename}" is too large. Maximum file size is ${maxSize}.`,
+    requestTooLarge: (maxSize: string) => `Total file size is too large. Maximum total size is ${maxSize}.`,
+    invalidFileType: (filename: string) => `File "${filename}" is not a supported image format. Only PNG, JPG, GIF, and WEBP are allowed.`,
+    validationFailed: 'File validation failed'
   }
 }; 
