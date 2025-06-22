@@ -1,7 +1,7 @@
 import { Component, Input, Output, EventEmitter } from '@angular/core';
 import { CommonModule } from '@angular/common';
 
-export type ButtonVariant = 'primary' | 'secondary' | 'gray';
+export type ButtonVariant = 'primary' | 'secondary' | 'gray' | 'destructive';
 export type ButtonSize = 'sm' | 'md' | 'lg';
 
 @Component({
@@ -23,13 +23,14 @@ export class ButtonComponent {
   @Output() clicked = new EventEmitter<Event>();
 
   // Base classes that are common to all buttons
-  private readonly baseClasses = 'inline-flex items-center justify-center gap-2 whitespace-nowrap rounded-md ring-offset-background transition-colors focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2 disabled:pointer-events-none disabled:opacity-50 font-semibold';
+  private readonly baseClasses = 'inline-flex items-center justify-center gap-2 whitespace-nowrap rounded-md ring-offset-background transition-colors focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2 disabled:pointer-events-none disabled:opacity-50 font-bold';
 
   // Variant-specific classes
   private readonly variantClasses = {
-    primary: 'bg-zinc-900 text-white hover:bg-slate-800',
+    primary: 'bg-blue-500 text-white hover:bg-blue-600',
     secondary: 'border border-zinc-200 bg-white text-zinc-950 hover:bg-slate-100',
-    gray: 'bg-gray-100 text-gray-700 hover:bg-gray-200'
+    gray: 'bg-gray-100 text-gray-700 hover:bg-gray-200',
+    destructive: 'bg-red-500 text-white hover:bg-red-600'
   };
 
   // Size-specific classes
