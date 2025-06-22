@@ -23,7 +23,7 @@ import { ButtonComponent } from '../../../../../shared/components/button/button.
   imports: [ReactiveFormsModule, RaffleDetailsComponent, RaffleTicketsComponent, RaffleImagesUploadComponent, ButtonComponent],
   templateUrl: './raffle-form.component.html'
 })
-export class RaffleFormComponent implements OnInit, OnChanges, OnDestroy {
+export class RaffleFormComponent implements OnInit, OnChanges {
   @Input() mode: 'create' | 'edit' = 'create';
   @Input() raffleData?: Raffle;
 
@@ -60,6 +60,7 @@ export class RaffleFormComponent implements OnInit, OnChanges, OnDestroy {
     return this.fb.group({
       title: ['', [Validators.required, Validators.maxLength(100)]],
       description: ['', [Validators.required, Validators.maxLength(5000)]],
+      startDate: [''],
       endDate: ['', [Validators.required]],
       images: this.fb.control([], [Validators.required]),
       ticketsInfo: this.fb.group({
@@ -73,14 +74,14 @@ export class RaffleFormComponent implements OnInit, OnChanges, OnDestroy {
   private prefillForm(): void {
     if (!this.raffleData) return;
 
-    // Format end date for input[type="date"] (YYYY-MM-DD)
+    const startDate = this.raffleData.startDate ? new Date(this.raffleData.startDate).toISOString().split('T')[0] : '';    
     const endDate = new Date(this.raffleData.endDate).toISOString().split('T')[0];
 
     this.raffleForm.patchValue({
       title: this.raffleData.title,
       description: this.raffleData.description,
+      startDate: startDate,
       endDate: endDate,
-      // Don't set images here as they are handled by the upload component via initialImages
       ticketsInfo: {
         amount: this.raffleData.totalTickets,
         price: this.raffleData.ticketPrice,
@@ -111,9 +112,6 @@ export class RaffleFormComponent implements OnInit, OnChanges, OnDestroy {
     if (this.mode === 'create') {
       const currentImages = this.raffleForm.get('images')?.value as Image[] || [];
       this.uploadedImageIds = currentImages.map(img => img.id);
-    }
-
-    if (this.mode === 'create') {
       this.createRaffle();
     } else {
       this.editRaffle();
@@ -122,14 +120,19 @@ export class RaffleFormComponent implements OnInit, OnChanges, OnDestroy {
 
   private createRaffle(): void {
     const rawFormValue = this.raffleForm.value;
+    console.log('Start Date from Form Control:', this.raffleForm.get('startDate')?.value);
     const raffleData: RaffleCreate = {
       ...rawFormValue,
-      endDate: `${rawFormValue.endDate}T00:00:00`
+      startDate: rawFormValue.startDate ? `${rawFormValue.startDate}T23:59:59` : undefined,
+      endDate: `${rawFormValue.endDate}T23:59:59`
     };
+
+    console.log('raffleData:', raffleData);
 
     this.raffleService.createRaffle(raffleData).subscribe({
       next: (response: SuccessResponse<Raffle>) => {
         if (response.data?.id) {
+          console.log('response:', response.data);
           this.uploadedImageIds = [];
           this.raffleQueryService.clearSearchCache();
           this.raffleQueryService.updateRaffleCache(response.data.id, response.data);          
@@ -139,11 +142,6 @@ export class RaffleFormComponent implements OnInit, OnChanges, OnDestroy {
         }
       },
       error: (error: unknown) => {
-        // Clean up uploaded images when raffle creation fails.
-        // Only applicable in create mode where images are uploaded to a temporary location
-        // before being associated with the raffle. In edit mode, images are already
-        // associated with the existing raffle, so no cleanup is needed.
-        this.cleanupUploadedImages();
         this.handleError(error);
       },
       complete: () => {
@@ -153,18 +151,13 @@ export class RaffleFormComponent implements OnInit, OnChanges, OnDestroy {
   }
 
   /**
-   * Clean up uploaded images when raffle creation fails.
-   * Only applicable in create mode where images are uploaded to a temporary location
-   * before being associated with the raffle. In edit mode, images are already
-   * associated with the existing raffle, so no cleanup is needed.
+   * Clean up uploaded images when explicitly requested.
    */
   private cleanupUploadedImages(): void {
     if (this.mode !== 'create' || this.uploadedImageIds.length === 0) {
       return;
     }
 
-    // Delete uploaded images in the background
-    // Don't block the error handling flow
     this.raffleImagesUploadService.deleteMultipleImages(this.uploadedImageIds).subscribe({
       next: () => {
         this.uploadedImageIds = [];
@@ -175,6 +168,24 @@ export class RaffleFormComponent implements OnInit, OnChanges, OnDestroy {
     });
   }
 
+  /**
+   * Explicitly cancel the raffle creation and cleanup uploaded images.
+   * This can be called by a cancel button or when user navigates away.
+   */
+  cancelRaffleCreation(): void {
+    this.cleanupUploadedImages();
+  }
+
+  /**
+   * Handle cancel button click
+   */
+  onCancel(): void {
+    if (this.mode === 'create') {
+      this.cancelRaffleCreation();
+    }
+    this.router.navigate(['/raffles']);
+  }
+
   private editRaffle(): void {
     if (!this.raffleData?.id) return;
 
@@ -182,17 +193,16 @@ export class RaffleFormComponent implements OnInit, OnChanges, OnDestroy {
     const raffleEditData: RaffleEdit = {
       title: rawFormValue.title,
       description: rawFormValue.description,
-      endDate: `${rawFormValue.endDate}T00:00:00`,
+      endDate: `${rawFormValue.endDate}T23:59:59`,
       images: rawFormValue.images,
       ticketPrice: rawFormValue.ticketsInfo.price,
       totalTickets: rawFormValue.ticketsInfo.amount,
-      price: rawFormValue.ticketsInfo.price
     };
 
     this.raffleService.editRaffle(this.raffleData.id, raffleEditData).subscribe({
       next: (response: SuccessResponse<Raffle>) => {
-        console.log(SuccessMessages.raffle.updated, response);
         if (response.data?.id) {
+          console.log(response.data);
           // Update cache with the edited raffle data
           this.raffleQueryService.updateRaffleCache(response.data.id, response.data);
           
@@ -202,6 +212,7 @@ export class RaffleFormComponent implements OnInit, OnChanges, OnDestroy {
         }
       },
       error: (error: unknown) => {
+        console.log(error);
         this.handleError(error);
       },
       complete: () => {
@@ -239,13 +250,5 @@ export class RaffleFormComponent implements OnInit, OnChanges, OnDestroy {
 
   get imagesControl(): FormControl {
     return this.raffleForm.get('images') as FormControl;
-  }  
-
-  ngOnDestroy(): void {
-    // Clean up any uploaded images if user navigates away without creating raffle
-    if (this.mode === 'create' && this.uploadedImageIds.length > 0) {
-      // Note: This cleanup happens in the background and doesn't block navigation
-      this.raffleImagesUploadService.deleteMultipleImages(this.uploadedImageIds);
-    }
   }
 } 

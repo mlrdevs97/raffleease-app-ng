@@ -48,7 +48,8 @@ export const ErrorMessages: {
         INVALID_TYPE: 'The type is invalid',
         VALUE_ALREADY_EXISTS: 'This value already exists',
         INVALID_FIELD: 'This field is invalid',
-        INVALID_NESTED_FIELD: 'This field contains invalid values'
+        INVALID_NESTED_FIELD: 'This field contains invalid values',
+        END_DATE_VALIDATION_ERROR: 'The end date must be at least 24 hours after the start date'
     },
     dedicated: {
         'userData.email': {

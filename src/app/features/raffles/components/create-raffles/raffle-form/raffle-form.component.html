@@ -15,7 +15,8 @@
             [control]="imagesControl" 
             [fieldErrors]="fieldErrors()"
             [initialImages]="mode === 'edit' ? raffleData?.images : undefined"
-            [raffleId]="mode === 'edit' ? raffleData?.id : undefined">
+            [raffleId]="mode === 'edit' ? raffleData?.id : undefined"
+            [mode]="mode">
         </app-raffle-images-upload>
     </div>
 
@@ -23,7 +24,8 @@
         <app-button
             variant="secondary"
             size="md"
-            type="button">
+            type="button"
+            (click)="onCancel()">
             Cancel
         </app-button>
         <app-button
