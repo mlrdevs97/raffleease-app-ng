@@ -42,17 +42,20 @@ export class ErrorHandlerService {
       return 'Connection error. Please check your internet connection or try again later.';
     }
 
-    const statusMessage = ErrorMessages.status[status];
-    if (statusMessage) return statusMessage;
-
     if (errorData && isErrorResponse(errorData)) {
       if (isValidationErrorResponse(errorData)) {
         return 'Please, correct the errors below and try again.';
       }
 
       const errorCode = errorData.code as ErrorCode;
-      return ErrorMessages.general[errorCode] ?? 'An error occurred. Please try again.';
+      const specificMessage = ErrorMessages.general[errorCode];
+      if (specificMessage) {
+        return specificMessage;
+      }
     }
+
+    const statusMessage = ErrorMessages.status[status];
+    if (statusMessage) return statusMessage;
 
     if (errorData instanceof Error) {
       return errorData.message;

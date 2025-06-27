@@ -1,5 +1,6 @@
-import { Component, Input, signal, inject, Output, EventEmitter, OnInit } from '@angular/core';
+import { Component, Input, signal, inject, Output, EventEmitter, OnInit, OnDestroy } from '@angular/core';
 import { CommonModule } from '@angular/common';
+import { Router } from '@angular/router';
 import { RaffleStatusLabelComponent } from '../../shared/raffle-status-label/raffle-status-label.component';
 import { ConfirmationDialogComponent, ConfirmationDialogData } from '../../../../../shared/components/confirmation-dialog/confirmation-dialog.component';
 import { RaffleStatus } from '../../../models/raffle.model';
@@ -7,11 +8,12 @@ import { RaffleService } from '../../../services/raffle.service';
 import { RaffleQueryService } from '../../../services/raffle-query.service';
 import { ErrorHandlerService } from '../../../../../core/services/error-handler.service';
 import { SuccessMessages } from '../../../../../core/constants/success-messages';
-import { ClientValidationMessages } from '../../../../../core/constants/client-validation-messages';
 import { SuccessResponse } from '../../../../../core/models/api-response.model';
 import { Raffle } from '../../../models/raffle.model';
 import { ConfirmationMessages } from '../../../../../core/constants/confirmation-messages';
 import { ButtonComponent } from '../../../../../shared/components/button/button.component';
+import { ErrorCodes } from '../../../../../core/constants/error-codes';
+import { ErrorMessages } from '../../../../../core/constants/error-messages';
 
 @Component({
   selector: 'app-raffle-header',
@@ -19,25 +21,29 @@ import { ButtonComponent } from '../../../../../shared/components/button/button.
   standalone: true,
   templateUrl: './raffle-header.component.html'
 })
-export class RaffleHeaderComponent implements OnInit {
+export class RaffleHeaderComponent implements OnInit, OnDestroy {
   @Input() raffle!: Raffle;
   @Input() initialSuccessMessage?: string | null;
+  @Input() associationId?: number;
   @Output() raffleUpdated = new EventEmitter<Raffle>();
   @Output() editRequested = new EventEmitter<void>();
+  @Output() raffleDeleted = new EventEmitter<void>();
 
   isUpdatingStatus = signal(false);
+  isDeleting = signal(false);
   showConfirmationDialog = signal(false);
-  currentAction = signal<'activate' | 'pause' | 'reactivate' | null>(null);
+  currentAction = signal<'activate' | 'pause' | 'reactivate' | 'delete' | null>(null);
   errorMessage = signal<string | null>(null);
   successMessage = signal<string | null>(null);
-
-  // Enum reference for template usage
+  isLoading = signal(false);
+  errorTimeout = signal<ReturnType<typeof setTimeout> | null>(null);
   readonly RaffleStatus = RaffleStatus;
 
   constructor(
     private raffleService: RaffleService,
     private raffleQueryService: RaffleQueryService,
-    private errorHandler: ErrorHandlerService
+    private errorHandler: ErrorHandlerService,
+    private router: Router
   ) {}
 
   ngOnInit(): void {
@@ -45,6 +51,10 @@ export class RaffleHeaderComponent implements OnInit {
       this.successMessage.set(this.initialSuccessMessage);
       setTimeout(() => this.successMessage.set(null), 5000);
     }
+  }
+
+  ngOnDestroy(): void {
+    this.clearErrorMessage();
   }
 
   get formattedStatus(): string {
@@ -60,6 +70,8 @@ export class RaffleHeaderComponent implements OnInit {
         return ConfirmationMessages.raffle.confirmPause;
       case 'reactivate':
         return ConfirmationMessages.raffle.confirmReactivation;
+      case 'delete':
+        return ConfirmationMessages.raffle.confirmDeletion;
       default:
         return ConfirmationMessages.raffle.confirmActivation;
     }
@@ -87,13 +99,78 @@ export class RaffleHeaderComponent implements OnInit {
     this.resetMessages();
   }
 
+  onDeleteClicked(): void {
+    this.currentAction.set('delete');
+    this.showConfirmationDialog.set(true);
+    this.resetMessages();
+  }
+
   onConfirmationConfirmed(): void {
     const action = this.currentAction();
     if (!action) return;
 
-    this.isUpdatingStatus.set(true);
     this.showConfirmationDialog.set(false);
     this.resetMessages();
+
+    if (action === 'delete') {
+      this.executeDeleteRaffle();
+    } else {
+      this.executeStatusUpdate(action);
+    }
+  }
+
+  onConfirmationCancelled(): void {
+    this.showConfirmationDialog.set(false);
+    this.currentAction.set(null);
+    this.resetMessages();
+  }
+
+  private executeDeleteRaffle(): void {
+    this.isDeleting.set(true);
+    this.isLoading.set(true);
+    
+    this.raffleService.deleteRaffle(this.raffle.id).subscribe({
+      next: () => {
+        this.isDeleting.set(false);
+        this.isLoading.set(false);
+        this.currentAction.set(null);
+        this.successMessage.set('Raffle deleted successfully');
+        
+        // Navigate back to raffles list after a short delay
+        setTimeout(() => {
+          this.raffleDeleted.emit();
+          if (this.associationId) {
+            this.router.navigate(['/associations', this.associationId, 'raffles']);
+          } else {
+            this.router.navigate(['/raffles']);
+          }
+        }, 1000);
+      },
+      error: (error) => {
+        this.isDeleting.set(false);
+        this.isLoading.set(false);
+        this.currentAction.set(null);
+        let errorMessage = this.errorHandler.getErrorMessage(error);
+        
+        if (this.errorHandler.isErrorOfType(error, ErrorCodes.BUSINESS_ERROR)) {
+          const cannotDeleteMessage = ErrorMessages.dedicated['raffle']?.['CANNOT_DELETE'];
+          const businessErrorMessage = ErrorMessages.general['BUSINESS_ERROR'];
+          errorMessage = cannotDeleteMessage || businessErrorMessage || 'Operation failed';
+        }
+        
+        this.errorMessage.set(errorMessage);
+        
+        // Auto-close error message after 8 seconds
+        this.errorTimeout.set(setTimeout(() => {
+          this.clearErrorMessage();
+        }, 8000));
+      }
+    });
+  }
+
+  private executeStatusUpdate(action: 'activate' | 'pause' | 'reactivate'): void {
+    this.isUpdatingStatus.set(true);
+    this.isLoading.set(true);
 
     const newStatus = this.getNewStatusForAction(action);
     const successMessage = this.getSuccessMessageForAction(action);
@@ -110,6 +187,7 @@ export class RaffleHeaderComponent implements OnInit {
           this.raffleUpdated.emit(response.data);
         }
         this.isUpdatingStatus.set(false);
+        this.isLoading.set(false);
         this.currentAction.set(null);
         
         // Clear success message after 5 seconds
@@ -118,18 +196,13 @@ export class RaffleHeaderComponent implements OnInit {
       error: (error: unknown) => {
         this.errorMessage.set(this.errorHandler.getErrorMessage(error));
         this.isUpdatingStatus.set(false);
+        this.isLoading.set(false);
         this.currentAction.set(null);
         
         // Clear error message after 8 seconds
         setTimeout(() => this.errorMessage.set(null), 8000);
       }
     });
-  }
-
-  onConfirmationCancelled(): void {
-    this.showConfirmationDialog.set(false);
-    this.currentAction.set(null);
-    this.resetMessages();
   }
 
   private getNewStatusForAction(action: 'activate' | 'pause' | 'reactivate'): RaffleStatus {
@@ -160,5 +233,13 @@ export class RaffleHeaderComponent implements OnInit {
   private resetMessages(): void {
     this.errorMessage.set(null);
     this.successMessage.set(null);
+  }
+
+  private clearErrorMessage(): void {
+    if (this.errorTimeout()) {
+      clearTimeout(this.errorTimeout()!);
+      this.errorTimeout.set(null);
+    }
+    this.errorMessage.set(null);
   }
 } 

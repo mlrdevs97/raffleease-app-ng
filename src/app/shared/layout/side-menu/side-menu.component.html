@@ -10,49 +10,48 @@
     <div class="flex flex-1 flex-col overflow-y-auto p-4">
         <ul class="flex flex-col gap-1">
             @for (item of mainMenuItems; track item.href) {
-                <li>
-                    <a [routerLink]="item.href"
-                        [class]="getMenuItemClasses(item.href, item.exactMatch)">
-                        <span [innerHTML]="getSafeIconHtml(item.icon)" 
-                              [class]="getIconClasses(item.href, item.exactMatch)"></span>
-                        <span class="truncate">{{ item.label }}</span>
-                    </a>
-                </li>
+            <li>
+                <a [routerLink]="item.href" [class]="getMenuItemClasses(item.href, item.exactMatch)">
+                    <span [innerHTML]="getSafeIconHtml(item.icon)"
+                        [class]="getIconClasses(item.href, item.exactMatch)"></span>
+                    <span class="truncate">{{ item.label }}</span>
+                </a>
+            </li>
             }
         </ul>
 
         <!-- Last raffles -->
         <div class="max-lg:hidden mt-8">
             <h3 class="mb-2 px-2 text-xs font-medium text-zinc-500">Last raffles</h3>
-            
+
             @if (isLoadingRaffles()) {
-                <!-- Loading state -->
-                <div class="px-2 py-2.5 text-sm text-zinc-500">
-                    {{ loadingMessage }}
-                </div>
+            <!-- Loading state -->
+            <div class="px-2 py-2.5 text-sm text-zinc-500">
+                {{ loadingMessage }}
+            </div>
             } @else if (rafflesError()) {
-                <!-- Error state -->
-                <div class="px-2 py-2.5 text-sm text-red-600">
-                    {{ rafflesError() }}
-                </div>
+            <!-- Error state -->
+            <div class="px-2 py-2.5 text-sm text-red-600">
+                {{ rafflesError() }}
+            </div>
             } @else if (upcomingRaffles().length === 0) {
-                <!-- Empty state -->
-                <div class="px-2 py-2.5 text-sm text-zinc-500">
-                    {{ noRafflesMessage }}
-                </div>
+            <!-- Empty state -->
+            <div class="px-2 py-2.5 text-sm text-zinc-500">
+                {{ noRafflesMessage }}
+            </div>
             } @else {
-                <!-- Raffles list -->
-                <ul class="flex flex-col gap-1 text-sm font-medium text-zinc-950">
-                    @for (raffle of upcomingRaffles(); track raffle.href) {
-                        <li>
-                            <a [routerLink]="raffle.href" 
-                               [class]="isActive(raffle.href) ? 'block rounded-lg px-2 py-2.5 text-zinc-950 bg-zinc-950/5 hover:bg-zinc-950/10' : 'block rounded-lg px-2 py-2.5 hover:bg-zinc-950/5'"
-                               [title]="raffle.label">
-                                <span class="truncate">{{ raffle.label }}</span>
-                            </a>
-                        </li>
-                    }
-                </ul>
+            <!-- Raffles list -->
+            <ul class="flex flex-col gap-1 text-sm font-medium text-zinc-950">
+                @for (raffle of upcomingRaffles(); track raffle.href) {
+                <li>
+                    <a [routerLink]="raffle.href"
+                        [class]="isActive(raffle.href) ? 'block rounded-lg px-2 py-2.5 text-zinc-950 bg-zinc-950/5 hover:bg-zinc-950/10' : 'block rounded-lg px-2 py-2.5 hover:bg-zinc-950/5'"
+                        [title]="raffle.label">
+                        <span class="truncate">{{ raffle.label }}</span>
+                    </a>
+                </li>
+                }
+            </ul>
             }
         </div>
 
@@ -60,22 +59,11 @@
         <div aria-hidden="true" class="mt-8 flex-1"></div>
     </div>
 
-    <!-- User profile footer -->
+    <!-- Logout button footer -->
     <div class="max-lg:hidden border-t border-zinc-200 p-4">
-        <button type="button"
-            class="flex w-full items-center gap-3 rounded-lg px-2 py-2.5 text-sm font-medium text-zinc-950 hover:bg-zinc-950/5">
-            <div class="h-10 w-10 rounded-full overflow-hidden border border-zinc-200">
-                <img src="/placeholder.svg?height=40&width=40" alt="User" class="h-full w-full object-cover" />
-            </div>
-            <div class="min-w-0">
-                <div class="truncate font-medium">Erica</div>
-                <div class="truncate text-xs text-zinc-500">erica[at]example.com</div>
-            </div>
-            <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 16 16" fill="currentColor" class="ml-auto h-4 w-4">
-                <path fill-rule="evenodd"
-                    d="M11.78 9.78a.75.75 0 0 1-1.06 0L8 7.06 5.28 9.78a.75.75 0 0 1-1.06-1.06l3.25-3.25a.75.75 0 0 1 1.06 0l3.25 3.25a.75.75 0 0 1 0 1.06Z"
-                    clip-rule="evenodd" />
-            </svg>
-        </button>
+        <app-logout-button 
+            [isLoading]="isLoggingOut()" 
+            (logoutClicked)="onLogout()">
+        </app-logout-button>
     </div>
 </nav>

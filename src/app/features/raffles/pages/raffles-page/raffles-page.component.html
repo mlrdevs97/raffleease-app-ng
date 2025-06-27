@@ -1,14 +1,16 @@
-<div class="container mx-auto px-4 py-8">
-  <app-raffles-header 
-    [suggestions]="suggestions"
-    [isSearchLoading]="isSearchLoading"
-    [noSearchResults]="noSearchResults"
-    (searchChange)="onSearchChange($event)"
-    (enterPressed)="onSearchEnterPressed($event)"
-    (suggestionSelected)="onSuggestionSelected($event)"
-    (statusChange)="onStatusChange($event)"
-    (sortChange)="onSortChange($event)">
-  </app-raffles-header>
+<div class="container mx-auto max-w-6xl p-4 space-y-8">
+  <div>
+    <app-raffles-header 
+      [suggestions]="suggestions"
+      [isSearchLoading]="isSearchLoading"
+      [noSearchResults]="noSearchResults"
+      (searchChange)="onSearchChange($event)"
+      (enterPressed)="onSearchEnterPressed($event)"
+      (suggestionSelected)="onSuggestionSelected($event)"
+      (statusChange)="onStatusChange($event)"
+      (sortChange)="onSortChange($event)">
+    </app-raffles-header>
+  </div>
 
   @if (errorMessage()) {
     <div class="bg-rose-100 text-rose-700 p-3 mb-6 rounded-md border border-rose-200 text-sm">
@@ -21,11 +23,13 @@
       <div class="animate-spin rounded-full h-8 w-8 border-b-2 border-gray-900"></div>
     </div>
   } @else {
-    <app-raffle-card-list 
-      [raffles]="raffles()" 
-      [associationId]="associationId()"
-      (raffleDeleted)="onRaffleDeleted($event)">
-    </app-raffle-card-list>
+    <div>  
+      <app-raffle-card-list 
+        [raffles]="raffles()" 
+        [associationId]="associationId()"
+        (raffleDeleted)="onRaffleDeleted($event)">
+      </app-raffle-card-list>
+    </div>
 
     @if (pagination().totalElements > pagination().pageSize) {
       <div class="flex justify-center mt-8">

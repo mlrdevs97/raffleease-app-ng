@@ -16,6 +16,7 @@ import {
 import { ValidationErrorCode } from '../constants/error-codes';
 import { ErrorMessages } from '../constants/error-messages';
 import { AuthService } from '../../features/auth/services/auth.service';
+import { isPublicApiRoute } from '../constants/public-routes';
 
 /**
  * Interceptor that handles API responses
@@ -26,8 +27,7 @@ export class ApiInterceptor implements HttpInterceptor {
   constructor(private authService: AuthService) {}
 
   intercept(request: HttpRequest<unknown>, next: HttpHandler): Observable<HttpEvent<unknown>> {
-    // Exclude auth-related requests
-    if (!request.url.includes('/auth/')) {
+    if (!isPublicApiRoute(request.url)) {
       const token = this.authService.getToken();
       if (token) {
         request = request.clone({

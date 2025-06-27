@@ -1,7 +1,9 @@
-import { Component, signal } from '@angular/core';
+import { Component, signal, inject } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { RouterLink, RouterLinkActive, Router } from '@angular/router';
 import { DomSanitizer, SafeHtml } from '@angular/platform-browser';
+import { AuthService } from '../../../features/auth/services/auth.service';
+import { LogoutButtonComponent } from '../../components/logout-button/logout-button.component';
 
 export interface MenuItem {
   href: string;
@@ -13,12 +15,19 @@ export interface MenuItem {
 @Component({
   selector: 'app-mobile-header',
   standalone: true,
-  imports: [CommonModule, RouterLink, RouterLinkActive],
+  imports: [CommonModule, RouterLink, RouterLinkActive, LogoutButtonComponent],
   templateUrl: './mobile-header.component.html'
 })
 export class MobileHeaderComponent {
+  private authService = inject(AuthService);
+  private router = inject(Router);
+  private sanitizer = inject(DomSanitizer);
+
   // Signal to manage mobile menu open/closed state
   isMobileMenuOpen = signal(false);
+  
+  // Signal to manage logout loading state
+  isLoggingOut = signal(false);
 
   // Menu items configuration (same as side-menu for consistency)
   mainMenuItems: MenuItem[] = [
@@ -46,15 +55,14 @@ export class MobileHeaderComponent {
       </svg>`
     },
     {
-      href: '/settings',
-      label: 'Settings',
-      icon: `<svg xmlns="http://www.w3.org/2000/svg" fill="currentColor" viewBox="0 0 20 20">
-        <path fill-rule="evenodd" d="M7.84 1.804A1 1 0 0 1 8.82 1h2.36a1 1 0 0 1 .98.804l.331 1.652a6.993 6.993 0 0 1 1.929 1.115l1.598-.54a1 1 0 0 1 1.186.447l1.18 2.044a1 1 0 0 1-.205 1.251l-1.267 1.113a7.047 7.047 0 0 1 0 2.228l1.267 1.113a1 1 0 0 1 .206 1.25l-1.18 2.045a1 1 0 0 1-1.187.447l-1.598-.54a6.993 6.993 0 0 1-1.929 1.115l-.33 1.652a1 1 0 0 1-.98.804H8.82a1 1 0 0 1-.98-.804l-.331-1.652a6.993 6.993 0 0 1-1.929-1.115l-1.598.54a1 1 0 0 1-1.186-.447l-1.18-2.044a1 1 0 0 1 .205-1.251l1.267-1.114a7.05 7.05 0 0 1 0-2.227L1.821 7.773a1 1 0 0 1-.206-1.25l1.18-2.045a1 1 0 0 1 1.187-.447l1.598.54A6.992 6.992 0 0 1 7.51 3.456l.33-1.652ZM10 13a3 3 0 1 0 0-6 3 3 0 0 0 0 6Z" clip-rule="evenodd" />
+      href: '/profile',
+      label: 'Profile',
+      icon: `<svg xmlns="http://www.w3.org/2000/svg" fill="currentColor" viewBox="0 0 60.671 60.671" xml:space="preserve">
+        <ellipse fill="currentColor" cx="30.336" cy="12.097" rx="11.997" ry="12.097"></ellipse> 
+        <path fill="currentColor" d="M35.64,30.079H25.031c-7.021,0-12.714,5.739-12.714,12.821v17.771h36.037V42.9 C48.354,35.818,42.661,30.079,35.64,30.079z"></path>
       </svg>`
     }
   ];
-
-  constructor(private router: Router, private sanitizer: DomSanitizer) {}
 
   /**
    * Toggles the mobile menu open/closed state
@@ -68,6 +76,25 @@ export class MobileHeaderComponent {
    */
   closeMobileMenu(): void {
     this.isMobileMenuOpen.set(false);
+  }
+
+  /**
+   * Handles user logout
+   */
+  onLogout(): void {
+    if (this.isLoggingOut()) return;
+    
+    this.isLoggingOut.set(true);
+    this.authService.logout().subscribe({
+      next: () => {
+        this.isLoggingOut.set(false);
+        this.closeMobileMenu();
+      },
+      error: () => {
+        this.isLoggingOut.set(false);
+        this.closeMobileMenu();
+      }
+    });
   }
 
   /**

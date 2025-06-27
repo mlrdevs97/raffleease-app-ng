@@ -1,15 +1,17 @@
 import { Injectable, signal } from '@angular/core';
 import { Router } from '@angular/router';
-import { AuthState, LoginRequest, RegisterRequest, AuthResponse, RegisterResponse, RegisterEmailVerificationRequest } from '../models/auth.model';
+import { AuthState, LoginRequest, RegisterRequest, AuthResponse, RegisterResponse, RegisterEmailVerificationRequest, ForgotPasswordRequest, ResetPasswordRequest } from '../models/auth.model';
 import { HttpClient } from '@angular/common/http';
 import { environment } from '../../../../environments/environment';
 import { Observable, tap, map } from 'rxjs';
 import { SuccessResponse } from '../../../core/models/api-response.model';
 import { jwtDecode } from 'jwt-decode';
 import { ClientValidationMessages } from '../../../core/constants/client-validation-messages';
+import { PUBLIC_CLIENT_ROUTES, isPublicClientRoute } from '../../../core/constants/public-routes';
 
 interface DecodedToken {
   exp: number;
+  sub: string;
 }
 
 @Injectable({
@@ -35,6 +37,10 @@ export class AuthService {
     return this.authState().token;
   }
 
+  getUserId(): number | undefined {
+    return this.authState().userId;
+  }
+
   register(registerData: RegisterRequest): Observable<RegisterResponse> {
     return this.http.post<SuccessResponse<RegisterResponse>>(`${this.apiUrl}/auth/register`, registerData).pipe(
       tap((response: SuccessResponse<RegisterResponse>) => {
@@ -52,6 +58,15 @@ export class AuthService {
     return this.http.post<SuccessResponse<void>>(`${this.apiUrl}/auth/verify`, { verificationToken: token });
   }
 
+  forgotPassword(email: string): Observable<SuccessResponse<void>> {
+    const request: ForgotPasswordRequest = { email };
+    return this.http.post<SuccessResponse<void>>(`${this.apiUrl}/auth/forgot-password`, request);
+  }
+
+  resetPassword(resetData: ResetPasswordRequest): Observable<SuccessResponse<void>> {
+    return this.http.post<SuccessResponse<void>>(`${this.apiUrl}/auth/reset-password`, resetData);
+  }
+
   login(identifier: string, password: string, rememberMe: boolean = false): Observable<void> {
     const loginRequest: LoginRequest = { identifier, password };
     return this.http.post<SuccessResponse<AuthResponse>>(`${this.apiUrl}/auth/login`, loginRequest).pipe(
@@ -63,6 +78,7 @@ export class AuthService {
 
         localStorage.setItem('accessToken', authResponse.accessToken);
         localStorage.setItem('associationId', authResponse.associationId.toString());
+        localStorage.setItem('userId', authResponse.userId.toString());
 
         this.authState.update(state => ({
           ...state,
@@ -71,11 +87,15 @@ export class AuthService {
 
         this.setTokenRefreshTimer(authResponse.accessToken);
       }),
-      map((response: SuccessResponse<AuthResponse>) => response?.data?.associationId as number),
-      tap((associationId: number) => {
+      map((response: SuccessResponse<AuthResponse>) => ({
+        associationId: response?.data?.associationId as number,
+        userId: response?.data?.userId as number
+      })),
+      tap(({ associationId, userId }) => {
         this.authState.update(state => ({
           ...state,
           associationId,
+          userId,
           isAuthenticated: true
         }));
         this.router.navigate(['/raffles']);
@@ -110,6 +130,15 @@ export class AuthService {
     return associationId;
   }
 
+  requireUserId(): number {
+    const userId = this.authState().userId;
+    if (!userId) {
+      this.closeSession();
+      throw new Error(ClientValidationMessages.auth.authenticationRequired);
+    }
+    return userId;
+  }
+
   private setTokenRefreshTimer(token: string): void {
     const decodedToken: DecodedToken = jwtDecode(token);
     const expiresIn = decodedToken.exp * 1000 - Date.now() - 60000;
@@ -130,8 +159,13 @@ export class AuthService {
         const authResponse: AuthResponse | null = response?.data;
         if (authResponse) {
           localStorage.setItem('accessToken', authResponse.accessToken);
+          localStorage.setItem('associationId', authResponse.associationId.toString());
+          localStorage.setItem('userId', authResponse.userId.toString());
+          
           this.authState.update(state => ({
             ...state,
+            associationId: authResponse.associationId,
+            userId: authResponse.userId,
             token: authResponse.accessToken
           }));
           this.setTokenRefreshTimer(authResponse.accessToken);
@@ -143,26 +177,48 @@ export class AuthService {
     });
   }
 
+  private isPublicRoute(): boolean {
+    const currentUrl = this.router.url.split('?')[0];
+    return isPublicClientRoute(currentUrl);
+  }
+
   private closeSession(): void {
     this.clearStoredAuth();    
     this.authState.update(state => ({
       ...state,
       associationId: undefined,
+      userId: undefined,
       isAuthenticated: false,
       token: null 
     }));
     if (this.tokenRefreshTimeout) {
       clearTimeout(this.tokenRefreshTimeout);
     }    
-    this.router.navigate(['/auth/login']);    
+    
+    if (!this.isPublicRoute()) {
+      this.router.navigate(['/auth/login']);
+    }
   }
 
   private checkAuthState(): void {
     let storedToken = localStorage.getItem('accessToken');
     let storedAssociationId = localStorage.getItem('associationId');
+    let storedUserId = localStorage.getItem('userId');
 
     if (!storedToken) {
-      this.closeSession();
+      // Only close session (and potentially redirect) if not on a public route
+      if (!this.isPublicRoute()) {
+        this.closeSession();
+      } else {
+        // Just clear the auth state without redirecting
+        this.authState.update(state => ({
+          ...state,
+          associationId: undefined,
+          userId: undefined,
+          isAuthenticated: false,
+          token: null 
+        }));
+      }
       return;
     }
 
@@ -174,10 +230,12 @@ export class AuthService {
       }
 
       const associationId = storedAssociationId ? Number(storedAssociationId) : undefined;
+      const userId = storedUserId ? Number(storedUserId) : undefined;
 
       this.authState.update(state => ({
         ...state,
         associationId,
+        userId,
         isAuthenticated: !!storedToken,
         token: storedToken
       }));
@@ -191,5 +249,6 @@ export class AuthService {
   private clearStoredAuth(): void {
     localStorage.removeItem('accessToken');
     localStorage.removeItem('associationId');
+    localStorage.removeItem('userId');
   }
 } 

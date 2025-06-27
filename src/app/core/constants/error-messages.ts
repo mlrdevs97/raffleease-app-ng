@@ -7,7 +7,6 @@ export const ErrorMessages: {
     dedicated: Record<string, Partial<Record<string, string>>>;
 } = {
     status: {
-        400: 'Invalid request. Please check your input and try again.',
         413: 'File size too large. Please select smaller files.',
         415: 'Unsupported file type. Please check the file format.',
         422: 'Request validation failed. Please check your input.',
@@ -24,7 +23,13 @@ export const ErrorMessages: {
         NOT_FOUND: 'The requested resource was not found.',
         CONFLICT: 'A conflict occurred. The operation could not be completed.',
         BUSINESS_ERROR: 'The operation could not be completed due to a business rule violation.',
-        IMAGE_LIMIT_EXCEEDED: 'You have reached the maximum limit of 10 images per raffle. Please remove some images before uploading new ones.'
+        IMAGE_LIMIT_EXCEEDED: 'You have reached the maximum limit of 10 images per raffle. Please remove some images before uploading new ones.',
+        EMAIL_SAME_AS_CURRENT: 'The new email must be different from your current email address.',
+        EMAIL_UPDATE_TOKEN_EXPIRED: 'The email verification link has expired. Please request a new email update.',
+        EMAIL_UPDATE_TOKEN_INVALID: 'The email verification link is invalid or has already been used.',
+        EMAIL_NO_LONGER_AVAILABLE: 'This email address is no longer available. Please choose a different email address.',
+        CURRENT_PASSWORD_INCORRECT: 'Current password is incorrect. Please try again.',
+        PASSWORD_SAME_AS_CURRENT: 'The new password must be different from your current password.'
     },
     validation: {
         REQUIRED: 'This field is required',
@@ -137,6 +142,20 @@ export const ErrorMessages: {
             REQUIRED: 'Email is required',
             INVALID_EMAIL: 'Please enter a valid email address',
             MAXLENGTH: 'Email must be less than 100 characters'
+        },
+        'newEmail': {
+            REQUIRED: 'New email is required',
+            INVALID_EMAIL: 'Please enter a valid email address',
+            VALUE_ALREADY_EXISTS: 'This email address is already in use',
+            EMAIL_SAME_AS_CURRENT: 'The new email must be different from your current email address'
+        },
+        'currentPassword': {
+            REQUIRED: 'Current password is required',
+            CURRENT_PASSWORD_INCORRECT: 'Current password is incorrect. Please try again.'
+        },
+        'password': {
+            REQUIRED: 'New password is required',
+            PASSWORD_SAME_AS_CURRENT: 'The new password must be different from your current password'
         }
     }
 };

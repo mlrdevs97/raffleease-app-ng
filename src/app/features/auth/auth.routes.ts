@@ -22,6 +22,16 @@ export const AUTH_ROUTES: Routes = [
     title: 'Email Verification'
   },
   {
+    path: 'forgot-password',
+    loadComponent: () => import('./pages/forgot-password/forgot-password.component').then(m => m.ForgotPasswordComponent),
+    title: 'Forgot Password'
+  },
+  {
+    path: 'reset-password',
+    loadComponent: () => import('./pages/forgot-password-reset/forgot-password-reset.component').then(m => m.ForgotPasswordResetComponent),
+    title: 'Reset Password'
+  },
+  {
     path: '',
     redirectTo: 'login',
     pathMatch: 'full'

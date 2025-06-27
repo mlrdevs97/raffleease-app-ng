@@ -114,10 +114,26 @@
             Reactivate
         </app-button>
         }
+
+        @if (raffle.status === RaffleStatus.PENDING) {
+        <app-button
+            variant="destructive"
+            size="sm"
+            customClasses="flex-1 md:flex-initial"
+            [disabled]="isUpdatingStatus() || isDeleting()"
+            [loading]="isDeleting()"
+            loadingText="Deleting..."
+            (clicked)="onDeleteClicked()">
+            Delete
+        </app-button>
+        }
     </div>
     
     <!-- Confirmation Dialog -->
-    <app-confirmation-dialog [isOpen]="showConfirmationDialog" [data]="confirmationDialogData"
-        [isLoading]="isUpdatingStatus" (confirmed)="onConfirmationConfirmed()"
+    <app-confirmation-dialog 
+        [isOpen]="showConfirmationDialog" 
+        [data]="confirmationDialogData"
+        [isLoading]="isLoading" 
+        (confirmed)="onConfirmationConfirmed()"
         (cancelled)="onConfirmationCancelled()" />
 </div>

@@ -8,6 +8,7 @@ export const SuccessMessages = {
   auth: {
     emailVerified: 'Your email has been verified successfully. You can now log in.',
     passwordReset: 'Your password has been reset successfully. You can now log in with your new password.',
+    passwordResetRequested: 'Password reset link has been sent to your email. Please check your inbox.',
     accountCreated: 'Your account has been created successfully. Please check your email to verify your account.'
   },
   
@@ -16,6 +17,9 @@ export const SuccessMessages = {
    */
   profile: {
     updated: 'Your profile has been updated successfully.',
+    emailUpdateRequested: 'Please check your email and click the verification link to complete the email update',
+    emailUpdated: 'Your email address has been updated successfully',
+    phoneUpdated: 'Phone number updated successfully',
     passwordChanged: 'Your password has been changed successfully.'
   },
   

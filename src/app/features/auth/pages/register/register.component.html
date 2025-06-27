@@ -6,7 +6,7 @@
     </div>
 
     <div class="space-y-6">
-      <h1 class="text-2xl font-bold text-gray-900">Create your Raffleease account</h1>
+      <h1 class="text-2xl font-bold text-gray-900">Create your Raffle Ease account</h1>
 
       @if (errorMessage()) {
       <div class="bg-rose-100 text-rose-700 p-3 mb-6 rounded-md border border-rose-200 text-sm">
@@ -14,27 +14,8 @@
       </div>
       }
 
-      <!-- Step indicator -->
-      <div class="mb-8">
-        <div class="h-10 w-full grid grid-cols-2 items-center justify-center rounded-md p-1 bg-gray-100 text-gray-600">
-          <button type="button" [attr.aria-selected]="currentStep() === 'user'"
-            [attr.data-state]="currentStep() === 'user' ? 'active' : 'inactive'" id="radix-trigger-user"
-            class="inline-flex items-center justify-center whitespace-nowrap rounded-sm px-3 py-1.5 text-sm font-medium ring-offset-background transition-all focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2 disabled:pointer-events-none disabled:opacity-50 data-[state=active]:bg-white data-[state=active]:text-foreground data-[state=active]:shadow-sm"
-            (click)="currentStep() !== 'user' && previousStep()">
-            User Information
-          </button>
-          <button type="button" [attr.aria-selected]="currentStep() === 'association'"
-            [attr.data-state]="currentStep() === 'association' ? 'active' : 'inactive'" id="radix-trigger-association"
-            class="inline-flex items-center justify-center whitespace-nowrap rounded-sm px-3 py-1.5 text-sm font-medium ring-offset-background transition-all focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2 disabled:pointer-events-none disabled:opacity-50 data-[state=active]:bg-white data-[state=active]:text-foreground data-[state=active]:shadow-sm"
-            (click)="currentStep() !== 'association' && nextStep()">
-            Association Details
-          </button>
-        </div>
-      </div>
-
-      <!-- User Information Form -->
-      @if (currentStep() === 'user') {
-      <form [formGroup]="userForm" class="space-y-5">
+      <!-- Single-step User Registration Form -->
+      <form [formGroup]="userForm" (ngSubmit)="onSubmit()" class="space-y-5">
         <div class="grid grid-cols-1 md:grid-cols-2 gap-5">
           <div>
             <label for="firstName" class="block text-sm font-medium text-gray-700 mb-1">First Name</label>
@@ -74,6 +55,23 @@
             {{ getFieldErrorMessage('user', 'userName') }}
           </div>
           }
+        </div>
+
+        <!-- Association Name Field -->
+        <div>
+          <label for="associationName" class="block text-sm font-medium text-gray-700 mb-1">Association Name</label>
+          <input id="associationName" type="text" formControlName="associationName"
+            class="w-full px-3 py-2 text-sm border border-gray-200 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent"
+            [ngClass]="{'border-rose-500 ring-1 ring-rose-500': userForm.controls['associationName'].invalid && userForm.controls['associationName'].touched}"
+            placeholder="Enter your association name">
+          @if (getFieldErrorMessage('user', 'associationName')) {
+          <div class="text-rose-600 text-xs mt-1">
+            {{ getFieldErrorMessage('user', 'associationName') }}
+          </div>
+          }
+          <div class="text-xs text-gray-500 mt-1">
+            This will be the name of your community association
+          </div>
         </div>
 
         <div>
@@ -187,194 +185,129 @@
           }
         </div>
 
-        <button type="button" (click)="nextStep()"
-          class="w-full py-2 mt-2 bg-blue-500 text-white font-medium rounded-md hover:bg-blue-600 transition-colors focus:outline-none focus:ring-2 focus:ring-blue-500 focus:ring-offset-2">
-          Next: Association Details
+        <!-- Submit button -->
+        <button type="submit" [disabled]="userForm.invalid || isLoading()"
+          class="w-full py-2 mt-2 bg-blue-500 text-white font-medium rounded-md hover:bg-blue-600 disabled:hover:bg-blue-500 disabled:cursor-not-allowed transition-colors focus:outline-none focus:ring-2 focus:ring-blue-500 focus:ring-offset-2">
+          @if (isLoading()) {
+          <span class="flex items-center justify-center">
+            <svg class="animate-spin -ml-1 mr-2 h-4 w-4 text-white" xmlns="http://www.w3.org/2000/svg" fill="none"
+              viewBox="0 0 24 24">
+              <circle class="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" stroke-width="4"></circle>
+              <path class="opacity-75" fill="currentColor"
+                d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4zm2 5.291A7.962 7.962 0 014 12H0c0 3.042 1.135 5.824 3 7.938l3-2.647z">
+              </path>
+            </svg>
+            Creating account...
+          </span>
+          } @else {
+          <span>Create Account</span>
+          }
         </button>
       </form>
-      }
 
-      <!-- Association Form -->
-      @if (currentStep() === 'association') {
-      <form [formGroup]="associationForm" (ngSubmit)="onSubmit()" class="space-y-5">
-        <div>
-          <label for="associationName" class="block text-sm font-medium text-gray-700 mb-1">Association Name</label>
-          <input id="associationName" type="text" formControlName="associationName"
-            class="w-full px-3 py-2 text-sm border border-gray-200 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent"
-            [ngClass]="{'border-rose-500 ring-1 ring-rose-500': associationForm.controls['associationName'].invalid && associationForm.controls['associationName'].touched}"
-            placeholder="Enter association name">
-          @if (getFieldErrorMessage('association', 'associationName')) {
-          <div class="text-rose-600 text-xs mt-1">
-            {{ getFieldErrorMessage('association', 'associationName') }}
-          </div>
-          }
-        </div>
-
-        <div>
-          <label for="description" class="block text-sm font-medium text-gray-700 mb-1">Description</label>
-          <textarea id="description" formControlName="description" rows="3"
-            class="w-full px-3 py-2 text-sm border border-gray-200 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent"
-            [ngClass]="{'border-rose-500 ring-1 ring-rose-500': associationForm.controls['description'].invalid && associationForm.controls['description'].touched}"
-            placeholder="Describe your association"></textarea>
-          @if (getFieldErrorMessage('association', 'description')) {
-          <div class="text-rose-600 text-xs mt-1">
-            {{ getFieldErrorMessage('association', 'description') }}
-          </div>
-          }
-          <div class="text-xs text-gray-500 mt-1">
-            <span>{{ associationForm.get('description')?.value?.length || 0 }}/500 characters</span>
-          </div>
-        </div>
-
-        <div>
-          <label for="associationEmail" class="block text-sm font-medium text-gray-700 mb-1">Association Email
-            (Optional)</label>
-          <input id="associationEmail" type="email" formControlName="email"
-            class="w-full px-3 py-2 text-sm border border-gray-200 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent"
-            [ngClass]="{'border-rose-500 ring-1 ring-rose-500': associationForm.controls['email'].invalid && associationForm.controls['email'].touched}"
-            placeholder="Enter association email">
-          @if (getFieldErrorMessage('association', 'email')) {
-          <div class="text-rose-600 text-xs mt-1">
-            {{ getFieldErrorMessage('association', 'email') }}
-          </div>
-          }
-        </div>
-
-        <div formGroupName="phoneNumber">
-          <label class="block text-sm font-medium text-gray-700 mb-1">Association Phone (Optional)</label>
-          <div class="grid grid-cols-3 gap-2">
-            <div>
-              <input type="text" formControlName="prefix"
-                class="w-full px-3 py-2 text-sm border border-gray-200 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent"
-                [ngClass]="{'border-rose-500 ring-1 ring-rose-500': associationForm.get('phoneNumber.prefix')?.invalid && associationForm.get('phoneNumber.prefix')?.touched}"
-                placeholder="+1">
-              @if (associationForm.get('phoneNumber.prefix')?.invalid &&
-              associationForm.get('phoneNumber.prefix')?.touched) {
-              <div class="text-rose-600 text-xs mt-1">
-                Invalid prefix format
-              </div>
-              }
-            </div>
-            <div class="col-span-2">
-              <input type="text" formControlName="nationalNumber"
-                class="w-full px-3 py-2 text-sm border border-gray-200 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent"
-                [ngClass]="{'border-rose-500 ring-1 ring-rose-500': associationForm.get('phoneNumber.nationalNumber')?.invalid && associationForm.get('phoneNumber.nationalNumber')?.touched}"
-                placeholder="1234567890">
-              @if (associationForm.get('phoneNumber.nationalNumber')?.invalid &&
-              associationForm.get('phoneNumber.nationalNumber')?.touched) {
-              <div class="text-rose-600 text-xs mt-1">
-                Invalid phone number format
-              </div>
-              }
-            </div>
-          </div>
-        </div>
-
-        <!-- Address Section -->
-        <div formGroupName="addressData" class="p-4 border border-gray-200 rounded-md bg-gray-50">
-          <h3 class="font-medium text-sm mb-3 text-gray-700">Association Address</h3>
-
-          <!-- Google Places-like Address Input -->
-          <div class="relative" id="addressContainer">
-            <label for="addressInput" class="block text-sm font-medium text-gray-700 mb-1">Search Address</label>
-            <input id="addressInput" type="text" 
+      <div class="hidden">
+        <!-- Association Form -->
+        <form [formGroup]="associationForm" (ngSubmit)="onSubmit()" class="space-y-5">
+          <div>
+            <label for="associationName" class="block text-sm font-medium text-gray-700 mb-1">Association Name</label>
+            <input id="associationName" type="text" formControlName="associationName"
               class="w-full px-3 py-2 text-sm border border-gray-200 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent"
-              placeholder="Start typing an address..." (input)="onAddressInputChange($event)"
-              (focus)="focusAddressInput($event)">
-
-            <!-- Address suggestions dropdown -->
-            @if (showAddressSuggestions()) {
-            <div
-              class="absolute z-50 w-full mt-1 bg-white border-2 border-blue-300 rounded-md shadow-lg max-h-60 overflow-auto">
-              <div class="sticky top-0 bg-blue-50 text-blue-700 font-medium text-xs py-2 px-3 border-b border-blue-200">
-                Address Suggestions
-              </div>
-              @for (suggestion of addressSuggestions(); track suggestion.placeId) {
-              <div
-                class="px-3 py-2 hover:bg-blue-50 cursor-pointer flex items-start border-b border-gray-100 last:border-b-0 text-sm"
-                (click)="selectAddress(suggestion)">
-                <div class="flex-shrink-0 text-gray-400 mt-1 mr-2">
-                  <svg xmlns="http://www.w3.org/2000/svg" class="h-4 w-4" viewBox="0 0 20 20" fill="currentColor">
-                    <path fill-rule="evenodd"
-                      d="M5.05 4.05a7 7 0 119.9 9.9L10 18.9l-4.95-4.95a7 7 0 010-9.9zM10 11a2 2 0 100-4 2 2 0 000 4z"
-                      clip-rule="evenodd" />
-                  </svg>
-                </div>
-                <div>
-                  <div class="font-medium">{{ suggestion.formattedAddress }}</div>
-                </div>
-              </div>
-              }
-              @if (addressSuggestions().length === 0) {
-              <div class="px-3 py-2 text-gray-500 text-center text-sm">
-                No address matches found
-              </div>
-              }
+              [ngClass]="{'border-rose-500 ring-1 ring-rose-500': associationForm.controls['associationName'].invalid && associationForm.controls['associationName'].touched}"
+              placeholder="Enter association name">
+            @if (getFieldErrorMessage('association', 'associationName')) {
+            <div class="text-rose-600 text-xs mt-1">
+              {{ getFieldErrorMessage('association', 'associationName') }}
             </div>
             }
-
-            <!-- Hidden fields populated when an address is selected -->
-            <input type="hidden" formControlName="placeId">
-            <input type="hidden" formControlName="latitude">
-            <input type="hidden" formControlName="longitude">
-            <input type="hidden" formControlName="city">
-            <input type="hidden" formControlName="province">
-            <input type="hidden" formControlName="zipCode">
-            <input type="hidden" formControlName="formattedAddress">
           </div>
 
-          <!-- Selected Address Information -->
-          @if (associationForm.get('addressData.formattedAddress')?.value) {
-          <div class="mt-3 p-3 bg-blue-50 border border-blue-200 rounded-md text-sm">
-            <h4 class="font-medium text-blue-700 mb-1">Selected Address</h4>
-            <p class="text-gray-700">{{ associationForm.get('addressData.formattedAddress')?.value }}</p>
-            <div class="grid grid-cols-1 sm:grid-cols-3 gap-2 mt-2 text-xs">
+          <div>
+            <label for="description" class="block text-sm font-medium text-gray-700 mb-1">Description</label>
+            <textarea id="description" formControlName="description" rows="3"
+              class="w-full px-3 py-2 text-sm border border-gray-200 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent"
+              [ngClass]="{'border-rose-500 ring-1 ring-rose-500': associationForm.controls['description'].invalid && associationForm.controls['description'].touched}"
+              placeholder="Describe your association"></textarea>
+            @if (getFieldErrorMessage('association', 'description')) {
+            <div class="text-rose-600 text-xs mt-1">
+              {{ getFieldErrorMessage('association', 'description') }}
+            </div>
+            }
+            <div class="text-xs text-gray-500 mt-1">
+              <span>{{ associationForm.get('description')?.value?.length || 0 }}/500 characters</span>
+            </div>
+          </div>
+
+          <div>
+            <label for="associationEmail" class="block text-sm font-medium text-gray-700 mb-1">Association Email
+              (Optional)</label>
+            <input id="associationEmail" type="email" formControlName="email"
+              class="w-full px-3 py-2 text-sm border border-gray-200 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent"
+              [ngClass]="{'border-rose-500 ring-1 ring-rose-500': associationForm.controls['email'].invalid && associationForm.controls['email'].touched}"
+              placeholder="Enter association email">
+            @if (getFieldErrorMessage('association', 'email')) {
+            <div class="text-rose-600 text-xs mt-1">
+              {{ getFieldErrorMessage('association', 'email') }}
+            </div>
+            }
+          </div>
+
+          <div formGroupName="phoneNumber">
+            <label class="block text-sm font-medium text-gray-700 mb-1">Association Phone (Optional)</label>
+            <div class="grid grid-cols-3 gap-2">
               <div>
-                <span class="text-gray-500">City:</span>
-                <span class="font-medium">{{ associationForm.get('addressData.city')?.value }}</span>
+                <input type="text" formControlName="prefix"
+                  class="w-full px-3 py-2 text-sm border border-gray-200 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent"
+                  [ngClass]="{'border-rose-500 ring-1 ring-rose-500': associationForm.get('phoneNumber.prefix')?.invalid && associationForm.get('phoneNumber.prefix')?.touched}"
+                  placeholder="+1">
+                @if (associationForm.get('phoneNumber.prefix')?.invalid &&
+                associationForm.get('phoneNumber.prefix')?.touched) {
+                <div class="text-rose-600 text-xs mt-1">
+                  Invalid prefix format
+                </div>
+                }
               </div>
-              <div>
-                <span class="text-gray-500">Province:</span>
-                <span class="font-medium">{{ associationForm.get('addressData.province')?.value }}</span>
-              </div>
-              <div>
-                <span class="text-gray-500">Zip Code:</span>
-                <span class="font-medium">{{ associationForm.get('addressData.zipCode')?.value }}</span>
+              <div class="col-span-2">
+                <input type="text" formControlName="nationalNumber"
+                  class="w-full px-3 py-2 text-sm border border-gray-200 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent"
+                  [ngClass]="{'border-rose-500 ring-1 ring-rose-500': associationForm.get('phoneNumber.nationalNumber')?.invalid && associationForm.get('phoneNumber.nationalNumber')?.touched}"
+                  placeholder="1234567890">
+                @if (associationForm.get('phoneNumber.nationalNumber')?.invalid &&
+                associationForm.get('phoneNumber.nationalNumber')?.touched) {
+                <div class="text-rose-600 text-xs mt-1">
+                  Invalid phone number format
+                </div>
+                }
               </div>
             </div>
           </div>
-          }
 
-          <p class="text-xs text-gray-500 mt-2">Note: Address search uses Google Places API</p>
-        </div>
+          <div class="flex space-x-3 pt-2">
+            <button (click)="previousStep()"
+              class="flex-1 h-10 px-4 py-2 rounded-md text-sm font-medium border border-input hover:bg-gray-100 hover:text-accent-foreground"
+              type="button">
+              Back
+            </button>
 
-        <div class="flex space-x-3 pt-2">
-          <button (click)="previousStep()"
-            class="flex-1 h-10 px-4 py-2 rounded-md text-sm font-medium border border-input hover:bg-gray-100 hover:text-accent-foreground"
-            type="button">
-            Back
-          </button>
-
-          <button type="submit" [disabled]="associationForm.invalid || isLoading()"
-            class="flex-1 h-10 px-4 py-2 bg-blue-500 text-white font-medium rounded-md hover:bg-blue-600 disabled:hover:bg-blue-500 disabled:cursor-not-allowed">
-            @if (isLoading()) {
-            <span class="flex items-center justify-center">
-              <svg class="animate-spin -ml-1 mr-2 h-4 w-4 text-white" xmlns="http://www.w3.org/2000/svg" fill="none"
-                viewBox="0 0 24 24">
-                <circle class="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" stroke-width="4"></circle>
-                <path class="opacity-75" fill="currentColor"
-                  d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4zm2 5.291A7.962 7.962 0 014 12H0c0 3.042 1.135 5.824 3 7.938l3-2.647z">
-                </path>
-              </svg>
-              Creating account...
-            </span>
-            } @else {
-            <span>Create Account</span>
-            }
-          </button>
-        </div>
-      </form>
-      }
+            <button type="submit" [disabled]="associationForm.invalid || isLoading()"
+              class="flex-1 h-10 px-4 py-2 bg-blue-500 text-white font-medium rounded-md hover:bg-blue-600 disabled:hover:bg-blue-500 disabled:cursor-not-allowed">
+              @if (isLoading()) {
+              <span class="flex items-center justify-center">
+                <svg class="animate-spin -ml-1 mr-2 h-4 w-4 text-white" xmlns="http://www.w3.org/2000/svg" fill="none"
+                  viewBox="0 0 24 24">
+                  <circle class="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" stroke-width="4"></circle>
+                  <path class="opacity-75" fill="currentColor"
+                    d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4zm2 5.291A7.962 7.962 0 014 12H0c0 3.042 1.135 5.824 3 7.938l3-2.647z">
+                  </path>
+                </svg>
+                Creating account...
+              </span>
+              } @else {
+              <span>Create Account</span>
+              }
+            </button>
+          </div>
+        </form>
+      </div>
     </div>
 
     <!-- Footer with login link, shown on both steps -->

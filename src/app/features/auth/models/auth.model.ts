@@ -9,6 +9,7 @@ export interface User {
 export interface AuthState {
   isAuthenticated: boolean;
   associationId?: number;
+  userId?: number;
   token: string | null;
 }
 
@@ -62,9 +63,20 @@ export interface RegisterEmailVerificationRequest {
 export interface AuthResponse {
   accessToken: string;
   associationId: number;
+  userId: number;
 }
 
 export interface RegisterResponse {
   id: string;
   email: string;
+}
+
+export interface ForgotPasswordRequest {
+  email: string;
+}
+
+export interface ResetPasswordRequest {
+  token: string;
+  password: string;
+  confirmPassword: string;
 } 

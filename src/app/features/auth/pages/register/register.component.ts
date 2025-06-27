@@ -8,16 +8,6 @@ import { ErrorHandlerService } from '../../../../core/services/error-handler.ser
 import { passwordMatchValidator } from '../../../../core/validators/password.validators';
 import { ClientValidationMessages } from '../../../../core/constants/client-validation-messages';
 
-interface AddressSuggestion {
-  placeId: string;
-  formattedAddress: string;
-  city: string;
-  province: string;
-  zipCode: string;
-  latitude: number;
-  longitude: number;
-}
-
 @Component({
   selector: 'app-register',
   standalone: true,
@@ -28,76 +18,15 @@ export class RegisterComponent implements OnInit {
   isLoading = signal(false);
   errorMessage = signal<string | null>(null);
   currentStep = signal<'user' | 'association'>('user');
-  
-  // Field-specific validation errors from backend
   fieldErrors = signal<Record<string, string>>({});
-  
-  // Password visibility toggles
   showPassword = signal(false);
-  showConfirmPassword = signal(false);
-  
-  // Address suggestion handling
+  showConfirmPassword = signal(false);  
   addressQuery = signal('');
   showAddressSuggestions = signal(false);
-  addressSuggestions = signal<AddressSuggestion[]>([]);
-  
-  // Validation messages
-  validationMessages = ClientValidationMessages;
-  
-  // User registration form
+  validationMessages = ClientValidationMessages;  
   userForm: FormGroup;
-  
-  // Association registration form
   associationForm: FormGroup;
-  
-  // Mock address data that would come from Google Places API
-  mockAddresses: AddressSuggestion[] = [
-    {
-      placeId: 'place1',
-      formattedAddress: '123 Main St, San Francisco, CA 94105, USA',
-      city: 'San Francisco',
-      province: 'CA',
-      zipCode: '94105',
-      latitude: 37.7749,
-      longitude: -122.4194
-    },
-    {
-      placeId: 'place2',
-      formattedAddress: '456 Market St, San Francisco, CA 94105, USA',
-      city: 'San Francisco',
-      province: 'CA',
-      zipCode: '94105',
-      latitude: 37.7899,
-      longitude: -122.4014
-    },
-    {
-      placeId: 'place3',
-      formattedAddress: '789 Mission St, San Francisco, CA 94103, USA',
-      city: 'San Francisco',
-      province: 'CA',
-      zipCode: '94103',
-      latitude: 37.7852,
-      longitude: -122.4056
-    },
-    {
-      placeId: 'place4',
-      formattedAddress: '1000 Broadway, New York, NY 10001, USA',
-      city: 'New York',
-      province: 'NY',
-      zipCode: '10001',
-      latitude: 40.7128,
-      longitude: -74.0060
-    },
-    {
-      placeId: 'place5',
-      formattedAddress: '2000 Peachtree St, Atlanta, GA 30309, USA',
-      city: 'Atlanta',
-      province: 'GA',
-      zipCode: '30309',
-      latitude: 33.7490,
-      longitude: -84.3880
-    }
-  ];
+
   
   constructor(
     private fb: FormBuilder, 
@@ -109,6 +38,7 @@ export class RegisterComponent implements OnInit {
       firstName: ['', [Validators.required, Validators.minLength(2), Validators.maxLength(50)]],
       lastName: ['', [Validators.required, Validators.minLength(2), Validators.maxLength(50)]],
       userName: ['', [Validators.required, Validators.minLength(2), Validators.maxLength(25)]],
+      associationName: ['', [Validators.required, Validators.minLength(2), Validators.maxLength(100)]],
       email: ['', [Validators.required, Validators.email]],
       phoneNumber: this.fb.group({
         prefix: ['', [Validators.pattern(/^\+\d{1,3}$/)]],
@@ -141,10 +71,16 @@ export class RegisterComponent implements OnInit {
         formattedAddress: ['', [Validators.required]]
       })
     });
+
+    // Sync association name from user form to association form
+    this.userForm.get('associationName')?.valueChanges.subscribe(value => {
+      this.associationForm.get('associationName')?.setValue(value, { emitEvent: false });
+    });
   }
 
   ngOnInit() {
     this.resetErrors();
+    this.populateMockAssociationData();
   }
   
   // Toggle password visibility
@@ -163,24 +99,53 @@ export class RegisterComponent implements OnInit {
     this.fieldErrors.set({});
   }
 
-  // Process backend validation errors and apply them to form fields
+  // Check if there are existing server validation errors
+  private hasServerValidationErrors(): boolean {
+    const fieldErrors = this.fieldErrors();
+    return Object.keys(fieldErrors).length > 0;
+  }
+
+  // Process backend vailidation errors and apply them to form fields
   applyFieldErrors(errors: Record<string, string>): void {
     // Set field-specific errors for display
     this.fieldErrors.set(errors);
+    
+    // Determine which step contains errors and navigate to the first step with errors
+    const errorStep = this.determineErrorStep(errors);
+    if (errorStep && errorStep !== this.currentStep()) {
+      this.currentStep.set(errorStep);
+      
+    }
     
     // Mark fields as touched and with errors
     Object.keys(errors).forEach(fieldPath => {
       const parts = fieldPath.split('.');
       
       if (parts.length === 1) {
-        const control: AbstractControl | null = this.userForm.get(fieldPath) || this.associationForm.get(fieldPath);
-        control?.markAsTouched();
-        control?.setErrors({ serverError: errors[fieldPath] });
+        // Direct form field - check both forms
+        const userControl = this.userForm.get(fieldPath);
+        const assocControl = this.associationForm.get(fieldPath);
+        
+        if (userControl) {
+          userControl.markAsTouched();
+          userControl.setErrors({ serverError: errors[fieldPath] });
+        } else if (assocControl) {
+          assocControl.markAsTouched();
+          assocControl.setErrors({ serverError: errors[fieldPath] });
+          
+          // If it's association name error, also apply to user form where it's displayed
+          if (fieldPath === 'associationName') {
+            const userAssocNameControl = this.userForm.get('associationName');
+            if (userAssocNameControl) {
+              userAssocNameControl.markAsTouched();
+              userAssocNameControl.setErrors({ serverError: errors[fieldPath] });
+            }
+          }
+        }
       } else {
         const formName = parts[0];
         
         if (formName === 'userData') {
-          // User form fields
           const userFieldPath = parts.slice(1).join('.');
           const control = this.userForm.get(userFieldPath);
           if (control) {
@@ -188,16 +153,78 @@ export class RegisterComponent implements OnInit {
             control.setErrors({ serverError: errors[fieldPath] });
           }
         } else if (formName === 'associationData') {
-          // Association form fields
           const assocFieldPath = parts.slice(1).join('.');
           const control = this.associationForm.get(assocFieldPath);
           if (control) {
             control.markAsTouched();
             control.setErrors({ serverError: errors[fieldPath] });
+            
+            // If it's association name error, also apply to user form where it's displayed
+            if (assocFieldPath === 'associationName') {
+              const userAssocNameControl = this.userForm.get('associationName');
+              if (userAssocNameControl) {
+                userAssocNameControl.markAsTouched();
+                userAssocNameControl.setErrors({ serverError: errors[fieldPath] });
+              }
+            }
           }
         }
       }
     });
+  }
+
+  // Determine which step contains the validation errors
+  private determineErrorStep(errors: Record<string, string>): 'user' | 'association' | null {
+    const errorFields = Object.keys(errors);
+    
+    // Define known user form fields
+    const userFormFields = [
+      'firstName', 'lastName', 'userName', 'email', 'password', 'confirmPassword',
+      'phoneNumber.prefix', 'phoneNumber.nationalNumber'
+    ];
+    
+    // Define known association form fields
+    const associationFormFields = [
+      'associationName', 'description', 'email', 
+      'phoneNumber.prefix', 'phoneNumber.nationalNumber',
+      'addressData.placeId', 'addressData.latitude', 'addressData.longitude',
+      'addressData.city', 'addressData.province', 'addressData.zipCode', 'addressData.formattedAddress'
+    ];
+    
+    // Check if any errors belong to user data (first step)
+    const hasUserErrors = errorFields.some(fieldPath => {
+      const parts = fieldPath.split('.');
+    
+      if (parts.length === 1) {
+        return userFormFields.includes(fieldPath) || this.userForm.get(fieldPath) !== null;
+      } else if (parts[0] === 'userData') {
+        return true;
+      } else {
+        return userFormFields.includes(fieldPath);
+      }
+    });
+    
+    // Check if any errors belong to association data (second step)
+    const hasAssociationErrors = errorFields.some(fieldPath => {
+      const parts = fieldPath.split('.');
+      
+      if (parts.length === 1) {
+        return !userFormFields.includes(fieldPath) && 
+               (associationFormFields.includes(fieldPath) || this.associationForm.get(fieldPath) !== null);
+      } else if (parts[0] === 'associationData') {
+        return true;
+      } else {
+        return associationFormFields.includes(fieldPath) && !userFormFields.includes(fieldPath);
+      }
+    });
+    
+    if (hasUserErrors) {
+      return 'user';
+    } else if (hasAssociationErrors) {
+      return 'association';
+    }
+    
+    return null;
   }
 
   // Close suggestions when clicking outside
@@ -210,69 +237,18 @@ export class RegisterComponent implements OnInit {
     }
   }
 
-  // Navigate to next step
+  // Navigate to next step (manual navigation)
   nextStep(): void {
     if (this.userForm.valid) {
-      this.resetErrors();
       this.currentStep.set('association');
     } else {
       this.userForm.markAllAsTouched();
     }
   }
   
-  // Go back to user information step
+  // Go back to user information step (manual navigation)  
   previousStep(): void {
-    this.resetErrors();
     this.currentStep.set('user');
-  }
-
-  // Handle address search input
-  onAddressInputChange(event: Event): void {
-    const query = (event.target as HTMLInputElement).value.trim().toLowerCase();
-    this.addressQuery.set(query);
-    
-    if (query.length >= 2) {
-      // Filter mock addresses based on query
-      const filteredAddresses = this.mockAddresses.filter(
-        address => address.formattedAddress.toLowerCase().includes(query)
-      );
-      
-      this.addressSuggestions.set(filteredAddresses);
-      this.showAddressSuggestions.set(true); // Always show if we have a query of 2+ chars
-    } else {
-      this.showAddressSuggestions.set(false);
-      this.addressSuggestions.set([]);
-    }
-  }
-  
-  // Focus the address input field
-  focusAddressInput(event: Event) {
-    const query = this.addressQuery();
-    if (query.length >= 2) {
-      // Re-show suggestions if there's already a valid query
-      const filteredAddresses = this.mockAddresses.filter(
-        address => address.formattedAddress.toLowerCase().includes(query)
-      );
-      this.addressSuggestions.set(filteredAddresses);
-      this.showAddressSuggestions.set(filteredAddresses.length > 0);
-    }
-  }
-  
-  // Handle selection of an address suggestion
-  selectAddress(address: AddressSuggestion): void {
-    const addressData = this.associationForm.get('addressData');
-    if (addressData) {
-      addressData.patchValue({
-        placeId: address.placeId,
-        latitude: address.latitude,
-        longitude: address.longitude,
-        city: address.city,
-        province: address.province,
-        zipCode: address.zipCode,
-        formattedAddress: address.formattedAddress
-      });
-    }
-    this.showAddressSuggestions.set(false);
   }
 
   // Get field error message (combines client and server validation)
@@ -311,19 +287,33 @@ export class RegisterComponent implements OnInit {
   }
 
   onSubmit(): void {
+    // Sync association name from user form to association form before validation
+    const associationNameValue = this.userForm.get('associationName')?.value;
+    this.associationForm.get('associationName')?.setValue(associationNameValue);
+
     if (!this.userForm.valid || !this.associationForm.valid) {
       this.userForm.markAllAsTouched();
       this.associationForm.markAllAsTouched();
       return;
     }
+    
     const registerData = {
       userData: this.userForm.value,
       associationData: this.associationForm.value
     };
+    
+    // Remove association name from user data as it belongs to association data
+    delete registerData.userData.associationName;
+    
     this.cleanEmptyPhoneNumber(registerData.userData);
     this.cleanEmptyPhoneNumber(registerData.associationData);
+    
+    // Ensure association email and phone are completely removed if empty
+    this.cleanEmptyAssociationContactInfo(registerData.associationData);
+    
     this.isLoading.set(true);
     this.resetErrors();
+    
     this.authService.register(registerData).subscribe({
       error: (error: unknown) => {
         this.errorMessage.set(this.errorHandler.getErrorMessage(error));
@@ -340,8 +330,41 @@ export class RegisterComponent implements OnInit {
   }
 
   cleanEmptyPhoneNumber(data: any): void {
-    if (!data.phoneNumber.prefix && !data.phoneNumber.nationalNumber) {
-      data.phoneNumber = undefined;
+    if (data.phoneNumber && !data.phoneNumber.prefix && !data.phoneNumber.nationalNumber) {
+      delete data.phoneNumber;
     }
-  }  
-} 
+  }
+
+  // Ensure association email and phone are completely removed if empty
+  cleanEmptyAssociationContactInfo(associationData: any): void {
+    // Remove email if empty or whitespace
+    if (!associationData.email || associationData.email.trim() === '') {
+      delete associationData.email;
+    }
+    
+    // Remove phone number if empty (already handled by cleanEmptyPhoneNumber but being explicit)
+    if (associationData.phoneNumber && 
+        (!associationData.phoneNumber.prefix || associationData.phoneNumber.prefix.trim() === '') &&
+        (!associationData.phoneNumber.nationalNumber || associationData.phoneNumber.nationalNumber.trim() === '')) {
+      delete associationData.phoneNumber;
+    }
+  }
+
+  // Populate association form with mock data (excluding email, phone, and association name)
+  private populateMockAssociationData(): void {
+    this.associationForm.patchValue({
+      // Association name will come from user input, not mocked
+      description: 'Community association created through Raffleease platform',
+      // Note: Email and phone number are intentionally NOT set
+      addressData: {
+        placeId: 'mock_place_id_' + Date.now(),
+        latitude: 37.7749,
+        longitude: -122.4194,
+        city: 'San Francisco',
+        province: 'CA',
+        zipCode: '94105',
+        formattedAddress: '123 Community St, San Francisco, CA 94105, USA'
+      }
+    });
+  }
+}

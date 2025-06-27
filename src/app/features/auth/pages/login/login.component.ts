@@ -34,13 +34,15 @@ export class LoginComponent {
       rememberMe: [false]
     });
 
-    // Get the return URL from route parameters or default to '/dashboard'
     this.route.queryParams.subscribe(params => {
       this.returnUrl = params['returnUrl'] || '/dashboard';
       
-      // Check if email was verified successfully
       if (params['emailVerified'] === 'success') {
         this.successMessage.set(SuccessMessages.auth.emailVerified);
+      }
+      
+      if (params['passwordReset'] === 'success') {
+        this.successMessage.set(SuccessMessages.auth.passwordReset);
       }
     });
   }

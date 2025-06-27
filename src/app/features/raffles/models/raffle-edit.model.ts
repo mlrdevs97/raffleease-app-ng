@@ -7,5 +7,4 @@ export interface RaffleEdit {
   images?: Image[];
   ticketPrice?: number;
   totalTickets?: number;
-  price?: number;
 } 

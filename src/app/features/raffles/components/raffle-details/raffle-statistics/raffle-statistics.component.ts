@@ -78,11 +78,11 @@ export class RaffleStatisticsComponent {
       : '100.0';
 
     // 5. Community Reach 
-    const formattedTicketsPerParticipant = `~${Number(ticketsPerParticipant).toFixed(1)} tickets / person`;
+    const formattedTicketsPerParticipant = `~${Number(ticketsPerParticipant).toFixed(1)} / person`;
 
     // 6. Sales Velocity 
     const formattedVelocity = dailySalesVelocity !== null 
-      ? `~${Number(dailySalesVelocity).toFixed(0)} tickets / day`
+      ? `~${Number(dailySalesVelocity).toFixed(0)} / day`
       : 'No data';
     
     let velocityContext = 'No sales data';

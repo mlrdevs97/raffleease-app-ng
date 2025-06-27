@@ -1,7 +1,6 @@
-import { Component, Input, OnInit, signal, computed } from '@angular/core';
+import { Component, Input, OnInit, signal, computed, input } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { RouterLink } from '@angular/router';
-
 import { OrdersTableComponent } from '../../../../orders/components/shared/orders-table/orders-table.component';
 import { OrdersService } from '../../../../orders/services/orders.service';
 import { ErrorHandlerService } from '../../../../../core/services/error-handler.service';
@@ -17,7 +16,7 @@ import { Raffle, RaffleStatus } from '../../../models/raffle.model';
 })
 export class RaffleOrdersComponent implements OnInit {
   @Input() raffleId!: number;
-  @Input() raffle?: Raffle;
+  raffle = input<Raffle>();
 
   orders = signal<Order[]>([]);
   isLoading = signal(false);
@@ -26,7 +25,7 @@ export class RaffleOrdersComponent implements OnInit {
   hasMoreOrders = computed(() => this.orders().length > 5);
   
   isRaffleActiveForOrders = computed(() => {
-    return this.raffle?.status === RaffleStatus.ACTIVE;
+    return this.raffle()?.status === RaffleStatus.ACTIVE;
   });
 
   constructor(

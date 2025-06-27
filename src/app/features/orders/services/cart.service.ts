@@ -114,9 +114,14 @@ export class CartService {
       { ticketIds }
     ).pipe(
       map(response => response.data!),
+      tap(() => {
+        if (cart.tickets) {
+          cart.tickets = cart.tickets.filter(ticket => !ticketIds.includes(ticket.id));
+          this.currentCart.set(cart);
+        }
+      }),
       finalize(() => {
         this.isReleasingTickets.set(false);
-        this.clearCart();
       }),
     );
   }

@@ -1,6 +1,6 @@
 import { Component, Input, ElementRef, HostListener, Output, EventEmitter, OnDestroy } from '@angular/core';
 import { RouterLink, Router } from '@angular/router';
-import { DatePipe } from '@angular/common';
+import { DatePipe, CurrencyPipe } from '@angular/common';
 import { Raffle } from '../../../models/raffle.model';
 import { RaffleStatusLabelComponent } from '../../shared/raffle-status-label/raffle-status-label.component';
 import { RaffleService } from '../../../services/raffle.service';
@@ -13,7 +13,7 @@ export type RaffleCardMode = 'menu' | 'clearSelection';
 @Component({
   selector: 'app-raffle-card',
   standalone: true,
-  imports: [RouterLink, RaffleStatusLabelComponent, DatePipe],
+  imports: [RouterLink, RaffleStatusLabelComponent, DatePipe, CurrencyPipe],
   templateUrl: './raffle-card.component.html'
 })
 export class RaffleCardComponent implements OnDestroy {

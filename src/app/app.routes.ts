@@ -24,6 +24,11 @@ export const routes: Routes = [
         path: 'orders',
         loadChildren: () => import('./features/orders/orders.routes').then(m => m.ORDERS_ROUTES),
         canActivate: [authGuard]
+      },
+      {
+        path: 'profile',
+        loadChildren: () => import('./features/profiles/profiles.routes').then(m => m.PROFILES_ROUTES),
+        canActivate: [authGuard]
       }
     ]
   }

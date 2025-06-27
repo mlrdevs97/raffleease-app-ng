@@ -7,8 +7,6 @@ import { TicketSelectionService } from '../../services/ticket-selection.service'
 import { ErrorHandlerService } from '../../../../core/services/error-handler.service';
 import { Cart } from '../../../../core/models/cart.model';
 import { CommonModule } from '@angular/common';
-import { switchMap } from 'rxjs/operators';
-import { of } from 'rxjs';
 
 @Component({
   selector: 'app-create-order-page',
@@ -44,10 +42,6 @@ export class CreateOrderPageComponent implements OnInit, OnDestroy {
     this.ticketSelectionService.clearTickets();
   }
 
-  /**
-   * Initialize cart by checking for existing cart and releasing tickets before creating new one
-   * This ensures that tickets are released on page reloads
-   */
   private initializeCart(): void {
     this.cartService.createCart().subscribe({
       next: (cart: Cart) => {

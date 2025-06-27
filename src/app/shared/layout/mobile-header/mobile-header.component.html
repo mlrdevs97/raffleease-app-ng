@@ -7,28 +7,27 @@
         </a>
 
         <!-- Menu toggle on the right -->
-        <button 
-            aria-label="Toggle navigation" 
-            type="button"
-            (click)="toggleMobileMenu()"
+        <button aria-label="Toggle navigation" type="button" (click)="toggleMobileMenu()"
             class="inline-flex items-center justify-center rounded-md p-2 text-zinc-600 hover:bg-zinc-100 hover:text-zinc-900 focus:outline-none focus:ring-2 focus:ring-zinc-500 transition-all duration-200 ease-in-out">
-            
+
             <!-- Hamburger icon when menu is closed with rotation animation -->
-            <div class="relative w-6 h-6 transition-all duration-300 ease-in-out" 
-                 [class.rotate-90]="isMobileMenuOpen()">
+            <div class="relative w-6 h-6 transition-all duration-300 ease-in-out"
+                [class.rotate-90]="isMobileMenuOpen()">
                 @if (!isMobileMenuOpen()) {
-                    <svg class="w-6 h-6 transition-all duration-300 ease-in-out transform" 
-                         viewBox="0 0 20 20" fill="currentColor" aria-hidden="true">
-                        <path d="M2 6.75C2 6.33579 2.33579 6 2.75 6H17.25C17.6642 6 18 6.33579 18 6.75C18 7.16421 17.6642 7.5 17.25 7.5H2.75C2.33579 7.5 2 7.16421 2 6.75ZM2 13.25C2 12.8358 2.33579 12.5 2.75 12.5H17.25C17.6642 12.5 18 12.8358 18 13.25C18 13.6642 17.6642 14 17.25 14H2.75C2.33579 14 2 13.6642 2 13.25Z" />
-                    </svg>
+                <svg class="w-6 h-6 transition-all duration-300 ease-in-out transform" viewBox="0 0 20 20"
+                    fill="currentColor" aria-hidden="true">
+                    <path
+                        d="M2 6.75C2 6.33579 2.33579 6 2.75 6H17.25C17.6642 6 18 6.33579 18 6.75C18 7.16421 17.6642 7.5 17.25 7.5H2.75C2.33579 7.5 2 7.16421 2 6.75ZM2 13.25C2 12.8358 2.33579 12.5 2.75 12.5H17.25C17.6642 12.5 18 12.8358 18 13.25C18 13.6642 17.6642 14 17.25 14H2.75C2.33579 14 2 13.6642 2 13.25Z" />
+                </svg>
                 }
-                
+
                 <!-- X icon when menu is open with fade in animation -->
                 @if (isMobileMenuOpen()) {
-                    <svg class="w-6 h-6 transition-all duration-300 ease-in-out transform" 
-                         viewBox="0 0 20 20" fill="currentColor" aria-hidden="true">
-                        <path d="M6.28 5.22a.75.75 0 0 0-1.06 1.06L8.94 10l-3.72 3.72a.75.75 0 1 0 1.06 1.06L10 11.06l3.72 3.72a.75.75 0 1 0 1.06-1.06L11.06 10l3.72-3.72a.75.75 0 0 0-1.06-1.06L10 8.94 6.28 5.22Z" />
-                    </svg>
+                <svg class="w-6 h-6 transition-all duration-300 ease-in-out transform" viewBox="0 0 20 20"
+                    fill="currentColor" aria-hidden="true">
+                    <path
+                        d="M6.28 5.22a.75.75 0 0 0-1.06 1.06L8.94 10l-3.72 3.72a.75.75 0 1 0 1.06 1.06L10 11.06l3.72 3.72a.75.75 0 1 0 1.06-1.06L11.06 10l3.72-3.72a.75.75 0 0 0-1.06-1.06L10 8.94 6.28 5.22Z" />
+                </svg>
                 }
             </div>
         </button>
@@ -36,129 +35,47 @@
 
     <!-- Mobile Menu Overlay with smooth transitions -->
     @if (isMobileMenuOpen()) {
-        <!-- Background overlay with backdrop blur and smooth fade -->
-        <div 
-            class="fixed inset-0 z-40 bg-black/30 backdrop-blur-sm transition-all duration-300 ease-out animate-fade-in"
-            (click)="closeMobileMenu()"
-            aria-hidden="true">
-        </div>
+    <!-- Background overlay with backdrop blur and smooth fade -->
+    <div class="fixed inset-0 z-40 bg-black/30 backdrop-blur-sm transition-all duration-300 ease-out animate-fade-in"
+        (click)="closeMobileMenu()" aria-hidden="true">
+    </div>
 
-        <!-- Slide-out menu panel with smooth slide animation -->
-        <div class="fixed inset-y-0 left-0 z-50 w-64 bg-white shadow-2xl transform transition-all duration-300 ease-out animate-slide-in-left">
-            <nav class="flex h-full flex-col">
-                <!-- Logo section with fade in delay -->
-                <div class="border-b border-zinc-200 p-4 animate-fade-in-up animation-delay-100">
-                    <a routerLink="/" class="flex items-center" (click)="closeMobileMenu()">
-                        <img src="/assets/logos/raffleease-logo-playful-text.svg" alt="Raffleease Logo" class="h-10" />
-                    </a>
-                </div>
+    <!-- Slide-out menu panel with smooth slide animation -->
+    <div
+        class="fixed inset-y-0 left-0 z-50 w-64 bg-white shadow-2xl transform transition-all duration-300 ease-out animate-slide-in-left">
+        <nav class="flex h-full flex-col">
+            <!-- Logo section with fade in delay -->
+            <div class="border-b border-zinc-200 p-4 animate-fade-in-up animation-delay-100">
+                <a routerLink="/" class="flex items-center" (click)="closeMobileMenu()">
+                    <img src="/assets/logos/raffleease-logo-playful-text.svg" alt="Raffleease Logo" class="h-10" />
+                </a>
+            </div>
 
-                <!-- Navigation links with staggered animation -->
-                <div class="flex-1 overflow-y-auto p-4">
-                    <ul class="space-y-2">
-                        @for (item of mainMenuItems; track item.href; let i = $index) {
-                            <li class="animate-fade-in-up" 
-                                [style.animation-delay]="(150 + i * 50) + 'ms'">
-                                <a 
-                                    [routerLink]="item.href"
-                                    [class]="getMenuItemClasses(item.href, item.exactMatch)"
-                                    (click)="onNavigate(item.href)">
-                                    <span 
-                                        [innerHTML]="getSafeIconHtml(item.icon)" 
-                                        [class]="getIconClasses(item.href, item.exactMatch)">
-                                    </span>
-                                    <span class="truncate">{{ item.label }}</span>
-                                </a>
-                            </li>
-                        }
-                    </ul>
-                </div>
+            <!-- Navigation links with staggered animation -->
+            <div class="flex-1 overflow-y-auto p-4">
+                <ul class="space-y-2">
+                    @for (item of mainMenuItems; track item.href; let i = $index) {
+                    <li class="animate-fade-in-up" [style.animation-delay]="(150 + i * 50) + 'ms'">
+                        <a [routerLink]="item.href" [class]="getMenuItemClasses(item.href, item.exactMatch)"
+                            (click)="onNavigate(item.href)">
+                            <span [innerHTML]="getSafeIconHtml(item.icon)"
+                                [class]="getIconClasses(item.href, item.exactMatch)">
+                            </span>
+                            <span class="truncate">{{ item.label }}</span>
+                        </a>
+                    </li>
+                    }
+                </ul>
+            </div>
 
-                <!-- User profile section with final delay -->
-                <div class="border-t border-zinc-200 p-4 animate-fade-in-up animation-delay-400">
-                    <button 
-                        type="button"
-                        class="flex w-full items-center gap-3 rounded-lg px-3 py-3 text-base font-medium text-zinc-700 hover:bg-zinc-950/5 hover:text-zinc-950 transition-all duration-200 ease-in-out">
-                        <div class="h-10 w-10 rounded-full overflow-hidden border border-zinc-200 bg-zinc-100">
-                            <img src="/placeholder.svg?height=40&width=40" alt="User" class="h-full w-full object-cover" />
-                        </div>
-                        <div class="min-w-0 text-left">
-                            <div class="truncate font-medium text-zinc-900">Erica</div>
-                            <div class="truncate text-sm text-zinc-500">erica&#64;example.com</div>
-                        </div>
-                        <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 16 16" fill="currentColor" class="ml-auto h-4 w-4 text-zinc-400">
-                            <path fill-rule="evenodd"
-                                d="M11.78 9.78a.75.75 0 0 1-1.06 0L8 7.06 5.28 9.78a.75.75 0 0 1-1.06-1.06l3.25-3.25a.75.75 0 0 1 1.06 0l3.25 3.25a.75.75 0 0 1 0 1.06Z"
-                                clip-rule="evenodd" />
-                        </svg>
-                    </button>
-                </div>
-            </nav>
-        </div>
+            <!-- Logout button section with final delay -->
+            <div class="border-t border-zinc-200 p-4 animate-fade-in-up animation-delay-400">
+                <app-logout-button 
+                    [isLoading]="isLoggingOut()" 
+                    (logoutClicked)="onLogout()">
+                </app-logout-button>
+            </div>
+        </nav>
+    </div>
     }
 </div>
-
-<!-- Custom CSS styles for smooth animations -->
-<style>
-    @keyframes fade-in {
-        from {
-            opacity: 0;
-        }
-        to {
-            opacity: 1;
-        }
-    }
-
-    @keyframes slide-in-left {
-        from {
-            transform: translateX(-100%);
-        }
-        to {
-            transform: translateX(0);
-        }
-    }
-
-    @keyframes fade-in-up {
-        from {
-            opacity: 0;
-            transform: translateY(10px);
-        }
-        to {
-            opacity: 1;
-            transform: translateY(0);
-        }
-    }
-
-    .animate-fade-in {
-        animation: fade-in 0.3s ease-out forwards;
-    }
-
-    .animate-slide-in-left {
-        animation: slide-in-left 0.3s cubic-bezier(0.4, 0, 0.2, 1) forwards;
-    }
-
-    .animate-fade-in-up {
-        animation: fade-in-up 0.4s cubic-bezier(0.4, 0, 0.2, 1) forwards;
-        opacity: 0;
-    }
-
-    .animation-delay-100 {
-        animation-delay: 100ms;
-    }
-
-    .animation-delay-400 {
-        animation-delay: 400ms;
-    }
-
-    /* Enhanced transitions for menu items */
-    .transition-all {
-        transition-property: all;
-        transition-timing-function: cubic-bezier(0.4, 0, 0.2, 1);
-    }
-
-    /* Smooth backdrop blur transition */
-    .backdrop-blur-sm {
-        backdrop-filter: blur(4px);
-        -webkit-backdrop-filter: blur(4px);
-    }
-</style>

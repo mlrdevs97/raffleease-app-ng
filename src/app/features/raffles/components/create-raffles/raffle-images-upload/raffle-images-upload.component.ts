@@ -161,7 +161,6 @@ export class RaffleImagesUploadComponent implements OnInit, OnChanges {
     
     this.uploadService.uploadImages(files, this.raffleId).subscribe({
       next: (response: SuccessResponse<ImageResponse>) => {
-        console.log('Response:', response);
         const newImages = response.data!.images.map((image, index) => ({
           ...image,
           imageOrder: this.images.length + index
@@ -176,8 +175,6 @@ export class RaffleImagesUploadComponent implements OnInit, OnChanges {
         if (this.errorHandler.isValidationError(error)) {
           const validationErrors = this.errorHandler.getValidationErrors(error);
           this.errorMessage.set(validationErrors['files']);
-        } else if (this.errorHandler.isErrorOfType(error, 'IMAGE_LIMIT_EXCEEDED')) {
-          this.errorMessage.set(this.errorHandler.getErrorMessage(error));
         } else {
           this.errorMessage.set(this.errorHandler.getErrorMessage(error));
         }
