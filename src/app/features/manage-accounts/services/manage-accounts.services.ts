@@ -5,6 +5,7 @@ import { environment } from '../../../../environments/environment';
 import { SuccessResponse } from '../../../core/models/api-response.model';
 import { AuthService } from '../../auth/services/auth.service';
 import { User, AssociationRole } from '../../../core/models/user.model';
+import { CreateUserRequest, CreateUserResponse } from '../models/create-user.model';
 
 export interface UserSearchFilters {
   fullName?: string;
@@ -94,6 +95,17 @@ export class ManageAccountsService {
     
     return this.http.put<SuccessResponse<User>>(
       `${this.apiUrl}/associations/${associationId}/users/${userId}/role`,
+      request
+    ).pipe(
+      map(response => response.data!)
+    );
+  }
+
+  createUser(request: CreateUserRequest): Observable<CreateUserResponse> {
+    const associationId = this.authService.requireAssociationId();
+    
+    return this.http.post<SuccessResponse<CreateUserResponse>>(
+      `${this.apiUrl}/associations/${associationId}/users`,
       request
     ).pipe(
       map(response => response.data!)

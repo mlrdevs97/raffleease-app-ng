@@ -9,8 +9,8 @@ export const MANAGE_ACCOUNTS_ROUTES: Routes = [
     title: 'Manage Accounts'
   },
   {
-    path: 'create-account',
-    loadComponent: () => import('./pages/create-account/create-account.component').then(m => m.CreateAccountComponent),
+    path: 'create',
+    loadComponent: () => import('./pages/create-account-page/create-account-page.component').then(m => m.CreateAccountPageComponent),
     canActivate: [adminGuard],
     title: 'Create Account'
   }

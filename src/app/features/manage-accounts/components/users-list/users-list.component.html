@@ -5,7 +5,9 @@
 
     <div class="space-y-4">
         @for (user of users; track user.id) {
-        <app-user-card [user]="user" (userUpdated)="onUserUpdated($event)"></app-user-card>
+        <div>
+            <app-user-card [user]="user" (userUpdated)="onUserUpdated($event)"></app-user-card>
+        </div>
         }
     </div>
 </div>

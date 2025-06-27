@@ -13,11 +13,12 @@
             </svg>
             Search Users
         </app-button>
-        <a routerLink="/manage-accounts/create-account">
+        <a routerLink="/accounts/create">
             <app-button
                 variant="primary"
-                size="md">
-                Create User
+                size="md"
+                [disabled]="!isAdmin()">
+                Create Account
             </app-button>
         </a>
     </div>
