@@ -5,11 +5,12 @@ import { ButtonComponent } from '../../../../shared/components/button/button.com
 import { ConfirmationDialogComponent, ConfirmationDialogData } from '../../../../shared/components/confirmation-dialog/confirmation-dialog.component';
 import { ProfilesService } from '../../services/profiles.service';
 import { ErrorHandlerService } from '../../../../core/services/error-handler.service';
-import { UserProfile, PhoneNumberFormData, UpdatePhoneNumberRequest } from '../../models/profile.model';
+import { PhoneNumberFormData, UpdatePhoneNumberRequest } from '../../models/profile.model';
 import { PhoneNumberData } from '../../../auth/models/auth.model';
 import { ConfirmationMessages } from '../../../../core/constants/confirmation-messages';
 import { SuccessMessages } from '../../../../core/constants/success-messages';
 import { ClientValidationMessages } from '../../../../core/constants/client-validation-messages';
+import { User } from '../../../../core/models/user.model';
 
 @Component({
   selector: 'app-update-phone',
@@ -18,9 +19,9 @@ import { ClientValidationMessages } from '../../../../core/constants/client-vali
   templateUrl: './update-phone.component.html',
 })
 export class UpdatePhoneComponent implements OnInit {
-  @Input() userProfile: UserProfile | null = null;
+  @Input() userProfile: User | null = null;
   @Input() userId: number | null = null;
-  @Output() phoneUpdated = new EventEmitter<UserProfile>();
+  @Output() phoneUpdated = new EventEmitter<User>();
 
   private readonly fb = inject(FormBuilder);
   private readonly profilesService = inject(ProfilesService);

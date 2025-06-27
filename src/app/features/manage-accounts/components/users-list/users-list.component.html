@@ -1,0 +1,11 @@
+<div class="space-y-8">
+    <div class="flex items-center justify-between">
+        <h2 class="text-lg font-semibold text-zinc-950">Association Users</h2>
+    </div>
+
+    <div class="space-y-4">
+        @for (user of users; track user.id) {
+        <app-user-card [user]="user" (userUpdated)="onUserUpdated($event)"></app-user-card>
+        }
+    </div>
+</div>

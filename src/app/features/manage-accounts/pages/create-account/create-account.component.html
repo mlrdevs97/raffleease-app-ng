@@ -1,0 +1,25 @@
+<div class="mx-auto max-w-3xl space-y-4">
+    <div>
+        <app-back-link routePath="/manage-accounts" label="Back to manage accounts" />
+    </div>
+    <div class="space-y-4">
+        <div class="flex flex-col space-y-2 p-4">
+            <h3 class="font-semibold tracking-tight text-2xl">Create User Account</h3>
+            <p class="text-sm text-slate-500">
+                Create a new user account.
+            </p>
+        </div>
+
+        @if (errorMessage()) {
+        <div class="bg-rose-100 text-rose-700 p-3 mb-6 rounded-md border border-rose-200 text-sm">
+            {{ errorMessage() }}
+        </div>
+        }
+
+        @if (cartService.getCurrentCart()() && !cartService.getIsCreatingCart()() && !errorMessage()) {
+        <div class="p-6 pt-0">
+            <app-order-form [raffleId]="raffleId()" />
+        </div>
+        }
+    </div>
+</div>

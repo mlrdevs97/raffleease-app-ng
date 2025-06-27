@@ -1,6 +1,6 @@
 import { Directive, ElementRef, HostListener, inject, AfterViewInit } from '@angular/core';
 import { NgControl } from '@angular/forms';
-import { formatName } from '../../core/utils/text-format.utils';
+import { formatName } from '../utils/text-format.utils';
 
 @Directive({
   selector: '[appNameFormatter]',

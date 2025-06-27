@@ -78,7 +78,6 @@ export class OrdersService {
             .set('size', size.toString())
             .set('sort', sort);
 
-        // Add all non-empty filters to params
         Object.entries(filters).forEach(([key, value]) => {
             if (value !== null && value !== undefined && value !== '') {
                 params = params.set(key, value.toString());

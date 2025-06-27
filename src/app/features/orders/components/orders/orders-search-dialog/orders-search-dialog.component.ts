@@ -55,18 +55,11 @@ export class OrdersSearchDialogComponent {
     }
     
     onReset(): void {
-        // Reset the search criteria to an empty object
         this.searchCriteria = {};
-        
-        // Emit reset event to notify all child components
         this.resetEvent.emit();
-        
-        // Reset to first tab
         if (this.searchTabsComponent) {
             this.searchTabsComponent.activeTab = 'order';
-        }
-        
-        // Reset all errors
+        }        
         this.resetErrors();
         this.hasValidCriteria.set(false);
     }
@@ -78,13 +71,10 @@ export class OrdersSearchDialogComponent {
     }
     
     onSearch(): void {
-        // Validate that we have at least one non-empty search criteria
         if (Object.keys(this.searchCriteria).length === 0) {
             this.validationError.set(this.validationMessages.search.noCriteria);
             return;
         }
-        
-        // Clear any previous errors
         this.resetErrors();
         this.isSearching.set(true);
         

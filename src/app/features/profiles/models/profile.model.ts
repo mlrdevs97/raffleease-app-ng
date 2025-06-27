@@ -1,24 +1,5 @@
 import { PhoneNumberData } from '../../auth/models/auth.model';
 
-export enum AssociationRole {
-  ADMIN = 'ADMIN',
-  MEMBER = 'MEMBER',
-  COLLABORATOR = 'COLLABORATOR'
-}
-
-export interface UserProfile {
-  id: number;
-  firstName: string;
-  lastName: string;
-  userName: string;
-  email: string;
-  phoneNumber: PhoneNumberData;
-  role: AssociationRole;
-  isEnabled: boolean;
-  createdAt: string;
-  updatedAt?: string;
-}
-
 export interface UpdateUserProfileRequest {
   firstName: string;
   lastName: string;

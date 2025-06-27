@@ -54,7 +54,7 @@
             <!-- Navigation links with staggered animation -->
             <div class="flex-1 overflow-y-auto p-4">
                 <ul class="space-y-2">
-                    @for (item of mainMenuItems; track item.href; let i = $index) {
+                    @for (item of filteredMenuItems(); track item.href; let i = $index) {
                     <li class="animate-fade-in-up" [style.animation-delay]="(150 + i * 50) + 'ms'">
                         <a [routerLink]="item.href" [class]="getMenuItemClasses(item.href, item.exactMatch)"
                             (click)="onNavigate(item.href)">
@@ -70,9 +70,7 @@
 
             <!-- Logout button section with final delay -->
             <div class="border-t border-zinc-200 p-4 animate-fade-in-up animation-delay-400">
-                <app-logout-button 
-                    [isLoading]="isLoggingOut()" 
-                    (logoutClicked)="onLogout()">
+                <app-logout-button [isLoading]="isLoggingOut()" (logoutClicked)="onLogout()">
                 </app-logout-button>
             </div>
         </nav>

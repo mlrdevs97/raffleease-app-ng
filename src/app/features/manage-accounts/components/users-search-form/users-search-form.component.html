@@ -1,0 +1,84 @@
+<form (ngSubmit)="onSubmit()" class="w-full">
+    <div class="space-y-4">
+        <!-- Full Name Field -->
+        <div class="space-y-2">
+            <label
+                class="text-sm font-semibold leading-none p-0 peer-disabled:cursor-not-allowed peer-disabled:opacity-70"
+                for="fullName">Full Name</label>
+            <div class="relative">
+                <input
+                    class="flex h-10 w-full rounded-md border border-gray-300 bg-white px-3 py-2 text-sm ring-offset-background file:border-0 file:bg-transparent file:text-sm file:font-medium placeholder:text-gray-500 focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent disabled:cursor-not-allowed disabled:opacity-50"
+                    [ngClass]="{'border-red-500': getErrorMessage('fullName')}"
+                    id="fullName"
+                    type="text"
+                    placeholder="Search by full name"
+                    [value]="fullName()"
+                    (input)="onFullNameChange($event)">
+                @if (getErrorMessage('fullName')) {
+                <div class="text-xs text-red-500 mt-1">{{ getErrorMessage('fullName') }}</div>
+                }
+            </div>
+        </div>
+
+        <!-- Email Field -->
+        <div class="space-y-2">
+            <label
+                class="text-sm font-semibold leading-none p-0 peer-disabled:cursor-not-allowed peer-disabled:opacity-70"
+                for="email">Email</label>
+            <div class="relative">
+                <input
+                    class="flex h-10 w-full rounded-md border border-gray-300 bg-white px-3 py-2 text-sm ring-offset-background file:border-0 file:bg-transparent file:text-sm file:font-medium placeholder:text-gray-500 focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent disabled:cursor-not-allowed disabled:opacity-50"
+                    [ngClass]="{'border-red-500': getErrorMessage('email')}"
+                    id="email"
+                    type="email"
+                    placeholder="Search by email address"
+                    [value]="email()"
+                    (input)="onEmailChange($event)">
+                @if (getErrorMessage('email')) {
+                <div class="text-xs text-red-500 mt-1">{{ getErrorMessage('email') }}</div>
+                }
+            </div>
+        </div>
+
+        <!-- Phone Number Field -->
+        <div class="space-y-2">
+            <label
+                class="text-sm font-semibold leading-none p-0 peer-disabled:cursor-not-allowed peer-disabled:opacity-70"
+                for="phoneNumber">Phone Number</label>
+            <div class="relative">
+                <input
+                    class="flex h-10 w-full rounded-md border border-gray-300 bg-white px-3 py-2 text-sm ring-offset-background file:border-0 file:bg-transparent file:text-sm file:font-medium placeholder:text-gray-500 focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent disabled:cursor-not-allowed disabled:opacity-50"
+                    [ngClass]="{'border-red-500': getErrorMessage('phoneNumber')}"
+                    id="phoneNumber"
+                    type="tel"
+                    placeholder="Search by phone number"
+                    [value]="phoneNumber()"
+                    (input)="onPhoneNumberChange($event)">
+                @if (getErrorMessage('phoneNumber')) {
+                <div class="text-xs text-red-500 mt-1">{{ getErrorMessage('phoneNumber') }}</div>
+                }
+            </div>
+        </div>
+
+        <!-- Role Field -->
+        <div class="space-y-2">
+            <label class="text-sm font-semibold leading-none p-0 peer-disabled:cursor-not-allowed peer-disabled:opacity-70"
+                for="role">Role</label>
+            <div class="relative">
+                <app-dropdown-select
+                    [options]="roleOptionLabels"
+                    [placeholder]="'All roles'"
+                    [displayAllOption]="false"
+                    [ngModel]="getSelectedRoleLabel()"
+                    (ngModelChange)="onRoleDropdownChange($event)"
+                    [ngClass]="{'border-red-500': getErrorMessage('role')}">
+                </app-dropdown-select>
+                @if (getErrorMessage('role')) {
+                <div class="text-xs text-red-500 mt-1">{{ getErrorMessage('role') }}</div>
+                }
+            </div>
+        </div>
+
+        <button type="submit" style="display: none;"></button>
+    </div>
+</form>

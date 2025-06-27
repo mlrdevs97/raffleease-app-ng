@@ -2,10 +2,10 @@ import { Component, OnInit, signal, inject } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { ActivatedRoute } from '@angular/router';
 import { UserProfileComponent } from '../../components/user-profile/user-profile.component';
-import { ProfilesService } from '../../services/profiles.service';
 import { AuthService } from '../../../auth/services/auth.service';
 import { ErrorHandlerService } from '../../../../core/services/error-handler.service';
-import { UserProfile } from '../../models/profile.model';
+import { User } from '../../../../core/models/user.model';
+import { UsersService } from '../../../../core/services/users.service';
 
 @Component({
   selector: 'app-profile-page',
@@ -15,11 +15,11 @@ import { UserProfile } from '../../models/profile.model';
 })
 export class ProfilePageComponent implements OnInit {
   private readonly route = inject(ActivatedRoute);
-  private readonly profilesService = inject(ProfilesService);
+  private readonly usersService = inject(UsersService);
   private readonly authService = inject(AuthService);
   private readonly errorHandler = inject(ErrorHandlerService);
 
-  userProfile = signal<UserProfile | null>(null);
+  userProfile = signal<User | null>(null);
   userId = signal<number | null>(null);
   isLoading = signal(false);
   errorMessage = signal<string | null>(null);
@@ -51,7 +51,7 @@ export class ProfilePageComponent implements OnInit {
       this.isLoading.set(true);
       this.errorMessage.set(null);
 
-      this.profilesService.getCurrentUserProfile().subscribe({
+      this.usersService.getCurrentUserProfile().subscribe({
         next: (profile) => {
           this.userProfile.set(profile);
           this.isLoading.set(false);
@@ -63,11 +63,11 @@ export class ProfilePageComponent implements OnInit {
       });
   }
 
-  onProfileUpdated(updatedProfile: UserProfile): void {
+  onProfileUpdated(updatedProfile: User): void {
     this.userProfile.set(updatedProfile);
   }
 
-  onPhoneUpdated(updatedProfile: UserProfile): void {
+  onPhoneUpdated(updatedProfile: User): void {
     this.userProfile.set(updatedProfile);
   }
 } 

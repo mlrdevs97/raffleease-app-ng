@@ -52,7 +52,6 @@ export class OrdersPageComponent implements OnInit {
     }
 
     ngOnInit(): void {
-        // Check for error message from query parameters
         this.route.queryParams.subscribe((params: Params) => {
             if (params['error']) {
                 this.error.set(params['error']);

@@ -117,5 +117,32 @@ export const ConfirmationMessages = {
       cancelText: 'Cancel',
       variant: 'warning' as const
     }
+  },
+
+  /**
+   * User management confirmation messages
+   */
+  userManagement: {
+    confirmRoleUpdate: {
+      title: 'Update User Role',
+      message: 'Are you sure you want to update this user\'s role? This action will change their permissions within the association.',
+      confirmText: 'Update Role',
+      cancelText: 'Cancel',
+      variant: 'warning' as const
+    },
+    confirmDisableUser: {
+      title: 'Disable User',
+      message: 'Are you sure you want to disable this user? They will lose access to the system and won\'t be able to log in.',
+      confirmText: 'Disable User',
+      cancelText: 'Cancel',
+      variant: 'destructive' as const
+    },
+    confirmEnableUser: {
+      title: 'Enable User',
+      message: 'Are you sure you want to enable this user? They will regain access to the system.',
+      confirmText: 'Enable User',
+      cancelText: 'Cancel',
+      variant: 'default' as const
+    }
   }
 } as const; 

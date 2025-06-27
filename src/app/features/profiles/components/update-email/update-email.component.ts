@@ -5,11 +5,11 @@ import { ButtonComponent } from '../../../../shared/components/button/button.com
 import { ConfirmationDialogComponent, ConfirmationDialogData } from '../../../../shared/components/confirmation-dialog/confirmation-dialog.component';
 import { ProfilesService } from '../../services/profiles.service';
 import { ErrorHandlerService } from '../../../../core/services/error-handler.service';
-import { UserProfile, EmailFormData, UpdateEmailRequest } from '../../models/profile.model';
+import { EmailFormData, UpdateEmailRequest } from '../../models/profile.model';
 import { ConfirmationMessages } from '../../../../core/constants/confirmation-messages';
 import { SuccessMessages } from '../../../../core/constants/success-messages';
 import { ClientValidationMessages } from '../../../../core/constants/client-validation-messages';
-import { ErrorCodes } from '../../../../core/constants/error-codes';
+import { User } from '../../../../core/models/user.model';
 
 @Component({
   selector: 'app-update-email',
@@ -18,7 +18,7 @@ import { ErrorCodes } from '../../../../core/constants/error-codes';
   templateUrl: './update-email.component.html',
 })
 export class UpdateEmailComponent implements OnChanges {
-  @Input() userProfile: UserProfile | null = null;
+  @Input() userProfile: User | null = null;
   @Input() userId: number | null = null;
   @Input() showEmailVerificationSuccess: boolean = false;
   @Input() emailVerificationError: string | null = null;

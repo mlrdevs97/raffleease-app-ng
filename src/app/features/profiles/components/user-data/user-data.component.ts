@@ -3,13 +3,15 @@ import { CommonModule } from '@angular/common';
 import { ReactiveFormsModule, FormBuilder, FormGroup, Validators } from '@angular/forms';
 import { ButtonComponent } from '../../../../shared/components/button/button.component';
 import { ConfirmationDialogComponent, ConfirmationDialogData } from '../../../../shared/components/confirmation-dialog/confirmation-dialog.component';
-import { NameFormatterDirective } from '../../../../shared/directives/name-formatter.directive';
-import { ProfilesService } from '../../services/profiles.service';
+import { NameFormatterDirective } from '../../../../core/directives/name-formatter.directive';
 import { ErrorHandlerService } from '../../../../core/services/error-handler.service';
-import { UserProfile, UserProfileFormData, UpdateUserProfileRequest } from '../../models/profile.model';
+import { UserProfileFormData, UpdateUserProfileRequest } from '../../models/profile.model';
 import { ConfirmationMessages } from '../../../../core/constants/confirmation-messages';
 import { ClientValidationMessages } from '../../../../core/constants/client-validation-messages';
 import { formatName } from '../../../../core/utils/text-format.utils';
+import { User } from '../../../../core/models/user.model';
+import { UsersService } from '../../../../core/services/users.service';
+import { ProfilesService } from '../../services/profiles.service';
 
 @Component({
   selector: 'app-user-data',
@@ -18,11 +20,12 @@ import { formatName } from '../../../../core/utils/text-format.utils';
   templateUrl: './user-data.component.html',
 })
 export class UserDataComponent implements OnInit {
-  @Input() userProfile: UserProfile | null = null;
+  @Input() userProfile: User | null = null;
   @Input() userId: number | null = null;
-  @Output() profileUpdated = new EventEmitter<UserProfile>();
+  @Output() profileUpdated = new EventEmitter<User>();
 
   private readonly fb = inject(FormBuilder);
+  private readonly usersService = inject(UsersService);
   private readonly profilesService = inject(ProfilesService);
   private readonly errorHandler = inject(ErrorHandlerService);
 
@@ -59,9 +62,9 @@ export class UserDataComponent implements OnInit {
     this.isLoading.set(true);
     this.resetMessages();
 
-    this.profilesService.getUserProfile(this.userId).subscribe({
-      next: (profile) => {
-        this.userProfile = profile;
+    this.usersService.getUserProfile(this.userId).subscribe({
+      next: (user: User) => {
+        this.userProfile = user;
         this.populateForm();
         this.isLoading.set(false);
       },
@@ -106,13 +109,12 @@ export class UserDataComponent implements OnInit {
     };
 
     this.profilesService.updateUserProfile(this.userId, updateRequest).subscribe({
-      next: (updatedProfile) => {
-        this.userProfile = updatedProfile;
+      next: (updatedUser: User) => {
+        this.userProfile = updatedUser;
         this.successMessage.set('Profile updated successfully');
         this.isSaving.set(false);
-        // Auto-hide success message after 5 seconds
         setTimeout(() => this.successMessage.set(null), 5000);
-        this.profileUpdated.emit(updatedProfile);
+        this.profileUpdated.emit(updatedUser);
       },
       error: (error) => {
         this.errorMessage.set(this.errorHandler.getErrorMessage(error));
@@ -133,7 +135,6 @@ export class UserDataComponent implements OnInit {
     this.fieldErrors.set(errors);
     
     Object.keys(errors).forEach(fieldPath => {
-      // Handle nested userData paths from server
       const actualFieldPath = fieldPath.startsWith('userData.') 
         ? fieldPath.replace('userData.', '') 
         : fieldPath;
