@@ -1,4 +1,4 @@
-import { Component, Input, ElementRef, HostListener, Output, EventEmitter, OnDestroy } from '@angular/core';
+import { Component, Input, ElementRef, HostListener, Output, EventEmitter, OnDestroy, signal } from '@angular/core';
 import { RouterLink, Router } from '@angular/router';
 import { DatePipe, CurrencyPipe } from '@angular/common';
 import { Raffle } from '../../../models/raffle.model';
@@ -7,13 +7,15 @@ import { RaffleService } from '../../../services/raffle.service';
 import { ErrorHandlerService } from '../../../../../core/services/error-handler.service';
 import { ErrorCodes } from '../../../../../core/constants/error-codes';
 import { ErrorMessages } from '../../../../../core/constants/error-messages';
+import { ConfirmationDialogComponent, ConfirmationDialogData } from '../../../../../shared/components/confirmation-dialog/confirmation-dialog.component';
+import { ConfirmationMessages } from '../../../../../core/constants/confirmation-messages';
 
 export type RaffleCardMode = 'menu' | 'clearSelection';
 
 @Component({
   selector: 'app-raffle-card',
   standalone: true,
-  imports: [RouterLink, RaffleStatusLabelComponent, DatePipe, CurrencyPipe],
+  imports: [RouterLink, RaffleStatusLabelComponent, DatePipe, CurrencyPipe, ConfirmationDialogComponent],
   templateUrl: './raffle-card.component.html'
 })
 export class RaffleCardComponent implements OnDestroy {
@@ -29,6 +31,16 @@ export class RaffleCardComponent implements OnDestroy {
   isDeleting = false;
   errorMessage: string | null = null;
   private errorTimeout: ReturnType<typeof setTimeout> | null = null;
+  
+  // Confirmation dialog state
+  showDeleteConfirmation = signal(false);
+  showEditConfirmation = signal(false);
+  deleteConfirmationLoading = signal(false);
+  editConfirmationLoading = signal(false);
+  
+  // Confirmation dialog data from centralized messages
+  deleteConfirmationData: ConfirmationDialogData = ConfirmationMessages.raffle.confirmDeletion;
+  editConfirmationData: ConfirmationDialogData = ConfirmationMessages.raffle.confirmEdit;
   
   constructor(
     private elementRef: ElementRef,
@@ -59,20 +71,46 @@ export class RaffleCardComponent implements OnDestroy {
 
   editRaffle() {
     this.menuOpen = false;
+    this.showEditConfirmation.set(true);
   }
 
   deleteRaffle() {
     this.menuOpen = false;
+    this.showDeleteConfirmation.set(true);
+  }
+  
+  // Confirmation dialog handlers
+  onEditConfirmed() {
+    this.editConfirmationLoading.set(true);
+    
+    // Simulate a brief loading state for better UX
+    setTimeout(() => {
+      this.editConfirmationLoading.set(false);
+      this.showEditConfirmation.set(false);
+      
+      // Navigate to edit page
+      this.router.navigate(['/raffles', this.raffle.id, 'edit']);
+    }, 500);
+  }
+  
+  onEditCancelled() {
+    this.showEditConfirmation.set(false);
+    this.editConfirmationLoading.set(false);
+  }
+  
+  onDeleteConfirmed() {
+    this.deleteConfirmationLoading.set(true);
     this.clearErrorMessage();
-    this.isDeleting = true;
     
     this.raffleService.deleteRaffle(this.raffle.id).subscribe({
       next: () => {
-        this.isDeleting = false;
+        this.deleteConfirmationLoading.set(false);
+        this.showDeleteConfirmation.set(false);
         this.deleted.emit(this.raffle.id);
       },
       error: (error) => {
-        this.isDeleting = false;
+        this.deleteConfirmationLoading.set(false);
+        this.showDeleteConfirmation.set(false);
         this.errorMessage = this.errorHandler.getErrorMessage(error);
         
         if (this.errorHandler.isErrorOfType(error, ErrorCodes.BUSINESS_ERROR)) {
@@ -87,6 +125,11 @@ export class RaffleCardComponent implements OnDestroy {
         }, 3000);
       }
     });
+  }
+  
+  onDeleteCancelled() {
+    this.showDeleteConfirmation.set(false);
+    this.deleteConfirmationLoading.set(false);
   }
 
   onClearSelection() {

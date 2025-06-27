@@ -122,3 +122,21 @@
     </div>
   </div>
 </div>
+
+<!-- Delete Confirmation Dialog -->
+<app-confirmation-dialog
+  [isOpen]="showDeleteConfirmation"
+  [data]="deleteConfirmationData"
+  [isLoading]="deleteConfirmationLoading"
+  (confirmed)="onDeleteConfirmed()"
+  (cancelled)="onDeleteCancelled()">
+</app-confirmation-dialog>
+
+<!-- Edit Confirmation Dialog -->
+<app-confirmation-dialog
+  [isOpen]="showEditConfirmation"
+  [data]="editConfirmationData"
+  [isLoading]="editConfirmationLoading"
+  (confirmed)="onEditConfirmed()"
+  (cancelled)="onEditCancelled()">
+</app-confirmation-dialog>

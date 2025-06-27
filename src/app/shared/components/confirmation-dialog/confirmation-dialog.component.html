@@ -16,14 +16,14 @@
 
   <div class="flex flex-row justify-end gap-2 mt-6">
     <app-button 
-      variant="destructive" 
+      variant="secondary" 
       size="md"
       (clicked)="onCancel()">
       {{ data.cancelText }}
     </app-button>
 
     <app-button
-      [variant]="'primary'"
+      [variant]="data.variant === 'destructive' ? 'destructive' : 'primary'"
       size="md"
       [disabled]="isLoading()" 
       [loading]="isLoading()"

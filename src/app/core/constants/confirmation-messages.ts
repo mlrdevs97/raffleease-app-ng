@@ -24,6 +24,13 @@ export const ConfirmationMessages = {
       confirmText: 'Reactivate Raffle',
       cancelText: 'Cancel'
     },
+    confirmEdit: {
+      title: 'Edit Raffle',
+      message: 'You are about to edit this raffle. Any changes will affect the current raffle configuration.',
+      confirmText: 'Continue',
+      cancelText: 'Cancel',
+      variant: 'warning' as const
+    },
     confirmDeletion: {
       title: 'Delete Raffle',
       message: 'Are you sure you want to delete this raffle? This action cannot be undone.',
