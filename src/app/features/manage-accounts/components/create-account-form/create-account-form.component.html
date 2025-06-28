@@ -58,7 +58,7 @@
                 <label class="text-sm font-medium text-gray-700" for="role">Role</label>
                 <div>
                     <app-dropdown-select formControlName="role" [options]="roleOptions" placeholder="Select user role"
-                        [required]="true">
+                        [required]="true" [displayAllOption]="false">
                     </app-dropdown-select>
                 </div>
                 @if(getErrorMessage('role')) {
