@@ -3,6 +3,7 @@ import { CommonModule } from '@angular/common';
 import { Order, OrderStatus } from '../../../models/order.model';
 import { RaffleStatus } from '../../../../raffles/models/raffle.model';
 import { ButtonComponent } from '../../../../../shared/components/button/button.component';
+import { getOrderStatusClasses } from '../../../../../core/utils/order.utils';
 
 @Component({
   selector: 'app-order-detail-header',
@@ -24,18 +25,7 @@ export class OrderDetailHeaderComponent {
   readonly RaffleStatus = RaffleStatus;
 
   get statusClass(): string {
-    switch (this.order?.status) {
-      case OrderStatus.COMPLETED:
-        return 'border-transparent bg-green-100 text-green-800 hover:bg-green-100';
-      case OrderStatus.PENDING:
-        return 'border-transparent bg-yellow-100 text-yellow-800 hover:bg-yellow-100';
-      case OrderStatus.CANCELLED:
-        return 'border-transparent bg-red-100 text-red-800 hover:bg-red-100';
-      case OrderStatus.REFUNDED:
-      case OrderStatus.UNPAID:
-      default:
-        return 'border-transparent bg-gray-100 text-gray-800 hover:bg-gray-100';
-    }
+    return getOrderStatusClasses(this.order?.status);
   }
 
   /**

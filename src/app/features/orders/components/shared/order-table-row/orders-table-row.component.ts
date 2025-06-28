@@ -3,6 +3,7 @@ import { CommonModule, CurrencyPipe, DatePipe, TitleCasePipe } from '@angular/co
 import { RouterModule } from '@angular/router';
 import { OrderRafflePreviewComponent } from '../order-raffle-preview/order-raffle-preview.component';
 import { Order, OrderStatus, OrderRaffleSummary } from '../../../models/order.model';
+import { getOrderStatusClasses } from '../../../../../core/utils/order.utils';
 
 @Component({
   selector: 'app-orders-table-row',
@@ -39,15 +40,6 @@ export class OrdersTableRowComponent {
   }
 
   getStatusClass(status: OrderStatus): string {
-    switch (status) {
-      case OrderStatus.COMPLETED:
-        return 'bg-green-100 text-green-800 hover:bg-green-100';
-      case OrderStatus.PENDING:
-        return 'bg-yellow-100 text-yellow-800 hover:bg-yellow-100';
-      case OrderStatus.CANCELLED:
-        return 'bg-red-100 text-red-800 hover:bg-red-100';
-      default:
-        return 'bg-gray-100 text-gray-800 hover:bg-gray-100';
-    }
+    return getOrderStatusClasses(status);
   }
 }
