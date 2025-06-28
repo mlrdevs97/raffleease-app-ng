@@ -1,15 +1,7 @@
 <div class="bg-white rounded-lg border border-gray-200 p-6">
   <div class="flex items-center justify-between mb-6">
-    <h2 class="text-lg font-semibold text-gray-900">Phone Number</h2>
+    <h2 class="text-xl font-semibold text-gray-900">Phone Number</h2>
   </div>
-
-  <!-- Current Phone Display -->
-  @if (userProfile?.phoneNumber) {
-  <div class="mb-6 p-4 bg-gray-50 rounded-md">
-    <label class="block text-sm font-medium text-gray-700 mb-1">Current Phone Number</label>
-    <p class="text-sm text-gray-900">{{ userProfile?.phoneNumber?.prefix }}{{ userProfile?.phoneNumber?.nationalNumber }}</p>
-  </div>
-  }
 
   <!-- Success Message -->
   @if (successMessage()) {
@@ -28,7 +20,7 @@
   <form [formGroup]="phoneForm" (ngSubmit)="onSubmit()" class="space-y-6">
     <!-- Phone Number -->
     <div formGroupName="phoneNumber">
-      <label class="block text-sm font-medium text-gray-700 mb-2">
+      <label class="block text-sm font-semibold text-gray-700 mb-2">
         Phone Number <span class="text-red-500">*</span>
       </label>
       <div class="grid grid-cols-3 gap-3">

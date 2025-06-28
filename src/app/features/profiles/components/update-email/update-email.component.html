@@ -1,15 +1,7 @@
 <div class="bg-white rounded-lg border border-gray-200 p-6">
   <div class="flex items-center justify-between mb-6">
-    <h2 class="text-lg font-semibold text-gray-900">Email Address</h2>
+    <h2 class="text-xl font-semibold text-gray-900">Email Address</h2>
   </div>
-
-  <!-- Current Email Display -->
-  @if (userProfile) {
-  <div class="mb-6 p-4 bg-gray-50 rounded-md">
-    <label class="block text-sm font-medium text-gray-700 mb-1">Current Email</label>
-    <p class="text-sm text-gray-900">{{ userProfile.email }}</p>
-  </div>
-  }
 
   <!-- Success Message -->
   @if (successMessage()) {
@@ -61,7 +53,7 @@
   <form [formGroup]="emailForm" (ngSubmit)="onSubmit()" class="space-y-6">
     <!-- New Email -->
     <div>
-      <label for="newEmail" class="block text-sm font-medium text-gray-700 mb-2">
+      <label for="newEmail" class="block text-sm font-semibold text-gray-700 mb-2">
         New Email Address <span class="text-red-500">*</span>
       </label>
       <input
@@ -72,8 +64,9 @@
         [class.border-red-500]="emailForm.controls['newEmail'].invalid && emailForm.controls['newEmail'].touched"
         placeholder="Enter your new email address"
       />
+      <p class="text-xs text-gray-500 mt-2">You will receive a verification email after updating your email address.</p>
       @if (getFieldErrorMessage('newEmail')) {
-      <div class="text-red-600 text-xs mt-1">
+      <div class="text-red-600 text-xs mt-2">
         {{ getFieldErrorMessage('newEmail') }}
       </div>
       }
