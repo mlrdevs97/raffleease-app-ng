@@ -78,7 +78,7 @@ export class RaffleStatisticsComponent {
       : '100.0';
 
     // 5. Community Reach 
-    const formattedTicketsPerParticipant = `~${Number(ticketsPerParticipant).toFixed(1)} / person`;
+    const formattedTicketsPerParticipant = `~${Number(ticketsPerParticipant).toFixed(1)} tickets / person`;
 
     // 6. Sales Velocity 
     const formattedVelocity = dailySalesVelocity !== null 

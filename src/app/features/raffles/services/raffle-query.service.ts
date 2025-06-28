@@ -1,26 +1,40 @@
-import { Injectable, signal, computed } from '@angular/core';
+import { Injectable, signal, computed, inject, OnDestroy } from '@angular/core';
 import { HttpClient, HttpParams } from '@angular/common/http';
-import { Observable, map, of, tap } from 'rxjs';
+import { Observable, map, of, tap, takeUntil, Subject } from 'rxjs';
 import { environment } from '../../../../environments/environment';
 import { AuthService } from '../../auth/services/auth.service';
 import { SuccessResponse } from '../../../core/models/api-response.model';
 import { RaffleSearchFilters } from '../models/raffle-search.model';
 import { PageResponse } from '../../../core/models/pagination.model';
 import { Raffle } from '../models/raffle.model';
+import { RaffleStatisticsUpdateService } from '../../../core/services/raffle-statistics-update.service';
 
 @Injectable({
     providedIn: 'root'
 })
-export class RaffleQueryService {
+export class RaffleQueryService implements OnDestroy {
     private readonly apiUrl = `${environment.apiUrl}/associations`;
     private readonly cache = signal<Map<string, PageResponse<Raffle>>>(new Map());
     private readonly raffleCache = signal<Map<number, Raffle>>(new Map());
     private readonly isLoading = signal(false);
+    private readonly destroy$ = new Subject<void>();
+    private readonly raffleStatsUpdateService = inject(RaffleStatisticsUpdateService);
 
     constructor(
         private http: HttpClient,
         private authService: AuthService
-    ) { }
+    ) {
+        this.raffleStatsUpdateService.raffleUpdates$
+            .pipe(takeUntil(this.destroy$))
+            .subscribe((raffleId: number) => {
+                this.invalidateRaffleCache(raffleId);
+            });
+    }
+
+    ngOnDestroy(): void {
+        this.destroy$.next();
+        this.destroy$.complete();
+    }
 
     get isLoading$() {
         return this.isLoading.asReadonly();

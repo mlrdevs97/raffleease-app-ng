@@ -1,7 +1,7 @@
-import { Component, OnInit, signal, computed } from '@angular/core';
+import { Component, OnInit, signal, computed, inject, OnDestroy } from '@angular/core';
 import { ActivatedRoute, Params, Router } from '@angular/router';
 import { CommonModule } from '@angular/common';
-import { EMPTY } from 'rxjs';
+import { EMPTY, Subject, takeUntil } from 'rxjs';
 import { RaffleStatisticsComponent } from '../../components/raffle-details/raffle-statistics/raffle-statistics.component';
 import { RaffleGalleryComponent } from '../../components/raffle-details/raffle-gallery/raffle-gallery.component';
 import { RaffleHeaderComponent } from '../../components/raffle-details/raffle-header/raffle-header.component';
@@ -11,6 +11,7 @@ import { RaffleQueryService } from '../../services/raffle-query.service';
 import { ErrorHandlerService } from '../../../../core/services/error-handler.service';
 import { RaffleOrdersComponent } from '../../components/raffle-details/raffle-orders/raffle-orders.component';
 import { ErrorMessages } from '../../../../core/constants/error-messages';
+import { RaffleStatisticsUpdateService } from '../../../../core/services/raffle-statistics-update.service';
 
 @Component({
   selector: 'app-raffle-details-page',
@@ -25,10 +26,13 @@ import { ErrorMessages } from '../../../../core/constants/error-messages';
   ],
   templateUrl: './raffle-details-page.component.html'
 })
-export class RaffleDetailsPageComponent implements OnInit {
+export class RaffleDetailsPageComponent implements OnInit, OnDestroy {
   raffle = signal<Raffle | null>(null);
   isLoading = signal(false);
   initialSuccessMessage = signal<string | null>(null);
+  private readonly destroy$ = new Subject<void>();
+  private readonly raffleStatsUpdateService = inject(RaffleStatisticsUpdateService);
+  private currentRaffleId: number | null = null;
 
   timePassed = computed(() => {
     const raffleData = this.raffle();
@@ -45,62 +49,91 @@ export class RaffleDetailsPageComponent implements OnInit {
     private router: Router,
     private raffleQueryService: RaffleQueryService,
     private errorHandler: ErrorHandlerService
-  ) { }
+  ) {
+    // Listen for raffle statistics updates for the current raffle
+    this.raffleStatsUpdateService.raffleUpdates$
+      .pipe(takeUntil(this.destroy$))
+      .subscribe((updatedRaffleId: number) => {
+        // Only reload if this is the raffle currently being viewed
+        if (this.currentRaffleId === updatedRaffleId) {
+          this.reloadRaffleData();
+        }
+      });
+  }
 
   ngOnInit(): void {
-    this.route.queryParams.subscribe(params => {
+    this.route.params.subscribe((params: Params) => {
+      this.loadRaffleData(params['id']);
+    });
+
+    this.route.queryParams.subscribe((params: Params) => {
       if (params['success']) {
         this.initialSuccessMessage.set(params['success']);
-        this.router.navigate([], {
-          relativeTo: this.route,
-          queryParams: {},
-          replaceUrl: true
-        });
       }
     });
+  }
 
-    this.route.params.subscribe({
-      next: (params: Params) => {
-        const raffleId = parseInt(params['id'], 10);
+  ngOnDestroy(): void {
+    this.destroy$.next();
+    this.destroy$.complete();
+  }
 
-        if (isNaN(raffleId)) {
-          this.router.navigate(['/raffles'], {
-            queryParams: { error: ErrorMessages.dedicated['raffle']['NOT_FOUND'] }
-          });
-          return EMPTY;
-        }
-
-        this.isLoading.set(true);
-
-        return this.raffleQueryService.getById(raffleId).subscribe({
-          next: (raffle: Raffle) => {
-            this.raffle.set(raffle);
-            this.isLoading.set(false);
-          },
-          error: (error) => {
-            this.isLoading.set(false);
-            this.router.navigate(['/raffles'], {
-              queryParams: { error: this.errorHandler.getErrorMessage(error) }
-            });
-          }
-        });
-      },
-      error: (error) => {
-        this.router.navigate(['/raffles'], {
-          queryParams: { error: this.errorHandler.getErrorMessage(error) }
-        });
-      }
-    });
+  onEditRequested(): void {
+    const raffleData = this.raffle();
+    if (raffleData) {
+      this.router.navigate(['/raffles', raffleData.id, 'edit']);
+    }
   }
 
   onRaffleUpdated(updatedRaffle: Raffle): void {
     this.raffle.set(updatedRaffle);
   }
 
-  onEditRequested(): void {
-    const currentRaffle = this.raffle();
-    if (currentRaffle) {
-      this.router.navigate(['/raffles', currentRaffle.id, 'edit']);
+  /**
+   * Reloads raffle data without showing loading state
+   * Used when order operations update raffle statistics
+   */
+  private reloadRaffleData(): void {
+    if (!this.currentRaffleId) return;
+
+    // Force refresh by invalidating cache and fetching fresh data
+    this.raffleQueryService.invalidateRaffleCache(this.currentRaffleId);
+    
+    this.raffleQueryService.getById(this.currentRaffleId).subscribe({
+      next: (raffle) => {
+        this.raffle.set(raffle);
+      },
+      error: (error) => {
+        console.error('Error reloading raffle data:', error);
+        // Don't show error to user for background refreshes
+      }
+    });
+  }
+
+  private loadRaffleData(raffleId: string): void {
+    if (!raffleId || isNaN(Number(raffleId))) {
+      this.router.navigate(['/raffles'], { 
+        queryParams: { error: ErrorMessages.dedicated['raffle']['NOT_FOUND'] } 
+      });
+      return;
     }
+
+    this.currentRaffleId = Number(raffleId);
+    this.isLoading.set(true);
+
+    this.raffleQueryService.getById(this.currentRaffleId).subscribe({
+      next: (raffle) => {
+        this.raffle.set(raffle);
+      },
+      error: (error) => {
+        console.error('Error loading raffle details:', error);
+        this.router.navigate(['/raffles'], { 
+          queryParams: { error: this.errorHandler.getErrorMessage(error) } 
+        });
+      },
+      complete: () => {
+        this.isLoading.set(false);
+      }
+    });
   }
 }
