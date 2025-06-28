@@ -33,28 +33,14 @@
             }
         </div>
         <div formGroupName="phoneNumber" class="space-y-2">
-            <label
-                class="text-sm font-semibold leading-none p-0 peer-disabled:cursor-not-allowed peer-disabled:opacity-70">Phone
-                Number</label>
-            <div class="flex gap-2">
-                <app-dropdown-select #countryCodeDropdown [formControlName]="'countryCode'" [options]="countryCodes"
-                    [displayAllOption]="false" class="w-[140px]">
-                </app-dropdown-select>
-                <input formControlName="nationalNumber"
-                    class="flex h-10 w-full rounded-md border border-input bg-background px-3 py-2 text-sm ring-offset-background file:border-0 file:bg-transparent file:text-sm file:font-medium file:text-foreground placeholder:text-muted-foreground focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2 disabled:cursor-not-allowed disabled:opacity-50 flex-1"
-                    [ngClass]="{'border-red-500': getErrorMessage('phoneNumber.nationalNumber')}"
-                    id="phoneNumber.nationalNumber" placeholder="Phone number">
-            </div>
-            @if(getErrorMessage('phoneNumber.countryCode')) {
-            <div class="text-red-500 text-xs">
-                {{ getErrorMessage('phoneNumber.countryCode') }}
-            </div>
-            }
-            @if(getErrorMessage('phoneNumber.nationalNumber')) {
-            <div class="text-red-500 text-xs">
-                {{ getErrorMessage('phoneNumber.nationalNumber') }}
-            </div>
-            }
+            <app-phone-number-input
+                [prefixControl]="prefixControl"
+                [nationalNumberControl]="nationalNumberControl"
+                label="Phone Number"
+                placeholder="Enter phone number"
+                [required]="true"
+                [showLabel]="false">
+            </app-phone-number-input>
         </div>
     </div>
 </div>

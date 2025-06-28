@@ -7,11 +7,12 @@ import { ValidationErrorCodes } from '../../../../core/constants/error-codes';
 import { ErrorHandlerService } from '../../../../core/services/error-handler.service';
 import { passwordMatchValidator } from '../../../../core/validators/password.validators';
 import { ClientValidationMessages } from '../../../../core/constants/client-validation-messages';
+import { PhoneNumberInputComponent } from '../../../../shared/components/phone-number-input/phone-number-input.component';
 
 @Component({
   selector: 'app-register',
   standalone: true,
-  imports: [CommonModule, ReactiveFormsModule, RouterLink],
+  imports: [CommonModule, ReactiveFormsModule, RouterLink, PhoneNumberInputComponent],
   templateUrl: './register.component.html'
 })
 export class RegisterComponent implements OnInit {
@@ -27,7 +28,22 @@ export class RegisterComponent implements OnInit {
   userForm: FormGroup;
   associationForm: FormGroup;
 
-  
+  get userPrefixControl(): FormControl {
+    return this.userForm.get('phoneNumber.prefix') as FormControl;
+  }
+
+  get userNationalNumberControl(): FormControl {
+    return this.userForm.get('phoneNumber.nationalNumber') as FormControl;
+  }
+
+  get associationPrefixControl(): FormControl {
+    return this.associationForm.get('phoneNumber.prefix') as FormControl;
+  }
+
+  get associationNationalNumberControl(): FormControl {
+    return this.associationForm.get('phoneNumber.nationalNumber') as FormControl;
+  }
+
   constructor(
     private fb: FormBuilder, 
     private authService: AuthService,
@@ -41,8 +57,8 @@ export class RegisterComponent implements OnInit {
       associationName: ['', [Validators.required, Validators.minLength(2), Validators.maxLength(100)]],
       email: ['', [Validators.required, Validators.email]],
       phoneNumber: this.fb.group({
-        prefix: ['', [Validators.pattern(/^\+\d{1,3}$/)]],
-        nationalNumber: ['', [Validators.pattern(/^\d{1,14}$/)]]
+        prefix: ['', [Validators.required, Validators.pattern(/^\+\d{1,3}$/)]],
+        nationalNumber: ['', [Validators.required, Validators.pattern(/^\d{1,14}$/)]]
       }),
       password: ['', [
         Validators.required, 
@@ -367,4 +383,4 @@ export class RegisterComponent implements OnInit {
       }
     });
   }
-}
+} 

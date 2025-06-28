@@ -1,8 +1,9 @@
 import { Component, Input, Output, EventEmitter, OnInit, signal, inject } from '@angular/core';
 import { CommonModule } from '@angular/common';
-import { ReactiveFormsModule, FormBuilder, FormGroup, Validators } from '@angular/forms';
+import { ReactiveFormsModule, FormBuilder, FormGroup, Validators, FormControl } from '@angular/forms';
 import { ButtonComponent } from '../../../../shared/components/button/button.component';
 import { ConfirmationDialogComponent, ConfirmationDialogData } from '../../../../shared/components/confirmation-dialog/confirmation-dialog.component';
+import { PhoneNumberInputComponent } from '../../../../shared/components/phone-number-input/phone-number-input.component';
 import { ProfilesService } from '../../services/profiles.service';
 import { ErrorHandlerService } from '../../../../core/services/error-handler.service';
 import { PhoneNumberFormData, UpdatePhoneNumberRequest } from '../../models/profile.model';
@@ -15,7 +16,7 @@ import { User } from '../../../../core/models/user.model';
 @Component({
   selector: 'app-update-phone',
   standalone: true,
-  imports: [CommonModule, ReactiveFormsModule, ButtonComponent, ConfirmationDialogComponent],
+  imports: [CommonModule, ReactiveFormsModule, ButtonComponent, ConfirmationDialogComponent, PhoneNumberInputComponent],
   templateUrl: './update-phone.component.html',
 })
 export class UpdatePhoneComponent implements OnInit {
@@ -131,6 +132,14 @@ export class UpdatePhoneComponent implements OnInit {
     this.errorMessage.set(null);
     this.successMessage.set(null);
     this.fieldErrors.set({});
+  }
+
+  get prefixControl(): FormControl {
+    return this.phoneForm.get('phoneNumber.prefix') as FormControl;
+  }
+
+  get nationalNumberControl(): FormControl {
+    return this.phoneForm.get('phoneNumber.nationalNumber') as FormControl;
   }
 
   getFieldErrorMessage(fieldName: string): string | null {

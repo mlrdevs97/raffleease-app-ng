@@ -1,9 +1,10 @@
 import { Component, OnInit, signal, computed } from '@angular/core';
-import { FormBuilder, FormGroup, Validators, ReactiveFormsModule } from '@angular/forms';
+import { FormBuilder, FormGroup, Validators, ReactiveFormsModule, FormControl } from '@angular/forms';
 import { Router } from '@angular/router';
 import { CommonModule } from '@angular/common';
 import { ButtonComponent } from '../../../../shared/components/button/button.component';
 import { DropdownSelectComponent } from '../../../../shared/components/dropdown-select/dropdown-select.component';
+import { PhoneNumberInputComponent } from '../../../../shared/components/phone-number-input/phone-number-input.component';
 import { ManageAccountsService } from '../../services/manage-accounts.services';
 import { ErrorHandlerService } from '../../../../core/services/error-handler.service';
 import { AssociationRole } from '../../../../core/models/user.model';
@@ -13,7 +14,7 @@ import { passwordMatchValidator } from '../../../../core/validators/password.val
 @Component({
   selector: 'app-create-account-form',
   standalone: true,
-  imports: [CommonModule, ButtonComponent, DropdownSelectComponent, ReactiveFormsModule],
+  imports: [CommonModule, ButtonComponent, DropdownSelectComponent, PhoneNumberInputComponent, ReactiveFormsModule],
   templateUrl: './create-account-form.component.html',
   styles: ``
 })
@@ -43,8 +44,8 @@ export class CreateAccountFormComponent implements OnInit {
       username: ['', [Validators.required, Validators.minLength(3), Validators.maxLength(30)]],
       email: ['', [Validators.required, Validators.email, Validators.maxLength(100)]],
       phoneNumber: this.fb.group({
-        prefix: ['', [Validators.pattern(/^\+\d{1,3}$/)]],
-        nationalNumber: ['', [Validators.pattern(/^\d{1,14}$/)]]
+        prefix: ['', [Validators.required, Validators.pattern(/^\+\d{1,3}$/)]],
+        nationalNumber: ['', [Validators.required, Validators.pattern(/^\d{1,14}$/)]]
       }),
       password: ['', [
         Validators.required, 
@@ -58,6 +59,14 @@ export class CreateAccountFormComponent implements OnInit {
 
   get phoneNumberGroup(): FormGroup {
     return this.userForm.get('phoneNumber') as FormGroup;
+  }
+
+  get prefixControl(): FormControl {
+    return this.phoneNumberGroup.get('prefix') as FormControl;
+  }
+
+  get nationalNumberControl(): FormControl {
+    return this.phoneNumberGroup.get('nationalNumber') as FormControl;
   }
 
   hasPhoneNumber = computed(() => {

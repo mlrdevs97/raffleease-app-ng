@@ -1,0 +1,43 @@
+<div class="space-y-2">
+  @if (showLabel) {
+  <label class="block text-sm font-medium text-gray-700">
+    {{ label }}
+    @if (required) {
+    <span class="text-red-500">*</span>
+    }
+  </label>
+  }
+  
+  <div class="flex gap-2">
+    <!-- Country Code Dropdown -->
+    <div class="w-[140px]">
+      <app-dropdown-select 
+        #countryCodeDropdown
+        [options]="countryCodes"
+        [displayAllOption]="false"
+        [placeholder]="defaultValue">
+      </app-dropdown-select>
+      @if (getErrorMessage('prefix')) {
+      <div class="text-red-600 text-xs mt-1">
+        {{ getErrorMessage('prefix') }}
+      </div>
+      }
+    </div>
+    
+    <!-- National Number Input -->
+    <div class="flex-1">
+      <input 
+        type="text"
+        [formControl]="nationalNumberControl"
+        [placeholder]="placeholder"
+        [disabled]="disabled"
+        class="flex h-10 w-full rounded-md border border-input bg-background px-3 py-2 text-sm ring-offset-background file:border-0 file:bg-transparent file:text-sm file:font-medium file:text-foreground placeholder:text-muted-foreground focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2 disabled:cursor-not-allowed disabled:opacity-50"
+        [ngClass]="{'border-red-500 ring-1 ring-red-500': getErrorMessage('nationalNumber')}">
+      @if (getErrorMessage('nationalNumber')) {
+      <div class="text-red-600 text-xs mt-1">
+        {{ getErrorMessage('nationalNumber') }}
+      </div>
+      }
+    </div>
+  </div>
+</div> 

@@ -69,9 +69,6 @@
             {{ getFieldErrorMessage('user', 'associationName') }}
           </div>
           }
-          <div class="text-xs text-gray-500 mt-1">
-            This will be the name of your community association
-          </div>
         </div>
 
         <div>
@@ -87,33 +84,16 @@
           }
         </div>
 
-        <div formGroupName="phoneNumber">
-          <label class="block text-sm font-medium text-gray-700 mb-1">Phone Number (Optional)</label>
-          <div class="grid grid-cols-3 gap-2">
-            <div>
-              <input type="text" formControlName="prefix"
-                class="w-full px-3 py-2 text-sm border border-gray-200 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent"
-                [ngClass]="{'border-rose-500 ring-1 ring-rose-500': userForm.get('phoneNumber.prefix')?.invalid && userForm.get('phoneNumber.prefix')?.touched}"
-                placeholder="+1">
-              @if (userForm.get('phoneNumber.prefix')?.invalid && userForm.get('phoneNumber.prefix')?.touched) {
-              <div class="text-rose-600 text-xs mt-1">
-                Invalid prefix format
-              </div>
-              }
-            </div>
-            <div class="col-span-2">
-              <input type="text" formControlName="nationalNumber"
-                class="w-full px-3 py-2 text-sm border border-gray-200 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent"
-                [ngClass]="{'border-rose-500 ring-1 ring-rose-500': userForm.get('phoneNumber.nationalNumber')?.invalid && userForm.get('phoneNumber.nationalNumber')?.touched}"
-                placeholder="1234567890">
-              @if (userForm.get('phoneNumber.nationalNumber')?.invalid &&
-              userForm.get('phoneNumber.nationalNumber')?.touched) {
-              <div class="text-rose-600 text-xs mt-1">
-                Invalid phone number format
-              </div>
-              }
-            </div>
-          </div>
+        <div>
+          <label for="phoneNumber" class="block text-sm font-medium text-gray-700 mb-1">Phone Number</label>
+          <app-phone-number-input
+            [prefixControl]="userPrefixControl"
+            [nationalNumberControl]="userNationalNumberControl"
+            label="Phone Number"
+            placeholder="Enter phone number"
+            [required]="true"
+            [showLabel]="false">
+          </app-phone-number-input>
         </div>
 
         <div>
@@ -204,110 +184,6 @@
           }
         </button>
       </form>
-
-      <div class="hidden">
-        <!-- Association Form -->
-        <form [formGroup]="associationForm" (ngSubmit)="onSubmit()" class="space-y-5">
-          <div>
-            <label for="associationName" class="block text-sm font-medium text-gray-700 mb-1">Association Name</label>
-            <input id="associationName" type="text" formControlName="associationName"
-              class="w-full px-3 py-2 text-sm border border-gray-200 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent"
-              [ngClass]="{'border-rose-500 ring-1 ring-rose-500': associationForm.controls['associationName'].invalid && associationForm.controls['associationName'].touched}"
-              placeholder="Enter association name">
-            @if (getFieldErrorMessage('association', 'associationName')) {
-            <div class="text-rose-600 text-xs mt-1">
-              {{ getFieldErrorMessage('association', 'associationName') }}
-            </div>
-            }
-          </div>
-
-          <div>
-            <label for="description" class="block text-sm font-medium text-gray-700 mb-1">Description</label>
-            <textarea id="description" formControlName="description" rows="3"
-              class="w-full px-3 py-2 text-sm border border-gray-200 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent"
-              [ngClass]="{'border-rose-500 ring-1 ring-rose-500': associationForm.controls['description'].invalid && associationForm.controls['description'].touched}"
-              placeholder="Describe your association"></textarea>
-            @if (getFieldErrorMessage('association', 'description')) {
-            <div class="text-rose-600 text-xs mt-1">
-              {{ getFieldErrorMessage('association', 'description') }}
-            </div>
-            }
-            <div class="text-xs text-gray-500 mt-1">
-              <span>{{ associationForm.get('description')?.value?.length || 0 }}/500 characters</span>
-            </div>
-          </div>
-
-          <div>
-            <label for="associationEmail" class="block text-sm font-medium text-gray-700 mb-1">Association Email
-              (Optional)</label>
-            <input id="associationEmail" type="email" formControlName="email"
-              class="w-full px-3 py-2 text-sm border border-gray-200 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent"
-              [ngClass]="{'border-rose-500 ring-1 ring-rose-500': associationForm.controls['email'].invalid && associationForm.controls['email'].touched}"
-              placeholder="Enter association email">
-            @if (getFieldErrorMessage('association', 'email')) {
-            <div class="text-rose-600 text-xs mt-1">
-              {{ getFieldErrorMessage('association', 'email') }}
-            </div>
-            }
-          </div>
-
-          <div formGroupName="phoneNumber">
-            <label class="block text-sm font-medium text-gray-700 mb-1">Association Phone (Optional)</label>
-            <div class="grid grid-cols-3 gap-2">
-              <div>
-                <input type="text" formControlName="prefix"
-                  class="w-full px-3 py-2 text-sm border border-gray-200 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent"
-                  [ngClass]="{'border-rose-500 ring-1 ring-rose-500': associationForm.get('phoneNumber.prefix')?.invalid && associationForm.get('phoneNumber.prefix')?.touched}"
-                  placeholder="+1">
-                @if (associationForm.get('phoneNumber.prefix')?.invalid &&
-                associationForm.get('phoneNumber.prefix')?.touched) {
-                <div class="text-rose-600 text-xs mt-1">
-                  Invalid prefix format
-                </div>
-                }
-              </div>
-              <div class="col-span-2">
-                <input type="text" formControlName="nationalNumber"
-                  class="w-full px-3 py-2 text-sm border border-gray-200 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent"
-                  [ngClass]="{'border-rose-500 ring-1 ring-rose-500': associationForm.get('phoneNumber.nationalNumber')?.invalid && associationForm.get('phoneNumber.nationalNumber')?.touched}"
-                  placeholder="1234567890">
-                @if (associationForm.get('phoneNumber.nationalNumber')?.invalid &&
-                associationForm.get('phoneNumber.nationalNumber')?.touched) {
-                <div class="text-rose-600 text-xs mt-1">
-                  Invalid phone number format
-                </div>
-                }
-              </div>
-            </div>
-          </div>
-
-          <div class="flex space-x-3 pt-2">
-            <button (click)="previousStep()"
-              class="flex-1 h-10 px-4 py-2 rounded-md text-sm font-medium border border-input hover:bg-gray-100 hover:text-accent-foreground"
-              type="button">
-              Back
-            </button>
-
-            <button type="submit" [disabled]="associationForm.invalid || isLoading()"
-              class="flex-1 h-10 px-4 py-2 bg-blue-500 text-white font-medium rounded-md hover:bg-blue-600 disabled:hover:bg-blue-500 disabled:cursor-not-allowed">
-              @if (isLoading()) {
-              <span class="flex items-center justify-center">
-                <svg class="animate-spin -ml-1 mr-2 h-4 w-4 text-white" xmlns="http://www.w3.org/2000/svg" fill="none"
-                  viewBox="0 0 24 24">
-                  <circle class="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" stroke-width="4"></circle>
-                  <path class="opacity-75" fill="currentColor"
-                    d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4zm2 5.291A7.962 7.962 0 014 12H0c0 3.042 1.135 5.824 3 7.938l3-2.647z">
-                  </path>
-                </svg>
-                Creating account...
-              </span>
-              } @else {
-              <span>Create Account</span>
-              }
-            </button>
-          </div>
-        </form>
-      </div>
     </div>
 
     <!-- Footer with login link, shown on both steps -->

@@ -33,12 +33,10 @@ export class DropdownSelectComponent implements ControlValueAccessor {
 
     writeValue(value: any): void {
         if (value !== undefined && value !== null) {
-            // Check if the value is one of the options
             const matchedOption = this.options.find(opt => opt === value);
             if (matchedOption) {
                 this.value = matchedOption;
             } else {
-                // If the value is not in options, it might be the raw value
                 this.value = value;
             }
         } else {
