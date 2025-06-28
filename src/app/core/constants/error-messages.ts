@@ -30,10 +30,10 @@ export const ErrorMessages: {
         EMAIL_NO_LONGER_AVAILABLE: 'This email address is no longer available. Please choose a different email address.',
         CURRENT_PASSWORD_INCORRECT: 'Current password is incorrect. Please try again.',
         PASSWORD_SAME_AS_CURRENT: 'The new password must be different from your current password.',
-        ROLE_UPDATE_SELF_DENIED: 'You cannot update your own role.',
+        ROLE_UPDATE_SELF_DENIED: 'Administrators cannot update their own role.',
         ROLE_UPDATE_ADMIN_DENIED: 'Administrator roles cannot be updated.',
         ADMIN_DISABLE_SELF_DENIED: 'You cannot disable your own administrator account.',
-        ADMIN_CREATE_ADMIN_DENIED: 'Administrator accounts cannot be used to create other administrator accounts.'
+        ADMIN_CREATE_ADMIN_DENIED: 'Administrator accounts cannot be used to create other administrator accounts.',
     },
     validation: {
         REQUIRED: 'This field is required',
