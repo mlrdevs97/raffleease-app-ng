@@ -1,5 +1,5 @@
 <div>
-  <ul class="space-y-6">
+  <ul>
     @if (raffles.length === 0) {
     <div class="text-center py-8 text-gray-500">
       <svg class="mx-auto h-12 w-12 text-gray-400" fill="none" viewBox="0 0 24 24" stroke="currentColor">
@@ -10,7 +10,7 @@
     }
 
     @for (raffle of raffles; track raffle.id) {
-    <li>
+    <li class="border-b border-gray-200 py-6"> 
       <app-raffle-card 
         [raffle]="raffle" 
         [associationId]="associationId"

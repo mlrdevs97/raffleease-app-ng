@@ -37,9 +37,7 @@ export class UsersSearchDialogComponent implements OnChanges {
 
   ngOnChanges(changes: SimpleChanges): void {
     if (changes['isOpen'] && changes['isOpen'].currentValue === true) {
-      // Reset form state when dialog opens
       this.resetDialog();
-      // Force change detection to ensure proper rendering
       setTimeout(() => {
         this.cdr.detectChanges();
       }, 0);
