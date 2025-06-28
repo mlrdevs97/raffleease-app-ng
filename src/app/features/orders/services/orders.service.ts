@@ -1,4 +1,4 @@
-import { Injectable, signal, computed } from '@angular/core';
+import { Injectable, signal, computed, inject } from '@angular/core';
 import { HttpClient, HttpParams } from '@angular/common/http';
 import { Observable, finalize, map, of, tap, throwError } from 'rxjs';
 import { OrderSearchFilters, Order } from '../models/order.model';
@@ -9,6 +9,7 @@ import { SuccessResponse } from '../../../core/models/api-response.model';
 import { PageResponse } from '../../../core/models/pagination.model';
 import { environment } from '../../../../environments/environment';
 import { AuthService } from '../../auth/services/auth.service';
+import { RaffleStatisticsUpdateService } from '../../../core/services/raffle-statistics-update.service';
 
 @Injectable({
     providedIn: 'root'
@@ -17,6 +18,7 @@ export class OrdersService {
     private baseUrl = `${environment.apiUrl}/associations`;
     private readonly cache = signal<Map<string, PageResponse<Order>>>(new Map());
     private readonly isLoading = signal(false);
+    private readonly raffleStatisticsUpdateService = inject(RaffleStatisticsUpdateService);
 
     constructor(
         private http: HttpClient,
@@ -128,8 +130,10 @@ export class OrdersService {
             orderComplete
         ).pipe(
             map(response => response.data!),
-            tap(() => {
+            tap((updatedOrder: Order) => {
                 this.clearCache();
+                // Notify raffle statistics to update
+                this.raffleStatisticsUpdateService.notifyRaffleStatisticsUpdate(updatedOrder.raffleSummary.id);
             })
         );
     }
@@ -146,8 +150,10 @@ export class OrdersService {
             {}
         ).pipe(
             map(response => response.data!),
-            tap(() => {
+            tap((updatedOrder: Order) => {
                 this.clearCache();
+                // Notify raffle statistics to update
+                this.raffleStatisticsUpdateService.notifyRaffleStatisticsUpdate(updatedOrder.raffleSummary.id);
             })
         );
     }
@@ -164,8 +170,10 @@ export class OrdersService {
             {}
         ).pipe(
             map(response => response.data!),
-            tap(() => {
+            tap((updatedOrder: Order) => {
                 this.clearCache();
+                // Notify raffle statistics to update
+                this.raffleStatisticsUpdateService.notifyRaffleStatisticsUpdate(updatedOrder.raffleSummary.id);
             })
         );
     }
@@ -182,8 +190,10 @@ export class OrdersService {
             {}
         ).pipe(
             map(response => response.data!),
-            tap(() => {
+            tap((updatedOrder: Order) => {
                 this.clearCache();
+                // Notify raffle statistics to update
+                this.raffleStatisticsUpdateService.notifyRaffleStatisticsUpdate(updatedOrder.raffleSummary.id);
             })
         );
     }
