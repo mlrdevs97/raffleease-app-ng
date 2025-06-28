@@ -4,10 +4,6 @@
         <app-raffle-status-label [status]="raffle.status" />
     </div>
 
-    <div>
-        <p class="mt-1 text-gray-600">{{ raffle.description }}</p>
-    </div>
-
     <!-- Success/Error Messages -->
     @if (successMessage()) {
     <div class="bg-green-50 text-green-800 p-3 mb-6 rounded-md border border-green-200 text-sm">
@@ -20,6 +16,11 @@
         {{ errorMessage() }}
     </div>
     }
+
+
+    <div>
+        <p class="mt-2 text-gray-600">{{ raffle.description }}</p>
+    </div>
 
     <div class="w-full lg:w-3/5">
         <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-1 xl:grid-cols-2 gap-4">
@@ -68,72 +69,44 @@
     </div>
 
     <div class="flex gap-2 w-full sm:w-auto">
-        <app-button
-            variant="secondary"
-            size="sm"
-            customClasses="flex-1 md:flex-initial"
-            (clicked)="onEditClicked()">
+        <app-button variant="secondary" size="sm" customClasses="flex-1 md:flex-initial" (clicked)="onEditClicked()">
             Edit
         </app-button>
 
         @if (raffle.status === RaffleStatus.PENDING) {
-        <app-button
-            variant="primary"
-            size="sm"
-            customClasses="flex-1 md:flex-initial"
-            [disabled]="isUpdatingStatus()"
-            [loading]="isUpdatingStatus() && currentAction() === 'activate'"
-            loadingText="Activating..."
+        <app-button variant="primary" size="sm" customClasses="flex-1 md:flex-initial" [disabled]="isUpdatingStatus()"
+            [loading]="isUpdatingStatus() && currentAction() === 'activate'" loadingText="Activating..."
             (clicked)="onActivateClicked()">
             Activate
         </app-button>
         }
 
         @if (raffle.status === RaffleStatus.ACTIVE) {
-        <app-button
-            variant="primary"
-            size="sm"
-            customClasses="flex-1 md:flex-initial"
-            [disabled]="isUpdatingStatus()"
-            [loading]="isUpdatingStatus() && currentAction() === 'pause'"
-            loadingText="Pausing..."
+        <app-button variant="primary" size="sm" customClasses="flex-1 md:flex-initial" [disabled]="isUpdatingStatus()"
+            [loading]="isUpdatingStatus() && currentAction() === 'pause'" loadingText="Pausing..."
             (clicked)="onPauseClicked()">
             Pause
         </app-button>
         }
 
         @if (raffle.status === RaffleStatus.PAUSED) {
-        <app-button
-            variant="primary"
-            size="sm"
-            customClasses="flex-1 md:flex-initial"
-            [disabled]="isUpdatingStatus()"
-            [loading]="isUpdatingStatus() && currentAction() === 'reactivate'"
-            loadingText="Reactivating..."
+        <app-button variant="primary" size="sm" customClasses="flex-1 md:flex-initial" [disabled]="isUpdatingStatus()"
+            [loading]="isUpdatingStatus() && currentAction() === 'reactivate'" loadingText="Reactivating..."
             (clicked)="onReactivateClicked()">
             Reactivate
         </app-button>
         }
 
         @if (raffle.status === RaffleStatus.PENDING) {
-        <app-button
-            variant="destructive"
-            size="sm"
-            customClasses="flex-1 md:flex-initial"
-            [disabled]="isUpdatingStatus() || isDeleting()"
-            [loading]="isDeleting()"
-            loadingText="Deleting..."
+        <app-button variant="destructive" size="sm" customClasses="flex-1 md:flex-initial"
+            [disabled]="isUpdatingStatus() || isDeleting()" [loading]="isDeleting()" loadingText="Deleting..."
             (clicked)="onDeleteClicked()">
             Delete
         </app-button>
         }
     </div>
-    
+
     <!-- Confirmation Dialog -->
-    <app-confirmation-dialog 
-        [isOpen]="showConfirmationDialog" 
-        [data]="confirmationDialogData"
-        [isLoading]="isLoading" 
-        (confirmed)="onConfirmationConfirmed()"
-        (cancelled)="onConfirmationCancelled()" />
+    <app-confirmation-dialog [isOpen]="showConfirmationDialog" [data]="confirmationDialogData" [isLoading]="isLoading"
+        (confirmed)="onConfirmationConfirmed()" (cancelled)="onConfirmationCancelled()" />
 </div>
