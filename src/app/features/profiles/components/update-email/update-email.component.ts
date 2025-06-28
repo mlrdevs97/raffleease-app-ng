@@ -1,4 +1,4 @@
-import { Component, Input, Output, EventEmitter, OnChanges, signal, inject } from '@angular/core';
+import { Component, Input, Output, EventEmitter, OnChanges, SimpleChanges, signal, inject } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { ReactiveFormsModule, FormBuilder, FormGroup, Validators } from '@angular/forms';
 import { ButtonComponent } from '../../../../shared/components/button/button.component';
@@ -48,7 +48,13 @@ export class UpdateEmailComponent implements OnChanges {
     return this.successMessage() === SuccessMessages.profile.emailUpdated;
   }
 
-  ngOnChanges(): void {
+  ngOnChanges(changes: SimpleChanges): void {
+    if (changes['userProfile'] && this.userProfile?.email) {
+      this.emailForm.patchValue({
+        newEmail: this.userProfile.email
+      });
+    }
+
     if (this.showEmailVerificationSuccess) {
       this.successMessage.set(SuccessMessages.profile.emailUpdated);
       this.errorMessage.set(null); // Clear any previous errors

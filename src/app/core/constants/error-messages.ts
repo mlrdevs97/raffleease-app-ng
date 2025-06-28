@@ -63,26 +63,32 @@ export const ErrorMessages: {
     dedicated: {
         'userData.email': {
             UNIQUE: 'This email is already registered',
+            VALUE_ALREADY_EXISTS: 'This email is already registered',
             REQUIRED: 'Email is required'
         },
         'userData.userName': {
             UNIQUE: 'This username is already taken',
+            VALUE_ALREADY_EXISTS: 'This username is already taken',
             REQUIRED: 'Username is required'
         },
         'userData.phoneNumber': {
             UNIQUE: 'This phone number is already registered',
+            VALUE_ALREADY_EXISTS: 'This phone number is already registered',
             REQUIRED: 'Phone number is required'
         },
         'associationData.associationName': {
             UNIQUE: 'This association name is already taken',
+            VALUE_ALREADY_EXISTS: 'This association name is already taken',
             REQUIRED: 'Association name is required'
         },
         'associationData.email': {
             UNIQUE: 'This email is already registered for another association',
+            VALUE_ALREADY_EXISTS: 'This email is already registered for another association',
             REQUIRED: 'Email is required'
         },
         'associationData.phoneNumber': {
             UNIQUE: 'This phone number is already registered for another association',
+            VALUE_ALREADY_EXISTS: 'This phone number is already registered for another association',
             REQUIRED: 'Phone number is required'
         },
         'files': {
@@ -145,6 +151,7 @@ export const ErrorMessages: {
         'customerInformation.email': {
             REQUIRED: 'Email is required',
             INVALID_EMAIL: 'Please enter a valid email address',
+            VALUE_ALREADY_EXISTS: 'This email address is already in use',
             MAXLENGTH: 'Email must be less than 100 characters'
         },
         'email': {

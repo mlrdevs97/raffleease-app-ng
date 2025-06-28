@@ -197,7 +197,7 @@
 
     <!-- Form Actions -->
     <div class="flex justify-end space-x-4 pt-6">
-        <app-button variant="gray" size="md" routerLink="/accounts" [disabled]="isLoading()">
+        <app-button variant="secondary" size="md" routerLink="/accounts" [disabled]="isLoading()">
             Cancel
         </app-button>
         <app-button variant="primary" size="md" type="submit" [disabled]="userForm.invalid || isLoading()"

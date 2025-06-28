@@ -70,6 +70,9 @@ export class CreateAccountFormComponent implements OnInit {
     const control = this.userForm.get(fieldName);
     if (control && control.invalid && (control.dirty || control.touched)) {
       const errors = control.errors;
+      
+      if (errors?.['serverError']) return errors['serverError'];
+      
       if (errors?.['required']) return `${this.getFieldLabel(fieldName)} is required`;
       if (errors?.['email']) return 'Please enter a valid email address';
       if (errors?.['minlength']) return `${this.getFieldLabel(fieldName)} must be at least ${errors['minlength'].requiredLength} characters`;
@@ -78,7 +81,6 @@ export class CreateAccountFormComponent implements OnInit {
         if (fieldName === 'password') return 'Password must contain at least one uppercase letter, one lowercase letter, one number, and one special character';
         return `${this.getFieldLabel(fieldName)} format is invalid`;
       }
-      if (errors?.['serverError']) return errors['serverError'];
     }
     
     // Check for form-level password mismatch error
@@ -162,7 +164,22 @@ export class CreateAccountFormComponent implements OnInit {
 
   private applyFieldErrors(errors: Record<string, string>): void {
     Object.keys(errors).forEach(fieldPath => {
-      const control = this.userForm.get(fieldPath);
+      // Handle nested field paths like 'userData.email' -> 'email'
+      let controlPath = fieldPath;
+      
+      // Map server field paths to form control paths
+      if (fieldPath === 'userData.email') {
+        controlPath = 'email';
+      } else if (fieldPath === 'userData.userName') {
+        controlPath = 'username';
+      } else if (fieldPath === 'userData.phoneNumber') {
+        controlPath = 'phoneNumber';
+      } else if (fieldPath.startsWith('userData.')) {
+        // Remove 'userData.' prefix for other fields
+        controlPath = fieldPath.replace('userData.', '');
+      }
+      
+      const control = this.userForm.get(controlPath);
       if (control) {
         control.markAsTouched();
         control.setErrors({ serverError: errors[fieldPath] });
