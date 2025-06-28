@@ -22,6 +22,16 @@ export const SuccessMessages = {
     phoneUpdated: 'Phone number updated successfully',
     passwordChanged: 'Your password has been changed successfully.'
   },
+
+  /**
+   * User management success messages
+   */
+  userManagement: {
+    roleUpdated: 'User role updated successfully!',
+    statusUpdated: 'User status updated successfully!',
+    userCreated: 'User account created successfully!',
+    userDeleted: 'User account deleted successfully!'
+  },
   
   /**
    * Transaction success messages

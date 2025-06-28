@@ -1,4 +1,4 @@
-import { Component, Input, Output, EventEmitter, signal, inject, OnInit, computed } from '@angular/core';
+import { Component, Input, Output, EventEmitter, signal, inject, OnInit, OnDestroy, computed } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { FormControl, ReactiveFormsModule } from '@angular/forms';
 import { ButtonComponent } from '../../../../shared/components/button/button.component';
@@ -8,6 +8,7 @@ import { ErrorHandlerService } from '../../../../core/services/error-handler.ser
 import { AssociationRole, User } from '../../../../core/models/user.model';
 import { ManageAccountsService } from '../../../manage-accounts/services/manage-accounts.services';
 import { ConfirmationMessages } from '../../../../core/constants/confirmation-messages';
+import { SuccessMessages } from '../../../../core/constants/success-messages';
 import { formatName } from '../../../../core/utils/text-format.utils';
 
 type ConfirmationType = 'role' | 'status';
@@ -18,7 +19,7 @@ type ConfirmationType = 'role' | 'status';
   imports: [CommonModule, ButtonComponent, DropdownSelectComponent, ConfirmationDialogComponent, ReactiveFormsModule],
   templateUrl: './user-card.component.html',
 })
-export class UserCardComponent implements OnInit {
+export class UserCardComponent implements OnInit, OnDestroy {
   private readonly manageAccountsService = inject(ManageAccountsService);
   private readonly errorHandler = inject(ErrorHandlerService);
 
@@ -28,6 +29,7 @@ export class UserCardComponent implements OnInit {
   isUpdatingStatus = signal(false);
   isUpdatingRole = signal(false);
   errorMessage = signal<string | null>(null);
+  successMessage = signal<string | null>(null);
   showConfirmDialog = signal(false);
   selectedRole = signal<string>('');
   confirmationType = signal<ConfirmationType>('role');
@@ -42,6 +44,8 @@ export class UserCardComponent implements OnInit {
   // Writable signal for loading state in confirmation dialog
   isConfirmationLoading = signal(false);
 
+  private messageTimeoutId?: number;
+
   ngOnInit(): void {
     this.roleControl.setValue(this.user.role);
     
@@ -50,6 +54,33 @@ export class UserCardComponent implements OnInit {
         this.onRoleChange(newRole);
       }
     });
+  }
+
+  ngOnDestroy(): void {
+    if (this.messageTimeoutId) {
+      clearTimeout(this.messageTimeoutId);
+    }
+  }
+
+  private showTemporaryMessage(message: string, type: 'success' | 'error', duration: number = 3000): void {
+    if (this.messageTimeoutId) {
+      clearTimeout(this.messageTimeoutId);
+    }
+
+    this.errorMessage.set(null);
+    this.successMessage.set(null);
+
+    if (type === 'success') {
+      this.successMessage.set(message);
+    } else {
+      this.errorMessage.set(message);
+    }
+
+    this.messageTimeoutId = window.setTimeout(() => {
+      this.successMessage.set(null);
+      this.errorMessage.set(null);
+      this.messageTimeoutId = undefined;
+    }, duration);
   }
 
   getRoleClass(role: AssociationRole): string {
@@ -98,7 +129,6 @@ export class UserCardComponent implements OnInit {
 
   private executeStatusToggle(): void {
     this.isUpdatingStatus.set(true);
-    this.errorMessage.set(null);
 
     const operation = this.user.isEnabled 
       ? this.manageAccountsService.disableUser(this.user.id)
@@ -114,12 +144,13 @@ export class UserCardComponent implements OnInit {
         this.isUpdatingStatus.set(false);
         this.isConfirmationLoading.set(false);
         this.showConfirmDialog.set(false);
+        this.showTemporaryMessage(SuccessMessages.userManagement.statusUpdated, 'success');
       },
       error: (error: any) => {
-        this.errorMessage.set(this.errorHandler.getErrorMessage(error));
         this.isUpdatingStatus.set(false);
         this.isConfirmationLoading.set(false);
         this.showConfirmDialog.set(false);
+        this.showTemporaryMessage(this.errorHandler.getErrorMessage(error), 'error');
       }
     });
   }
@@ -181,7 +212,6 @@ export class UserCardComponent implements OnInit {
     if (!newRole) return;
 
     this.isUpdatingRole.set(true);
-    this.errorMessage.set(null);
 
     this.manageAccountsService.updateUserRole(this.user.id, newRole as AssociationRole).subscribe({
       next: (updatedUser: User) => {
@@ -191,19 +221,19 @@ export class UserCardComponent implements OnInit {
         this.showConfirmDialog.set(false);
         this.selectedRole.set('');
         this.roleControl.setValue(updatedUser.role, { emitEvent: false });
+        this.showTemporaryMessage(SuccessMessages.userManagement.roleUpdated, 'success');
       },
       error: (error: any) => {
-        this.errorMessage.set(this.errorHandler.getErrorMessage(error));
         this.isUpdatingRole.set(false);
         this.isConfirmationLoading.set(false);
         this.showConfirmDialog.set(false);
         this.selectedRole.set('');
         this.roleControl.setValue(this.user.role, { emitEvent: false });
+        this.showTemporaryMessage(this.errorHandler.getErrorMessage(error), 'error');
       }
     });
   }
 
-  // Keep these methods for backward compatibility with the template
   onConfirmRoleUpdate(): void {
     this.onConfirmAction();
   }
