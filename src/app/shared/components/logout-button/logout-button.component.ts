@@ -8,15 +8,9 @@ import { CommonModule } from '@angular/common';
   templateUrl: './logout-button.component.html',
 })
 export class LogoutButtonComponent {
-  // Input signal for loading state
-  isLoading = input<boolean>(false);
-  
-  // Output event for logout action
+  isLoading = input<boolean>(false);  
   logoutClicked = output<void>();
 
-  /**
-   * Handles the logout button click
-   */
   onLogout(): void {
     if (this.isLoading()) return;
     this.logoutClicked.emit();
