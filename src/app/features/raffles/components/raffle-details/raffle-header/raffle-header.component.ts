@@ -134,17 +134,19 @@ export class RaffleHeaderComponent implements OnInit, OnDestroy {
         this.isDeleting.set(false);
         this.isLoading.set(false);
         this.currentAction.set(null);
-        this.successMessage.set('Raffle deleted successfully');
         
-        // Navigate back to raffles list after a short delay
         setTimeout(() => {
           this.raffleDeleted.emit();
           if (this.associationId) {
-            this.router.navigate(['/associations', this.associationId, 'raffles']);
+            this.router.navigate(['/associations', this.associationId, 'raffles'], {
+              queryParams: { success: 'Raffle deleted successfully' }
+            });
           } else {
-            this.router.navigate(['/raffles']);
+            this.router.navigate(['/raffles'], {
+              queryParams: { success: 'Raffle deleted successfully' }
+            });
           }
-        }, 1000);
+        }, 500);
       },
       error: (error) => {
         this.isDeleting.set(false);
@@ -179,27 +181,20 @@ export class RaffleHeaderComponent implements OnInit, OnDestroy {
       next: (response: SuccessResponse<Raffle>) => {
         this.successMessage.set(successMessage);
         if (response.data) {
-          // Update the local raffle data to reflect the status change
           this.raffle = { ...this.raffle, status: response.data.status };
-          // Update cache with the new raffle data
           this.raffleQueryService.updateRaffleCache(this.raffle.id, response.data);
-          // Emit the updated raffle data to parent components
           this.raffleUpdated.emit(response.data);
         }
         this.isUpdatingStatus.set(false);
         this.isLoading.set(false);
-        this.currentAction.set(null);
-        
-        // Clear success message after 5 seconds
+        this.currentAction.set(null);        
         setTimeout(() => this.successMessage.set(null), 5000);
       },
       error: (error: unknown) => {
         this.errorMessage.set(this.errorHandler.getErrorMessage(error));
         this.isUpdatingStatus.set(false);
         this.isLoading.set(false);
-        this.currentAction.set(null);
-        
-        // Clear error message after 8 seconds
+        this.currentAction.set(null);        
         setTimeout(() => this.errorMessage.set(null), 8000);
       }
     });

@@ -147,7 +147,7 @@ export const ErrorMessages: {
             INVALID_EMAIL: 'Please enter a valid email address',
             MAXLENGTH: 'Email must be less than 100 characters'
         },
-        'newEmail': {
+        'email': {
             REQUIRED: 'New email is required',
             INVALID_EMAIL: 'Please enter a valid email address',
             VALUE_ALREADY_EXISTS: 'This email address is already in use',

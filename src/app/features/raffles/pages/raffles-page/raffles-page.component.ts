@@ -9,6 +9,7 @@ import { ErrorHandlerService } from '../../../../core/services/error-handler.ser
 import { RaffleSearchFilters } from '../../models/raffle-search.model';
 import { PageResponse } from '../../../../core/models/pagination.model';
 import { ActivatedRoute, Params, Router } from '@angular/router';
+import { SuccessMessages } from '../../../../core/constants/success-messages';
 
 @Component({
   selector: 'app-raffles-page',
@@ -31,6 +32,7 @@ export class RafflesPageComponent implements OnInit, OnDestroy {
     pageSize: 20
   });
   errorMessage = signal<string | null>(null);
+  successMessage = signal<string | null>(null);
   associationId = signal<number>(0);
 
   searchTerm = signal<string>('');
@@ -45,6 +47,7 @@ export class RafflesPageComponent implements OnInit, OnDestroy {
     public raffleSearchService: RaffleSearchService,
     private errorHandler: ErrorHandlerService,
     private route: ActivatedRoute,
+    private router: Router,
   ) { }
 
   private filters = computed(() => {
@@ -70,13 +73,26 @@ export class RafflesPageComponent implements OnInit, OnDestroy {
     this.sortBy.set('createdAt');
     this.sortDirection.set('desc');
 
-    // Check for error message from query parameters
     this.route.queryParams.subscribe((params: Params) => {
+      if (params['success']) {
+        this.successMessage.set(params['success']);
+        this.router.navigate([], {
+          relativeTo: this.route,
+          queryParams: { success: null },
+          queryParamsHandling: 'merge',
+          replaceUrl: true
+        });
+        setTimeout(() => this.successMessage.set(null), 5000);
+        this.loadRaffles();
+        return;
+      }
+      
       if (params['error']) {
         console.error('Error loading raffles:', params['error']);
         this.errorMessage.set(params['error']);
         return;
       }
+      
       this.loadRaffles();
     });
   }
@@ -167,6 +183,11 @@ export class RafflesPageComponent implements OnInit, OnDestroy {
       totalElements: current.totalElements - 1
     }));
 
+    // Show success message for raffle deletion
+    this.successMessage.set(SuccessMessages.raffle.deleted);
+    // Auto-clear success message after 5 seconds
+    setTimeout(() => this.successMessage.set(null), 5000);
+
     if (updatedRaffles.length === 0 && this.pagination().currentPage > 0) {
       this.loadRaffles(this.pagination().currentPage - 1);
     }
@@ -182,5 +203,10 @@ export class RafflesPageComponent implements OnInit, OnDestroy {
 
   get noSearchResults() {
     return this.raffleSearchService.noSearchResults();
+  }
+
+  private clearMessages(): void {
+    this.errorMessage.set(null);
+    this.successMessage.set(null);
   }
 } 

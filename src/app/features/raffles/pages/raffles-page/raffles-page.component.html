@@ -12,6 +12,12 @@
     </app-raffles-header>
   </div>
 
+  @if (successMessage()) {
+    <div class="bg-green-50 text-green-800 p-3 mb-6 rounded-md border border-green-200 text-sm">
+      {{ successMessage() }}
+    </div>
+  }
+
   @if (errorMessage()) {
     <div class="bg-rose-100 text-rose-700 p-3 mb-6 rounded-md border border-rose-200 text-sm">
       {{ errorMessage() }}

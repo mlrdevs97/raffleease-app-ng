@@ -86,7 +86,7 @@ export class OrderDetailHeaderComponent {
         {
           action: 'refund',
           text: 'Refund Order',
-          variant: 'gray',
+          variant: 'primary',
           loadingText: 'Refunding...'
         }
       ];
