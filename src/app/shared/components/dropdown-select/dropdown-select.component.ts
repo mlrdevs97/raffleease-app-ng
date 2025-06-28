@@ -1,4 +1,4 @@
-import { Component, Input, Self, Optional, ElementRef, HostListener, ViewChild } from '@angular/core';
+import { Component, Input, Self, Optional, ElementRef, HostListener, ViewChild, ChangeDetectorRef } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { ControlValueAccessor, NgControl, ReactiveFormsModule } from '@angular/forms';
 
@@ -24,7 +24,8 @@ export class DropdownSelectComponent implements ControlValueAccessor {
 
     constructor(
         @Optional() @Self() public ngControl: NgControl,
-        private elementRef: ElementRef
+        private elementRef: ElementRef,
+        private cdr: ChangeDetectorRef
     ) {
         if (this.ngControl) {
             this.ngControl.valueAccessor = this;
@@ -32,7 +33,7 @@ export class DropdownSelectComponent implements ControlValueAccessor {
     }
 
     writeValue(value: any): void {
-        if (value !== undefined && value !== null) {
+        if (value !== undefined && value !== null && value !== '') {
             const matchedOption = this.options.find(opt => opt === value);
             if (matchedOption) {
                 this.value = matchedOption;
@@ -42,6 +43,8 @@ export class DropdownSelectComponent implements ControlValueAccessor {
         } else {
             this.value = '';
         }
+        
+        this.cdr.markForCheck();
     }
 
     registerOnChange(fn: (value: string) => void): void {
@@ -76,20 +79,22 @@ export class DropdownSelectComponent implements ControlValueAccessor {
     }
 
     selectOption(option: string): void {
-        this.value = option;
-        this.onChange(option);
+        const valueToEmit = option === 'ANY' ? '' : option;
+        this.value = valueToEmit;
+        this.onChange(valueToEmit);
         this.onTouched();
         this.isOpen = false;
-        this.focusedIndex = -1;
+        this.focusedIndex = -1;        
+        this.cdr.markForCheck();
     }
 
     get displayValue(): string {
+        if (!this.value && this.displayAllOption) {
+            return 'ANY';
+        }
         return this.value || this.placeholder;
     }
 
-    /**
-     * Get all available options including 'ANY' if displayAllOption is true
-     */
     get allOptions(): string[] {
         const options = [...this.options];
         if (this.displayAllOption) {
@@ -98,57 +103,53 @@ export class DropdownSelectComponent implements ControlValueAccessor {
         return options;
     }
 
-    /**
-     * Check if an option is currently focused
-     */
+    isOptionSelected(option: string): boolean {
+        if (option === 'ANY') {
+            return !this.value; 
+        }
+        return this.value === option;
+    }
+
     isOptionFocused(option: string): boolean {
         const allOptions = this.allOptions;
         return this.focusedIndex >= 0 && allOptions[this.focusedIndex] === option;
     }
 
-    /**
-     * Set focus to the currently selected option when dropdown opens
-     */
     private setFocusToSelectedOption(): void {
-        if (this.value) {
-            const allOptions = this.allOptions;
-            const selectedIndex = allOptions.findIndex(option => option === this.value);
-            if (selectedIndex >= 0) {
-                this.focusedIndex = selectedIndex;
-            }
+        const allOptions = this.allOptions;
+        let selectedIndex = -1;
+        
+        if (!this.value && this.displayAllOption) {
+            selectedIndex = allOptions.findIndex(option => option === 'ANY');
+        } else if (this.value) {
+            selectedIndex = allOptions.findIndex(option => option === this.value);
+        }
+        
+        if (selectedIndex >= 0) {
+            this.focusedIndex = selectedIndex;
         }
     }
 
-    /**
-     * Move focus to the next option
-     */
     private focusNextOption(): void {
         const allOptions = this.allOptions;
         if (allOptions.length === 0) return;
 
         if (this.focusedIndex === -1) {
-            // No option focused, focus the first option
             this.focusedIndex = 0;
         } else if (this.focusedIndex < allOptions.length - 1) {
             this.focusedIndex++;
         } else {
-            // Wrap to first option
             this.focusedIndex = 0;
         }
 
-        // Scroll the focused option into view
         this.scrollFocusedOptionIntoView();
     }
 
-    /**
-     * Move focus to the previous option
-     */
     private focusPreviousOption(): void {
         const allOptions = this.allOptions;
         if (allOptions.length === 0) return;
 
         if (this.focusedIndex === -1) {
-            // No option focused, focus the last option
             this.focusedIndex = allOptions.length - 1;
         } else if (this.focusedIndex > 0) {
             this.focusedIndex--;
@@ -156,17 +157,13 @@ export class DropdownSelectComponent implements ControlValueAccessor {
             this.focusedIndex = allOptions.length - 1;
         }
 
-        // Scroll the focused option into view
+        // Scroll thefocused option into view
         this.scrollFocusedOptionIntoView();
     }
 
-    /**
-     * Scroll the currently focused option into view
-     */
     private scrollFocusedOptionIntoView(): void {
         if (this.focusedIndex < 0) return;
 
-        // Use setTimeout to ensure the DOM has been updated
         setTimeout(() => {
             const container = this.elementRef.nativeElement.querySelector('[role="presentation"].overflow-auto');
             if (!container) return;
@@ -178,27 +175,19 @@ export class DropdownSelectComponent implements ControlValueAccessor {
 
             const containerRect = container.getBoundingClientRect();
             const elementRect = focusedElement.getBoundingClientRect();
-
-            // Calculate relative positions within the container
             const elementTop = elementRect.top - containerRect.top + container.scrollTop;
             const elementBottom = elementTop + elementRect.height;
             const containerScrollTop = container.scrollTop;
             const containerScrollBottom = containerScrollTop + container.clientHeight;
 
-            // Check if element is above the visible area
             if (elementTop < containerScrollTop) {
                 container.scrollTop = elementTop;
-            }
-            // Check if element is below the visible area
-            else if (elementBottom > containerScrollBottom) {
+            } else if (elementBottom > containerScrollBottom) {
                 container.scrollTop = elementBottom - container.clientHeight;
             }
         }, 0);
     }
 
-    /**
-     * Select the currently focused option
-     */
     private selectFocusedOption(): void {
         const allOptions = this.allOptions;
         if (this.focusedIndex >= 0 && this.focusedIndex < allOptions.length) {
@@ -207,7 +196,6 @@ export class DropdownSelectComponent implements ControlValueAccessor {
         }
     }
 
-    // Close dropdown when clicking outside
     @HostListener('document:click', ['$event'])
     onClickOutside(event: Event): void {
         if (!this.elementRef.nativeElement.contains(event.target) && this.isOpen) {
@@ -216,7 +204,6 @@ export class DropdownSelectComponent implements ControlValueAccessor {
         }
     }
     
-    // Close dropdown when pressing ESC key
     @HostListener('document:keydown.escape', ['$event'])
     onEscKeydown(event: KeyboardEvent): void {
         if (this.isOpen) {
@@ -226,33 +213,28 @@ export class DropdownSelectComponent implements ControlValueAccessor {
         }
     }
 
-    // Handle arrow down key
     @HostListener('keydown.arrowdown', ['$event'])
     onArrowDown(event: KeyboardEvent): void {
         if (this.isOpen) {
             event.preventDefault();
             this.focusNextOption();
         } else if (!this.isDisabled) {
-            // Open dropdown if closed
             event.preventDefault();
             this.toggleDropdown();
         }
     }
 
-    // Handle arrow up key
     @HostListener('keydown.arrowup', ['$event'])
     onArrowUp(event: KeyboardEvent): void {
         if (this.isOpen) {
             event.preventDefault();
             this.focusPreviousOption();
         } else if (!this.isDisabled) {
-            // Open dropdown if closed
             event.preventDefault();
             this.toggleDropdown();
         }
     }
 
-    // Handle enter key
     @HostListener('keydown.enter', ['$event'])
     onEnterKey(event: KeyboardEvent): void {
         if (this.isOpen && this.focusedIndex >= 0) {
@@ -264,7 +246,6 @@ export class DropdownSelectComponent implements ControlValueAccessor {
         }
     }
 
-    // Handle space key
     @HostListener('keydown.space', ['$event'])
     onSpaceKey(event: KeyboardEvent): void {
         if (this.isOpen && this.focusedIndex >= 0) {

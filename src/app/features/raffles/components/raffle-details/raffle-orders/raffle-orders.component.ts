@@ -23,6 +23,7 @@ export class RaffleOrdersComponent implements OnInit {
   errorMessage = signal<string | null>(null);
   raffleOrders = computed(() => this.orders().slice(0, 5));
   hasMoreOrders = computed(() => this.orders().length > 5);
+  isInSearchMode = computed(() => !!this.raffleId);
   
   isRaffleActiveForOrders = computed(() => {
     return this.raffle()?.status === RaffleStatus.ACTIVE;

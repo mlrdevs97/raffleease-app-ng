@@ -26,7 +26,7 @@
                 @if (displayAllOption) {
                 <div role="option"
                     [id]="'option-0'"
-                    [attr.aria-selected]="value === 'ANY'"
+                    [attr.aria-selected]="isOptionSelected('ANY')"
                     tabindex="-1"
                     class="relative flex w-full cursor-pointer select-none items-center rounded-sm py-1.5 pl-8 pr-2 text-sm outline-none transition-colors duration-150"
                     [class.bg-slate-100]="isOptionFocused('ANY')"
@@ -35,7 +35,7 @@
                     [class.hover:text-slate-800]="!isOptionFocused('ANY')"
                     (click)="selectOption('ANY')">
                     <span class="absolute left-2 flex h-3.5 w-3.5 items-center justify-center">
-                        @if (value === 'ANY') {
+                        @if (isOptionSelected('ANY')) {
                         <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24"
                             viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"
                             class="lucide lucide-check h-4 w-4 text-slate-600">
@@ -50,17 +50,17 @@
                 @for (option of options; track option; let i = $index) {
                 <div role="option" 
                     [id]="'option-' + (displayAllOption ? i + 1 : i)"
-                    [attr.aria-selected]="value === option"
+                    [attr.aria-selected]="isOptionSelected(option)"
                     tabindex="-1" 
                     (click)="selectOption(option)"
                     class="relative flex w-full cursor-pointer select-none items-center rounded-sm py-1.5 pl-8 pr-2 text-sm outline-none transition-colors duration-150"
-                    [class.bg-slate-50]="value === option && !isOptionFocused(option)"
+                    [class.bg-slate-50]="isOptionSelected(option) && !isOptionFocused(option)"
                     [class.bg-slate-100]="isOptionFocused(option)"
                     [class.text-slate-800]="isOptionFocused(option)"
                     [class.hover:bg-slate-100]="!isOptionFocused(option)"
                     [class.hover:text-slate-800]="!isOptionFocused(option)">
                     <span class="absolute left-2 flex h-3.5 w-3.5 items-center justify-center">
-                        @if (value === option) {
+                        @if (isOptionSelected(option)) {
                         <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none"
                             stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"
                             class="lucide lucide-check h-4 w-4 text-slate-600">

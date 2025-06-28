@@ -39,6 +39,7 @@ export class OrdersPageComponent implements OnInit {
 
     isSearchDialogOpen = signal<boolean>(false);
     currentFilters = signal<OrderSearchFilters>({});
+    isInSearchMode = computed(() => Object.keys(this.currentFilters()).length > 0);
 
     constructor(
         private ordersService: OrdersService,

@@ -39,7 +39,9 @@
         <app-orders-search-order-info
             [criteria]="criteria"
             [fieldErrors]="fieldErrors"
-            (criteriaChange)="onOrderInfoCriteriaChange($event)"></app-orders-search-order-info>
+            [resetEvent]="resetEvent"
+            (criteriaChange)="onOrderInfoCriteriaChange($event)"
+            (hasInteraction)="onOrderInfoInteraction($event)"></app-orders-search-order-info>
     </div>
 
     <div [hidden]="activeTab !== 'payment'"

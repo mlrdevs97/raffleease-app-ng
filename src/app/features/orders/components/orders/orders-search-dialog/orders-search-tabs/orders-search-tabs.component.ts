@@ -24,18 +24,15 @@ export class OrdersSearchTabsComponent implements OnChanges, OnInit, OnDestroy {
     @Input() resetEvent!: EventEmitter<void>;
     @Input() fieldErrors: Record<string, string> = {};
     @Output() criteriaChange = new EventEmitter<OrderSearchFilters>();
+    @Output() hasInteraction = new EventEmitter<boolean>();
     
     activeTab: 'order' | 'payment' | 'customer' | 'dates' = 'order';
     private resetSubscription?: Subscription;
 
     ngOnInit(): void {
-        // Subscribe to reset events
         if (this.resetEvent) {
             this.resetSubscription = this.resetEvent.subscribe(() => {
-                // Reset active tab to default
                 this.activeTab = 'order';
-                
-                // Propagate empty criteria to child components
                 this.criteriaChange.emit({});
             });
         }
@@ -49,20 +46,16 @@ export class OrdersSearchTabsComponent implements OnChanges, OnInit, OnDestroy {
     }
 
     ngOnChanges(changes: SimpleChanges): void {
-        // Detect when criteria is reset to an empty object
         if (changes['criteria'] && 
             Object.keys(changes['criteria'].currentValue || {}).length === 0 && 
             Object.keys(changes['criteria'].previousValue || {}).length > 0) {
             
-            // Reset activeTab to default
             this.activeTab = 'order';
         }
         
-        // If field errors appear, switch to the tab containing the error
         if (changes['fieldErrors'] && this.fieldErrors) {
             const errorFields = Object.keys(this.fieldErrors);
             if (errorFields.length > 0) {
-                // Determine which tab to activate based on field names with errors
                 if (errorFields.some(field => field.startsWith('order.') || field === 'raffleId')) {
                     this.activeTab = 'order';
                 } else if (errorFields.some(field => field.startsWith('payment.') || field.includes('amount'))) {
@@ -81,22 +74,78 @@ export class OrdersSearchTabsComponent implements OnChanges, OnInit, OnDestroy {
     }
     
     onOrderInfoCriteriaChange(orderCriteria: Partial<OrderSearchFilters>): void {
-        this.criteria = { ...this.criteria, ...orderCriteria };
+        const updatedCriteria = { ...this.criteria };        
+        const orderFields = ['status', 'orderReference', 'raffleId'];
+        
+        orderFields.forEach(field => {
+            delete updatedCriteria[field as keyof OrderSearchFilters];
+        });
+        
+        Object.entries(orderCriteria).forEach(([key, value]) => {
+            if (value !== undefined && value !== null && value !== '') {
+                updatedCriteria[key as keyof OrderSearchFilters] = value as any;
+            }
+        });
+        
+        this.criteria = updatedCriteria;
         this.criteriaChange.emit(this.criteria);
     }
     
+    onOrderInfoInteraction(hasInteraction: boolean): void {
+        this.hasInteraction.emit(hasInteraction);
+    }
+    
     onPaymentInfoCriteriaChange(paymentCriteria: Partial<OrderSearchFilters>): void {
-        this.criteria = { ...this.criteria, ...paymentCriteria };
+        const updatedCriteria = { ...this.criteria };        
+        const paymentFields = ['paymentStatus', 'paymentMethod', 'amount', 'minAmount', 'maxAmount'];
+        
+        paymentFields.forEach(field => {
+            delete updatedCriteria[field as keyof OrderSearchFilters];
+        });
+        
+        Object.entries(paymentCriteria).forEach(([key, value]) => {
+            if (value !== undefined && value !== null && value !== '') {
+                updatedCriteria[key as keyof OrderSearchFilters] = value as any;
+            }
+        });
+        
+        this.criteria = updatedCriteria;
         this.criteriaChange.emit(this.criteria);
     }
     
     onCustomerCriteriaChange(customerCriteria: Partial<OrderSearchFilters>): void {
-        this.criteria = { ...this.criteria, ...customerCriteria };
+        const updatedCriteria = { ...this.criteria };
+        const customerFields = ['customerEmail', 'customerName', 'customerId'];
+        
+        customerFields.forEach(field => {
+            delete updatedCriteria[field as keyof OrderSearchFilters];
+        });
+        
+        Object.entries(customerCriteria).forEach(([key, value]) => {
+            if (value !== undefined && value !== null && value !== '') {
+                updatedCriteria[key as keyof OrderSearchFilters] = value as any;
+            }
+        });
+        
+        this.criteria = updatedCriteria;
         this.criteriaChange.emit(this.criteria);
     }
     
     onDatesCriteriaChange(datesCriteria: Partial<OrderSearchFilters>): void {
-        this.criteria = { ...this.criteria, ...datesCriteria };
+        const updatedCriteria = { ...this.criteria };
+        const dateFields = ['startDate', 'endDate', 'createdAfter', 'createdBefore'];
+        
+        dateFields.forEach(field => {
+            delete updatedCriteria[field as keyof OrderSearchFilters];
+        });
+        
+        Object.entries(datesCriteria).forEach(([key, value]) => {
+            if (value !== undefined && value !== null && value !== '') {
+                updatedCriteria[key as keyof OrderSearchFilters] = value as any;
+            }
+        });
+        
+        this.criteria = updatedCriteria;
         this.criteriaChange.emit(this.criteria);
     }
 }

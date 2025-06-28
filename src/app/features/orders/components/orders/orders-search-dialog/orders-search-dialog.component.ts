@@ -36,6 +36,7 @@ export class OrdersSearchDialogComponent {
     validationError = signal<string | null>(null);
     fieldErrors = signal<Record<string, string>>({});
     hasValidCriteria = signal(false);
+    hasUserInteraction = signal(false);
     validationMessages = ClientValidationMessages;
 
     constructor(
@@ -62,6 +63,7 @@ export class OrdersSearchDialogComponent {
         }        
         this.resetErrors();
         this.hasValidCriteria.set(false);
+        this.hasUserInteraction.set(false);
     }
     
     resetErrors(): void {
@@ -71,10 +73,6 @@ export class OrdersSearchDialogComponent {
     }
     
     onSearch(): void {
-        if (Object.keys(this.searchCriteria).length === 0) {
-            this.validationError.set(this.validationMessages.search.noCriteria);
-            return;
-        }
         this.resetErrors();
         this.isSearching.set(true);
         
@@ -104,11 +102,20 @@ export class OrdersSearchDialogComponent {
     }
     
     onCriteriaChange(criteria: OrderSearchFilters): void {
-        this.searchCriteria = { ...criteria };
-        // Check if we have valid criteria
-        this.hasValidCriteria.set(Object.keys(this.searchCriteria).length > 0);
-        // Clear validation error if we now have criteria
-        if (this.hasValidCriteria()) {
+        this.searchCriteria = criteria;
+        
+        const hasValid = Object.keys(this.searchCriteria).length > 0;
+        this.hasValidCriteria.set(hasValid);
+        
+        if (hasValid || this.hasUserInteraction()) {
+            this.validationError.set(null);
+        }
+    }
+    
+    onInteractionChange(hasInteraction: boolean): void {
+        this.hasUserInteraction.set(hasInteraction);
+        
+        if (hasInteraction) {
             this.validationError.set(null);
         }
     }

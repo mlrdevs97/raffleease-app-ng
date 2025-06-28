@@ -1,10 +1,12 @@
-import { Component, Input, Output, EventEmitter, OnInit, OnChanges, SimpleChanges } from '@angular/core';
+import { Component, Input, Output, EventEmitter, OnInit, OnChanges, SimpleChanges, OnDestroy } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { FormBuilder, FormGroup, ReactiveFormsModule } from '@angular/forms';
+import { distinctUntilChanged } from 'rxjs/operators';
 import { OrderStatus, OrderSearchFilters } from '../../../../models/order.model';
 import { DropdownSelectComponent } from '../../../../../../shared/components/dropdown-select/dropdown-select.component';
 import { positiveNumberValidator } from '../../../../../../core/validators/number.validators';
 import { ClientValidationMessages } from '../../../../../../core/constants/client-validation-messages';
+import { Subscription } from 'rxjs';
 
 @Component({
     selector: 'app-orders-search-order-info',
@@ -12,15 +14,19 @@ import { ClientValidationMessages } from '../../../../../../core/constants/clien
     imports: [CommonModule, DropdownSelectComponent, ReactiveFormsModule],
     templateUrl: './orders-search-order-info.component.html',
 })
-export class OrdersSearchOrderInfoComponent implements OnInit, OnChanges {
+export class OrdersSearchOrderInfoComponent implements OnInit, OnChanges, OnDestroy {
     @Input() criteria: OrderSearchFilters = {};
     @Input() fieldErrors: Record<string, string> = {};
+    @Input() resetEvent!: EventEmitter<void>;
     @Output() criteriaChange = new EventEmitter<Partial<OrderSearchFilters>>();
+    @Output() hasInteraction = new EventEmitter<boolean>();
     
     orderStatusOptions = Object.values(OrderStatus); 
     
     searchForm: FormGroup;
     validationMessages = ClientValidationMessages;
+    private userHasInteracted = false;
+    private resetSubscription?: Subscription;
     
     constructor(private fb: FormBuilder) {
         this.searchForm = this.fb.group({
@@ -31,34 +37,51 @@ export class OrdersSearchOrderInfoComponent implements OnInit, OnChanges {
     }
     
     ngOnInit(): void {
-        // Initialize form with criteria if any
         this.updateFormFromCriteria();
         
-        // React to form changes
-        this.searchForm.valueChanges.subscribe(formValues => {
+        if (this.resetEvent) {
+            this.resetSubscription = this.resetEvent.subscribe(() => {
+                this.resetInteractionTracking();
+            });
+        }
+        
+        this.searchForm.valueChanges.pipe(
+            distinctUntilChanged((prev, curr) => {
+                return JSON.stringify(prev) === JSON.stringify(curr);
+            })
+        ).subscribe(formValues => {
+            if (!this.userHasInteracted) {
+                this.userHasInteracted = true;
+                this.hasInteraction.emit(true);
+            }
+            
             this.updateCriteria(formValues);
         });
     }
     
     ngOnChanges(changes: SimpleChanges): void {
-        // Detect when criteria is reset to an empty object
-        if (changes['criteria']) {
-            this.updateFormFromCriteria();
+        if (changes['criteria'] && changes['criteria'].previousValue !== changes['criteria'].currentValue) {
+            const prevCriteria = changes['criteria'].previousValue || {};
+            const currCriteria = changes['criteria'].currentValue || {};
+            
+            if (JSON.stringify(prevCriteria) !== JSON.stringify(currCriteria)) {
+                this.updateFormFromCriteria();
+            }
         }
         
-        // Apply server validation errors if any
         if (changes['fieldErrors'] && this.fieldErrors) {
             this.applyFieldErrors();
         }
     }
 
     updateFormFromCriteria(): void {
-        // Reset form when criteria is empty or update with existing values
-        this.searchForm.patchValue({
+        const formValues = {
             status: this.criteria?.status || '',
             orderReference: this.criteria?.orderReference || '',
             raffleId: this.criteria?.raffleId || ''
-        }, { emitEvent: false }); // Prevent triggering valueChanges subscription
+        };
+        
+        this.searchForm.patchValue(formValues, { emitEvent: false });
     }
     
     updateCriteria(data: Partial<OrderSearchFilters>): void {
@@ -89,17 +112,14 @@ export class OrdersSearchOrderInfoComponent implements OnInit, OnChanges {
         });
     }
 
-    // Helper methods for the template
     getErrorMessage(controlName: string): string | null {
         const control = this.searchForm.get(controlName);
         if (!control?.touched || !control.errors) return null;
         
-        // Check for server error first
         if (control.errors['serverError']) {
             return control.errors['serverError'];
         }
         
-        // Check for client-side validation errors
         if (control.errors['required']) {
             return this.validationMessages.common.required;
         } else if (control.errors['positiveNumber']) {
@@ -107,5 +127,16 @@ export class OrdersSearchOrderInfoComponent implements OnInit, OnChanges {
         }
         
         return null;
+    }
+
+    ngOnDestroy(): void {
+        if (this.resetSubscription) {
+            this.resetSubscription.unsubscribe();
+        }
+    }
+
+    resetInteractionTracking(): void {
+        this.userHasInteracted = false;
+        this.hasInteraction.emit(false);
     }
 }
