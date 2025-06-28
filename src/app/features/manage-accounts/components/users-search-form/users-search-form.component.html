@@ -68,8 +68,9 @@
                 <app-dropdown-select
                     [options]="roleOptionLabels"
                     [placeholder]="'All roles'"
-                    [displayAllOption]="false"
+                    [displayAllOption]="true"
                     [ngModel]="getSelectedRoleLabel()"
+                    [ngModelOptions]="{standalone: true}"
                     (ngModelChange)="onRoleDropdownChange($event)"
                     [ngClass]="{'border-red-500': getErrorMessage('role')}">
                 </app-dropdown-select>

@@ -1,4 +1,4 @@
-import { Component, Input, Output, EventEmitter, HostListener, signal, inject } from '@angular/core';
+import { Component, Input, Output, EventEmitter, HostListener, signal, inject, ChangeDetectorRef, OnChanges, SimpleChanges } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { User } from '../../../../core/models/user.model';
 import { ButtonComponent } from '../../../../shared/components/button/button.component';
@@ -18,9 +18,10 @@ export interface UserSearchResult<T> {
   imports: [CommonModule, ButtonComponent, UsersSearchFormComponent],
   templateUrl: './users-search-dialog.component.html',
 })
-export class UsersSearchDialogComponent {
+export class UsersSearchDialogComponent implements OnChanges {
   private readonly manageAccountsService = inject(ManageAccountsService);
   private readonly errorHandler = inject(ErrorHandlerService);
+  private readonly cdr = inject(ChangeDetectorRef);
 
   @Input() isOpen = false;
   @Output() closeDialog = new EventEmitter<void>();
@@ -33,6 +34,17 @@ export class UsersSearchDialogComponent {
   validationError = signal<string | null>(null);
   fieldErrors = signal<Record<string, string>>({});
   validationMessages = ClientValidationMessages;
+
+  ngOnChanges(changes: SimpleChanges): void {
+    if (changes['isOpen'] && changes['isOpen'].currentValue === true) {
+      // Reset form state when dialog opens
+      this.resetDialog();
+      // Force change detection to ensure proper rendering
+      setTimeout(() => {
+        this.cdr.detectChanges();
+      }, 0);
+    }
+  }
 
   @HostListener('document:keydown.escape', ['$event'])
   onKeydownHandler(event: KeyboardEvent): void {
@@ -51,6 +63,12 @@ export class UsersSearchDialogComponent {
     this.resetErrors();
   }
 
+  resetDialog(): void {
+    this.searchCriteria = {};
+    this.resetErrors();
+    this.isSearching.set(false);
+  }
+
   resetErrors(): void {
     this.errorMessage.set(null);
     this.validationError.set(null);
@@ -58,11 +76,6 @@ export class UsersSearchDialogComponent {
   }
 
   onSearchSubmit(criteria: UserSearchFilters): void {
-    if (Object.keys(criteria).length === 0) {
-      this.validationError.set(this.validationMessages.search.noCriteria);
-      return;
-    }
-
     this.searchCriteria = { ...criteria };
     this.resetErrors();
     this.isSearching.set(true);

@@ -11,6 +11,7 @@ import { User } from '../../../../core/models/user.model';
 })
 export class UsersListComponent {
   @Input() users: User[] = [];
+  @Input() isInSearchMode: boolean = false;
   @Output() userUpdated = new EventEmitter<User>();
 
   onUserUpdated(user: User): void {

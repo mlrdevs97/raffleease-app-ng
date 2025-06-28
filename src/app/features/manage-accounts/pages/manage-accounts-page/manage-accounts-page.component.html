@@ -11,18 +11,24 @@
     <div class="bg-red-50 border border-red-200 text-red-700 px-4 py-2 rounded-md">
         <p>{{ error() }}</p>
     </div>
-    } @else if (users().length === 0) {
-    <div class="text-center py-8 text-gray-500">
-        <svg class="mx-auto h-12 w-12 text-gray-400" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
-              d="M9 12h6m-6 4h6m2 5H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z" />
-        </svg>
-        <h3 class="mt-2 text-sm font-medium text-gray-900">No users yet</h3>
-    </div>
     } @else {
-    <div>
+    <div class="space-y-4">
+        @if (isInSearchMode) {
+        <div class="flex items-center justify-between">
+            <p class="text-sm text-gray-600">
+                Showing search results
+            </p>
+            <button 
+                type="button"
+                class="text-sm text-blue-600 hover:text-blue-800 hover:underline focus:outline-none focus:underline transition-colors duration-200"
+                (click)="clearSearch()">
+                Clear search
+            </button>
+        </div>
+        }
         <app-users-list 
             [users]="users()" 
+            [isInSearchMode]="isInSearchMode"
             (userUpdated)="onUserUpdated($event)">
         </app-users-list>
     </div>

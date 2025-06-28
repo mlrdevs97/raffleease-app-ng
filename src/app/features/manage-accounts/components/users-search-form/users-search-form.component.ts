@@ -1,4 +1,4 @@
-import { Component, Input, Output, EventEmitter, signal, OnInit, OnDestroy } from '@angular/core';
+import { Component, Input, Output, EventEmitter, signal, OnInit, OnDestroy, ChangeDetectorRef, inject, OnChanges, SimpleChanges } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { FormsModule } from '@angular/forms';
 import { DropdownSelectComponent } from '../../../../shared/components/dropdown-select/dropdown-select.component';
@@ -17,7 +17,9 @@ interface RoleOption {
   imports: [CommonModule, FormsModule, DropdownSelectComponent],
   templateUrl: './users-search-form.component.html',
 })
-export class UsersSearchFormComponent implements OnInit, OnDestroy {
+export class UsersSearchFormComponent implements OnInit, OnDestroy, OnChanges {
+  private readonly cdr = inject(ChangeDetectorRef);
+
   @Input() criteria: UserSearchFilters = {};
   @Input() fieldErrors: Record<string, string> = {};
   @Input() resetEvent?: EventEmitter<void>;
@@ -42,23 +44,36 @@ export class UsersSearchFormComponent implements OnInit, OnDestroy {
     return this.roleOptions.map(option => option.label);
   }
 
-  ngOnInit(): void {
-    if (this.criteria) {
-      this.fullName.set(this.criteria.fullName || '');
-      this.email.set(this.criteria.email || '');
-      this.phoneNumber.set(this.criteria.phoneNumber || '');
-      this.selectedRole.set((this.criteria.role as AssociationRole) || null);
+  ngOnChanges(changes: SimpleChanges): void {
+    if (changes['criteria']) {
+      this.initializeForm();
     }
+    if (changes['fieldErrors']) {
+      // Trigger change detection when field errors change
+      this.cdr.markForCheck();
+    }
+  }
+
+  ngOnInit(): void {
+    this.initializeForm();
 
     if (this.resetEvent) {
       this.resetSubscription = this.resetEvent.subscribe(() => {
         this.clearForm();
+        this.cdr.detectChanges(); // Force update after reset
       });
     }
   }
 
   ngOnDestroy(): void {
     this.resetSubscription?.unsubscribe();
+  }
+
+  private initializeForm(): void {
+    this.fullName.set(this.criteria?.fullName || '');
+    this.email.set(this.criteria?.email || '');
+    this.phoneNumber.set(this.criteria?.phoneNumber || '');
+    this.selectedRole.set((this.criteria?.role as AssociationRole) || null);
   }
 
   onSubmit(): void {
@@ -112,10 +127,10 @@ export class UsersSearchFormComponent implements OnInit, OnDestroy {
 
   getSelectedRoleLabel(): string {
     const currentRole = this.selectedRole();
-    if (!currentRole) return '';
+    if (!currentRole) return 'ANY';
     
     const roleOption = this.roleOptions.find(option => option.value === currentRole);
-    return roleOption ? roleOption.label : '';
+    return roleOption ? roleOption.label : 'ANY';
   }
 
   clearForm(): void {
@@ -137,4 +152,4 @@ export class UsersSearchFormComponent implements OnInit, OnDestroy {
   getErrorMessage(field: string): string | null {
     return this.fieldErrors[field] || null;
   }
-}
+} 
