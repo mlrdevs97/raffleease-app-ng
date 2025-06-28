@@ -48,9 +48,9 @@ export const SuccessMessages = {
     created: 'Your raffle has been created successfully.',
     updated: 'Your raffle has been updated successfully.',
     deleted: 'Your raffle has been deleted successfully.',
-    activated: 'Your raffle has been activated successfully and is now available for ticket sales.',
-    paused: 'Your raffle has been paused successfully. Ticket sales are now suspended.',
-    reactivated: 'Your raffle has been reactivated successfully. Ticket sales have resumed.'
+    activated: 'Your raffle has been activated successfully.',
+    paused: 'Your raffle has been paused successfully.',
+    reactivated: 'Your raffle has been reactivated successfully.'
   },
 
   /**
