@@ -18,25 +18,26 @@
             <p class="text-sm text-gray-600">
                 Showing search results
             </p>
-            <button 
-                type="button"
+            <button type="button"
                 class="text-sm text-blue-600 hover:text-blue-800 hover:underline focus:outline-none focus:underline transition-colors duration-200"
                 (click)="clearSearch()">
                 Clear search
             </button>
         </div>
         }
-        <app-users-list 
-            [users]="users()" 
-            [isInSearchMode]="isInSearchMode"
-            (userUpdated)="onUserUpdated($event)">
+        <app-users-list [users]="users()" [isInSearchMode]="isInSearchMode" (userUpdated)="onUserUpdated($event)">
         </app-users-list>
+
+        @if (users().length > 0) {
+        <div>
+            <app-pagination [pagination]="pagination()" (pageChange)="onPageChange($event)">
+            </app-pagination>
+        </div>
+        }
     </div>
     }
 
-    <app-users-search-dialog 
-        [isOpen]="isSearchDialogOpen()" 
-        (closeDialog)="closeSearchDialog()"
+    <app-users-search-dialog [isOpen]="isSearchDialogOpen()" (closeDialog)="closeSearchDialog()"
         (searchResults)="handleSearchResults($event)">
     </app-users-search-dialog>
 </div>

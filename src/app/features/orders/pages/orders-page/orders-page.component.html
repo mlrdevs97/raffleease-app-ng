@@ -34,25 +34,11 @@
     <app-orders-table [orders]="orders()" (pageChange)="onPageChange($event)">
     </app-orders-table>
   </div>
-  @if (pagination().totalPages > 1) {
-  <div class="flex justify-between items-center">
-    <div class="text-sm text-slate-500">
-      Showing {{ pagination().currentPage * pagination().pageSize + 1 }}-{{
-      min((pagination().currentPage + 1) * pagination().pageSize, pagination().totalElements)
-      }} of {{ pagination().totalElements }} orders
-    </div>
 
-    <div class="flex space-x-2">
-      <button [disabled]="pagination().currentPage === 0" (click)="onPageChange(pagination().currentPage - 1)"
-        class="px-3 py-1 rounded border hover:bg-slate-50 disabled:opacity-50 disabled:pointer-events-none">
-        Previous
-      </button>
-      <button [disabled]="pagination().currentPage === pagination().totalPages - 1"
-        (click)="onPageChange(pagination().currentPage + 1)"
-        class="px-3 py-1 rounded border hover:bg-slate-50 disabled:opacity-50 disabled:pointer-events-none">
-        Next
-      </button>
-    </div>
+  @if (pagination().totalPages > 1) {
+  <div>
+    <app-pagination [pagination]="pagination()" (pageChange)="onPageChange($event)">
+    </app-pagination>
   </div>
   }
   }

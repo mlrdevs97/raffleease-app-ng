@@ -3,13 +3,14 @@ import { CommonModule } from '@angular/common';
 import { User } from '../../../../core/models/user.model';
 import { ButtonComponent } from '../../../../shared/components/button/button.component';
 import { UsersSearchFormComponent } from '../users-search-form/users-search-form.component';
-import { ManageAccountsService, UserSearchFilters, SearchResult } from '../../services/manage-accounts.services';
+import { ManageAccountsService, UserSearchFilters } from '../../services/manage-accounts.services';
 import { ErrorHandlerService } from '../../../../core/services/error-handler.service';
 import { ClientValidationMessages } from '../../../../core/constants/client-validation-messages';
+import { PageResponse } from '../../../../core/models/pagination.model';
 
 export interface UserSearchResult<T> {
   filters: UserSearchFilters;
-  results: SearchResult<T>;
+  results: PageResponse<T>;
 }
 
 @Component({
@@ -79,7 +80,7 @@ export class UsersSearchDialogComponent implements OnChanges {
     this.isSearching.set(true);
     
     this.manageAccountsService.searchUsers(this.searchCriteria, { page: 0, size: 20 }).subscribe({
-      next: (response: SearchResult<User>) => {
+      next: (response: PageResponse<User>) => {
         this.searchResults.emit({
           filters: { ...this.searchCriteria },
           results: response

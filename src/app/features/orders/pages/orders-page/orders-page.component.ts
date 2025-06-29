@@ -8,6 +8,7 @@ import { ErrorHandlerService } from '../../../../core/services/error-handler.ser
 import { OrdersTableComponent } from '../../components/shared/orders-table/orders-table.component';
 import { OrdersSearchDialogComponent, SearchResult } from '../../components/orders/orders-search-dialog/orders-search-dialog.component';
 import { OrdersToolbarComponent } from '../../components/orders/orders-toolbar/orders-toolbar.component';
+import { PaginationComponent, PaginationInfo } from '../../../../../../../raffleease-app/src/app/shared/components/pagination/pagination.component';
 
 @Component({
     selector: 'app-orders-page',
@@ -17,7 +18,8 @@ import { OrdersToolbarComponent } from '../../components/orders/orders-toolbar/o
         RouterModule,
         OrdersToolbarComponent,
         OrdersTableComponent,
-        OrdersSearchDialogComponent
+        OrdersSearchDialogComponent,
+        PaginationComponent
     ],
     templateUrl: './orders-page.component.html',
 })
@@ -25,12 +27,7 @@ export class OrdersPageComponent implements OnInit {
     isLoading = computed(() => this.ordersService.isLoading$());
     error = signal<string | null>(null);
     orders = signal<Order[]>([]);
-    pagination = signal<{
-        totalElements: number;
-        totalPages: number;
-        currentPage: number;
-        pageSize: number;
-    }>({
+    pagination = signal<PaginationInfo>({
         totalElements: 0,
         totalPages: 0,
         currentPage: 0,
@@ -45,12 +42,7 @@ export class OrdersPageComponent implements OnInit {
         private ordersService: OrdersService,
         private errorHandler: ErrorHandlerService,
         private route: ActivatedRoute,
-        private router: Router
     ) { }
-
-    min(a: number, b: number): number {
-        return Math.min(a, b);
-    }
 
     ngOnInit(): void {
         this.route.queryParams.subscribe((params: Params) => {

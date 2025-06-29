@@ -1,57 +1,54 @@
 <div class="container mx-auto max-w-6xl p-4 space-y-8">
-  <div>
-    <app-raffles-header 
-      [suggestions]="suggestions"
-      [isSearchLoading]="isSearchLoading"
-      [noSearchResults]="noSearchResults"
-      (searchChange)="onSearchChange($event)"
-      (enterPressed)="onSearchEnterPressed($event)"
-      (suggestionSelected)="onSuggestionSelected($event)"
-      (statusChange)="onStatusChange($event)"
-      (sortChange)="onSortChange($event)">
-    </app-raffles-header>
-  </div>
-
-  @if (successMessage()) {
-    <div class="bg-green-50 text-green-800 p-3 mb-6 rounded-md border border-green-200 text-sm">
-      {{ successMessage() }}
-    </div>
-  }
+  <app-raffles-header 
+  [suggestions]="suggestions"
+  [isSearchLoading]="isSearchLoading"
+  [noSearchResults]="noSearchResults"
+  (searchChange)="onSearchChange($event)"
+  (enterPressed)="onSearchEnterPressed($event)"
+  (suggestionSelected)="onSuggestionSelected($event)"
+  (statusChange)="onStatusChange($event)"
+  (sortChange)="onSortChange($event)">
+</app-raffles-header>
 
   @if (errorMessage()) {
-    <div class="bg-rose-100 text-rose-700 p-3 mb-6 rounded-md border border-rose-200 text-sm">
-      {{ errorMessage() }}
-    </div>
+  <div class="bg-red-50 border border-red-200 text-red-700 px-4 py-2 rounded-md">
+    <p>{{ errorMessage() }}</p>
+  </div>
   }
 
-  @if (raffleQueryService.isLoading$()) {
-    <div class="flex justify-center items-center py-8">
-      <div class="animate-spin rounded-full h-8 w-8 border-b-2 border-gray-900"></div>
-    </div>
-  } @else {
-    <div>  
-      <app-raffle-card-list 
-        [raffles]="raffles()" 
-        [associationId]="associationId()"
-        (raffleDeleted)="onRaffleDeleted($event)">
-      </app-raffle-card-list>
-    </div>
+  @if (successMessage()) {
+  <div class="bg-green-50 border border-green-200 text-green-700 px-4 py-2 rounded-md">
+    <p>{{ successMessage() }}</p>
+  </div>
+  }
 
-    @if (pagination().totalElements > pagination().pageSize) {
-      <div class="flex justify-center mt-8">
-        <nav class="flex items-center gap-2">
-          @for (page of [].constructor(Math.ceil(pagination().totalElements / pagination().pageSize)); track page) {
-            <button
-              (click)="onPageChange($index)"
-              [class.bg-black]="pagination().currentPage === $index"
-              [class.text-white]="pagination().currentPage === $index"
-              class="px-4 py-2 rounded-md border border-gray-300 hover:bg-gray-100"
-            >
-              {{ $index + 1 }}
-            </button>
-          }
-        </nav>
-      </div>
+  @if (raffles().length === 0) {
+  <div class="text-center py-8 text-gray-500">
+    @if (searchTerm() || selectedStatus()) {
+    <svg class="mx-auto h-12 w-12 text-gray-400" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+      <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
+        d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0z" />
+    </svg>
+    <h3 class="mt-2 text-sm font-medium text-gray-900">No raffles found</h3>
+    <p class="mt-1 text-sm text-gray-500">Try adjusting your search criteria to find what you're looking for.</p>
+    } @else {
+    <svg class="mx-auto h-12 w-12 text-gray-400" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+      <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
+        d="M9 12h6m-6 4h6m2 5H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z" />
+    </svg>
+    <h3 class="mt-2 text-sm font-medium text-gray-900">No raffles yet</h3>
+    <p class="mt-1 text-sm text-gray-500">Get started by creating your first raffle.</p>
     }
+  </div>
+  } @else {
+  <app-raffle-card-list [raffles]="raffles()" (raffleDeleted)="onRaffleDeleted($event)">
+  </app-raffle-card-list>
+
+  @if (pagination().totalPages > 1) {
+  <div>
+    <app-pagination [pagination]="pagination()" (pageChange)="onPageChange($event)">
+    </app-pagination>
+  </div>
+  }
   }
 </div>

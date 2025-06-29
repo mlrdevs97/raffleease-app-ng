@@ -10,26 +10,27 @@ import { RaffleSearchFilters } from '../../models/raffle-search.model';
 import { PageResponse } from '../../../../core/models/pagination.model';
 import { ActivatedRoute, Params, Router } from '@angular/router';
 import { SuccessMessages } from '../../../../core/constants/success-messages';
+import { PaginationComponent, PaginationInfo } from '../../../../shared/components/pagination/pagination.component';
 
 @Component({
   selector: 'app-raffles-page',
   standalone: true,
-  imports: [CommonModule, RafflesHeaderComponent, RaffleCardListComponent],
+  imports: [
+    CommonModule,
+    RafflesHeaderComponent,
+    RaffleCardListComponent,
+    PaginationComponent
+  ],
   templateUrl: './raffles-page.component.html',
 })
 
 export class RafflesPageComponent implements OnInit, OnDestroy {
   raffles = signal<Raffle[]>([]);
-  pagination = signal<{
-    totalElements: number;
-    totalPages: number;
-    currentPage: number;
-    pageSize: number;
-  }>({
+  pagination = signal<PaginationInfo>({
     totalElements: 0,
     totalPages: 0,
     currentPage: 0,
-    pageSize: 20
+    pageSize: 5
   });
   errorMessage = signal<string | null>(null);
   successMessage = signal<string | null>(null);
@@ -39,8 +40,6 @@ export class RafflesPageComponent implements OnInit, OnDestroy {
   selectedStatus = signal<string | null>(null);
   sortBy = signal<string | null>(null);
   sortDirection = signal<'asc' | 'desc'>('asc');
-
-  protected readonly Math = Math;
 
   constructor(
     public raffleQueryService: RaffleQueryService,
@@ -86,13 +85,13 @@ export class RafflesPageComponent implements OnInit, OnDestroy {
         this.loadRaffles();
         return;
       }
-      
+
       if (params['error']) {
         console.error('Error loading raffles:', params['error']);
         this.errorMessage.set(params['error']);
         return;
       }
-      
+
       this.loadRaffles();
     });
   }
@@ -121,7 +120,7 @@ export class RafflesPageComponent implements OnInit, OnDestroy {
           totalElements: response.totalElements,
           totalPages: response.totalPages,
           currentPage: response.number,
-          pageSize: response.size
+          pageSize: this.pagination().pageSize
         });
       },
       error: (error) => {
