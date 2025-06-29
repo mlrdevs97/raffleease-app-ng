@@ -34,10 +34,11 @@ export const ErrorMessages: {
         ROLE_UPDATE_ADMIN_DENIED: 'Administrator roles cannot be updated.',
         ADMIN_DISABLE_SELF_DENIED: 'You cannot disable your own administrator account.',
         ADMIN_CREATE_ADMIN_DENIED: 'Administrator accounts cannot be used to create other administrator accounts.',
+        INSUFFICIENT_TICKETS_AVAILABLE: 'The requested number of tickets exceeds the available tickets. Please select a smaller quantity.'
     },
     validation: {
         REQUIRED: 'This field is required',
-        INVALID_EMAIL: 'Please enter a valid email address',
+        INVALID_EMAIL: 'Please enter a valid email address', 
         INVALID_FORMAT: 'The format is invalid',
         INVALID_DIGITS: 'Please enter only digits',
         INVALID_URL: 'Please enter a valid URL',
@@ -121,7 +122,8 @@ export const ErrorMessages: {
             ACCESS_DENIED: 'You do not have permission to search tickets for this raffle.',
             SERVER_ERROR: 'Server error occurred while searching for tickets. Please try again.',
             CONNECTION_ERROR: 'Connection error. Please check your internet connection.',
-            SEARCH_ERROR: 'Failed to search for tickets. Please try again.'
+            SEARCH_ERROR: 'Failed to search for tickets. Please try again.',
+            INSUFFICIENT_TICKETS_AVAILABLE: 'The requested number of tickets exceeds the available tickets. Please select a smaller quantity.'
         },
         'order': {
             CREATION_FAILED: 'Failed to create order. Please try again.',

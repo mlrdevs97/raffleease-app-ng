@@ -13,6 +13,7 @@ import { Raffle } from '../../../../raffles/models/raffle.model';
 import { Cart } from '../../../../../core/models/cart.model';
 import { createOrderTickets } from '../../../../../core/utils/ticket.utils';
 import { ButtonComponent } from '../../../../../shared/components/button/button.component';
+import { ErrorCodes } from '../../../../../core/constants/error-codes';
 
 @Component({
     selector: 'app-random-ticket-selection',
@@ -118,7 +119,13 @@ export class RandomTicketSelectionComponent {
                 this.reserveAndAddTickets(tickets, raffle);
             },
             error: (error) => {
-                this.errorMessage.set(this.errorHandler.getErrorMessage(error));
+                const errorMessage = this.errorHandler.getErrorMessage(error);
+                if (this.errorHandler.isErrorOfType(error, ErrorCodes.INSUFFICIENT_TICKETS_AVAILABLE)) {
+                    const message = ErrorMessages.dedicated['tickets']['INSUFFICIENT_TICKETS_AVAILABLE'];
+                    this.errorMessage.set(message || errorMessage);
+                } else {
+                    this.errorMessage.set(errorMessage);
+                }
                 this.isGeneratingTickets.set(false);
             }
         });

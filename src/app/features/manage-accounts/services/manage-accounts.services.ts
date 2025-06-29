@@ -93,7 +93,7 @@ export class ManageAccountsService {
     const associationId = this.authService.requireAssociationId();
     const request: UpdateUserRoleRequest = { role };
     
-    return this.http.put<SuccessResponse<User>>(
+    return this.http.patch<SuccessResponse<User>>(
       `${this.apiUrl}/associations/${associationId}/users/${userId}/role`,
       request
     ).pipe(

@@ -43,8 +43,8 @@ export class ProfilesService {
 
   updateEmail(userId: number, emailData: UpdateEmailRequest): Observable<void> {
     const associationId = this.authService.requireAssociationId();
-    return this.http.put<SuccessResponse<void>>(
-      `${this.apiUrl}/associations/${associationId}/users/${userId}/email`,
+    return this.http.post<SuccessResponse<void>>(
+      `${this.apiUrl}/associations/${associationId}/users/${userId}/email/verification-request`,
       emailData
     ).pipe(
       map(() => void 0)
@@ -68,7 +68,7 @@ export class ProfilesService {
 
   updatePhoneNumber(userId: number, phoneData: UpdatePhoneNumberRequest): Observable<User> {
     const associationId = this.authService.requireAssociationId();
-    return this.http.put<SuccessResponse<User>>(
+    return this.http.patch<SuccessResponse<User>>(
       `${this.apiUrl}/associations/${associationId}/users/${userId}/phone-number`,
       phoneData
     ).pipe(
@@ -83,7 +83,7 @@ export class ProfilesService {
 
   updatePassword(userId: number, passwordData: UpdatePasswordRequest): Observable<void> {
     const associationId = this.authService.requireAssociationId();
-    return this.http.put<SuccessResponse<void>>(
+    return this.http.patch<SuccessResponse<void>>(
       `${this.apiUrl}/associations/${associationId}/users/${userId}/password`,
       passwordData
     ).pipe(
