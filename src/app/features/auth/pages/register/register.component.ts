@@ -7,6 +7,7 @@ import { ValidationErrorCodes } from '../../../../core/constants/error-codes';
 import { ErrorHandlerService } from '../../../../core/services/error-handler.service';
 import { passwordMatchValidator } from '../../../../core/validators/password.validators';
 import { ClientValidationMessages } from '../../../../core/constants/client-validation-messages';
+import { ErrorMessages } from '../../../../core/constants/error-messages';
 import { PhoneNumberInputComponent } from '../../../../shared/components/phone-number-input/phone-number-input.component';
 
 @Component({
@@ -130,7 +131,6 @@ export class RegisterComponent implements OnInit {
     const errorStep = this.determineErrorStep(errors);
     if (errorStep && errorStep !== this.currentStep()) {
       this.currentStep.set(errorStep);
-      
     }
     
     // Mark fields as touched and with errors
@@ -144,17 +144,17 @@ export class RegisterComponent implements OnInit {
         
         if (userControl) {
           userControl.markAsTouched();
-          userControl.setErrors({ serverError: errors[fieldPath] });
+          userControl.setErrors({ serverError: this.getServerErrorMessage(fieldPath, errors[fieldPath]) });
         } else if (assocControl) {
           assocControl.markAsTouched();
-          assocControl.setErrors({ serverError: errors[fieldPath] });
+          assocControl.setErrors({ serverError: this.getServerErrorMessage(fieldPath, errors[fieldPath]) });
           
           // If it's association name error, also apply to user form where it's displayed
           if (fieldPath === 'associationName') {
             const userAssocNameControl = this.userForm.get('associationName');
             if (userAssocNameControl) {
               userAssocNameControl.markAsTouched();
-              userAssocNameControl.setErrors({ serverError: errors[fieldPath] });
+              userAssocNameControl.setErrors({ serverError: this.getServerErrorMessage(fieldPath, errors[fieldPath]) });
             }
           }
         }
@@ -163,30 +163,87 @@ export class RegisterComponent implements OnInit {
         
         if (formName === 'userData') {
           const userFieldPath = parts.slice(1).join('.');
-          const control = this.userForm.get(userFieldPath);
-          if (control) {
-            control.markAsTouched();
-            control.setErrors({ serverError: errors[fieldPath] });
+          
+          // Special handling for phone number - apply error to both prefix and nationalNumber
+          if (userFieldPath === 'phoneNumber') {
+            const prefixControl = this.userForm.get('phoneNumber.prefix');
+            const nationalNumberControl = this.userForm.get('phoneNumber.nationalNumber');
+            const serverErrorMessage = this.getServerErrorMessage(fieldPath, errors[fieldPath]);
+            
+            if (prefixControl) {
+              prefixControl.markAsTouched();
+              prefixControl.setErrors({ serverError: serverErrorMessage });
+            }
+            if (nationalNumberControl) {
+              nationalNumberControl.markAsTouched();
+              nationalNumberControl.setErrors({ serverError: serverErrorMessage });
+            }
+          } else {
+            const control = this.userForm.get(userFieldPath);
+            if (control) {
+              control.markAsTouched();
+              control.setErrors({ serverError: this.getServerErrorMessage(fieldPath, errors[fieldPath]) });
+            }
           }
         } else if (formName === 'associationData') {
           const assocFieldPath = parts.slice(1).join('.');
-          const control = this.associationForm.get(assocFieldPath);
-          if (control) {
-            control.markAsTouched();
-            control.setErrors({ serverError: errors[fieldPath] });
+          
+          // Special handling for phone number - apply error to both prefix and nationalNumber
+          if (assocFieldPath === 'phoneNumber') {
+            const prefixControl = this.associationForm.get('phoneNumber.prefix');
+            const nationalNumberControl = this.associationForm.get('phoneNumber.nationalNumber');
+            const serverErrorMessage = this.getServerErrorMessage(fieldPath, errors[fieldPath]);
             
-            // If it's association name error, also apply to user form where it's displayed
-            if (assocFieldPath === 'associationName') {
-              const userAssocNameControl = this.userForm.get('associationName');
-              if (userAssocNameControl) {
-                userAssocNameControl.markAsTouched();
-                userAssocNameControl.setErrors({ serverError: errors[fieldPath] });
+            if (prefixControl) {
+              prefixControl.markAsTouched();
+              prefixControl.setErrors({ serverError: serverErrorMessage });
+            }
+            if (nationalNumberControl) {
+              nationalNumberControl.markAsTouched();
+              nationalNumberControl.setErrors({ serverError: serverErrorMessage });
+            }
+          } else {
+            const control = this.associationForm.get(assocFieldPath);
+            if (control) {
+              control.markAsTouched();
+              control.setErrors({ serverError: this.getServerErrorMessage(fieldPath, errors[fieldPath]) });
+              
+              // If it's association name error, also apply to user form where it's displayed
+              if (assocFieldPath === 'associationName') {
+                const userAssocNameControl = this.userForm.get('associationName');
+                if (userAssocNameControl) {
+                  userAssocNameControl.markAsTouched();
+                  userAssocNameControl.setErrors({ serverError: this.getServerErrorMessage(fieldPath, errors[fieldPath]) });
+                }
               }
             }
           }
         }
       }
     });
+  }
+
+  private getServerErrorMessage(fieldPath: string, errorCode: string): string {
+    // Check dedicated field messages first
+    const dedicatedMessages = ErrorMessages.dedicated[fieldPath];
+    if (dedicatedMessages && dedicatedMessages[errorCode]) {
+      return dedicatedMessages[errorCode];
+    }
+    
+    // Check general error messages
+    const generalMessage = ErrorMessages.general[errorCode as keyof typeof ErrorMessages.general];
+    if (generalMessage) {
+      return generalMessage;
+    }
+    
+    // Check validation error messages
+    const validationMessage = ErrorMessages.validation[errorCode as keyof typeof ErrorMessages.validation];
+    if (validationMessage) {
+      return validationMessage;
+    }
+    
+    // Fallback to error code
+    return errorCode;
   }
 
   // Determine which step contains the validation errors

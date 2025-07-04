@@ -107,6 +107,12 @@ export class PhoneNumberInputComponent implements OnInit, AfterViewInit {
     const control = fieldName === 'prefix' ? this.prefixControl : this.nationalNumberControl;
     if (!control || !control.touched || !control.errors) return null;
 
+    // Check for server-side errors first
+    if (control.errors['serverError']) {
+      return control.errors['serverError'];
+    }
+
+    // Check client-side validation errors
     if (control.errors['required']) {
       if (fieldName === 'prefix') {
         return 'Country code is required';
@@ -123,6 +129,17 @@ export class PhoneNumberInputComponent implements OnInit, AfterViewInit {
       return 'Invalid format';
     }
 
+    return null;
+  }
+
+  getPhoneNumberGroupError(): string | null {
+    const prefixError = this.prefixControl?.errors?.['serverError'];
+    const nationalNumberError = this.nationalNumberControl?.errors?.['serverError'];
+    
+    if (prefixError && nationalNumberError && prefixError === nationalNumberError) {
+      return prefixError;
+    }
+    
     return null;
   }
 

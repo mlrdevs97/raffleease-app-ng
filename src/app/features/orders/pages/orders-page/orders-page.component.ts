@@ -8,7 +8,7 @@ import { ErrorHandlerService } from '../../../../core/services/error-handler.ser
 import { OrdersTableComponent } from '../../components/shared/orders-table/orders-table.component';
 import { OrdersSearchDialogComponent, SearchResult } from '../../components/orders/orders-search-dialog/orders-search-dialog.component';
 import { OrdersToolbarComponent } from '../../components/orders/orders-toolbar/orders-toolbar.component';
-import { PaginationComponent, PaginationInfo } from '../../../../../../../raffleease-app/src/app/shared/components/pagination/pagination.component';
+import { PaginationComponent, PaginationInfo } from '../../../../shared/components/pagination/pagination.component';
 
 @Component({
     selector: 'app-orders-page',
