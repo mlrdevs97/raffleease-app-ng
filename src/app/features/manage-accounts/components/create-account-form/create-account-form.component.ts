@@ -10,6 +10,7 @@ import { ErrorHandlerService } from '../../../../core/services/error-handler.ser
 import { AssociationRole } from '../../../../core/models/user.model';
 import { CreateUserRequest } from '../../models/create-user.model';
 import { passwordMatchValidator } from '../../../../core/validators/password.validators';
+import { ErrorMessages } from '../../../../core/constants/error-messages';
 
 @Component({
   selector: 'app-create-account-form',
@@ -57,21 +58,18 @@ export class CreateAccountFormComponent implements OnInit {
     }, { validators: passwordMatchValidator() });
   }
 
-  get phoneNumberGroup(): FormGroup {
-    return this.userForm.get('phoneNumber') as FormGroup;
-  }
-
+  // Phone number control getters - following the same pattern as register component
   get prefixControl(): FormControl {
-    return this.phoneNumberGroup.get('prefix') as FormControl;
+    return this.userForm.get('phoneNumber.prefix') as FormControl;
   }
 
   get nationalNumberControl(): FormControl {
-    return this.phoneNumberGroup.get('nationalNumber') as FormControl;
+    return this.userForm.get('phoneNumber.nationalNumber') as FormControl;
   }
 
   hasPhoneNumber = computed(() => {
-    const prefix = this.phoneNumberGroup?.get('prefix')?.value;
-    const nationalNumber = this.phoneNumberGroup?.get('nationalNumber')?.value;
+    const prefix = this.prefixControl?.value;
+    const nationalNumber = this.nationalNumberControl?.value;
     return prefix && nationalNumber;
   });
 
@@ -182,7 +180,22 @@ export class CreateAccountFormComponent implements OnInit {
       } else if (fieldPath === 'userData.userName') {
         controlPath = 'username';
       } else if (fieldPath === 'userData.phoneNumber') {
-        controlPath = 'phoneNumber';
+        // Handle phone number validation - apply to both prefix and national number controls
+        const serverErrorMessage = this.getServerErrorMessage(fieldPath, errors[fieldPath]);
+        
+        this.prefixControl.markAsTouched();
+        this.prefixControl.setErrors({ serverError: serverErrorMessage });
+        
+        this.nationalNumberControl.markAsTouched();
+        this.nationalNumberControl.setErrors({ serverError: serverErrorMessage });
+        
+        // Also mark the parent phoneNumber group as touched
+        const phoneNumberGroup = this.userForm.get('phoneNumber');
+        if (phoneNumberGroup) {
+          phoneNumberGroup.markAsTouched();
+        }
+        
+        return; // Skip the general control handling for phone number
       } else if (fieldPath.startsWith('userData.')) {
         // Remove 'userData.' prefix for other fields
         controlPath = fieldPath.replace('userData.', '');
@@ -191,9 +204,32 @@ export class CreateAccountFormComponent implements OnInit {
       const control = this.userForm.get(controlPath);
       if (control) {
         control.markAsTouched();
-        control.setErrors({ serverError: errors[fieldPath] });
+        control.setErrors({ serverError: this.getServerErrorMessage(fieldPath, errors[fieldPath]) });
       }
     });
+  }
+
+  private getServerErrorMessage(fieldPath: string, errorCode: string): string {
+    // Check dedicated field messages first
+    const dedicatedMessages = ErrorMessages.dedicated[fieldPath];
+    if (dedicatedMessages && dedicatedMessages[errorCode]) {
+      return dedicatedMessages[errorCode];
+    }
+    
+    // Check general error messages
+    const generalMessage = ErrorMessages.general[errorCode as keyof typeof ErrorMessages.general];
+    if (generalMessage) {
+      return generalMessage;
+    }
+    
+    // Check validation error messages
+    const validationMessage = ErrorMessages.validation[errorCode as keyof typeof ErrorMessages.validation];
+    if (validationMessage) {
+      return validationMessage;
+    }
+    
+    // Fallback to error code
+    return errorCode;
   }
 
   // Helper method to get role display labels

@@ -164,7 +164,6 @@ export class RegisterComponent implements OnInit {
         if (formName === 'userData') {
           const userFieldPath = parts.slice(1).join('.');
           
-          // Special handling for phone number - apply error to both prefix and nationalNumber
           if (userFieldPath === 'phoneNumber') {
             const prefixControl = this.userForm.get('phoneNumber.prefix');
             const nationalNumberControl = this.userForm.get('phoneNumber.nationalNumber');
@@ -188,33 +187,17 @@ export class RegisterComponent implements OnInit {
         } else if (formName === 'associationData') {
           const assocFieldPath = parts.slice(1).join('.');
           
-          // Special handling for phone number - apply error to both prefix and nationalNumber
-          if (assocFieldPath === 'phoneNumber') {
-            const prefixControl = this.associationForm.get('phoneNumber.prefix');
-            const nationalNumberControl = this.associationForm.get('phoneNumber.nationalNumber');
-            const serverErrorMessage = this.getServerErrorMessage(fieldPath, errors[fieldPath]);
-            
-            if (prefixControl) {
-              prefixControl.markAsTouched();
-              prefixControl.setErrors({ serverError: serverErrorMessage });
-            }
-            if (nationalNumberControl) {
-              nationalNumberControl.markAsTouched();
-              nationalNumberControl.setErrors({ serverError: serverErrorMessage });
-            }
-          } else {
-            const control = this.associationForm.get(assocFieldPath);
-            if (control) {
-              control.markAsTouched();
-              control.setErrors({ serverError: this.getServerErrorMessage(fieldPath, errors[fieldPath]) });
+          const control = this.associationForm.get(assocFieldPath);
+          if (control) {
+            control.markAsTouched();
+            control.setErrors({ serverError: this.getServerErrorMessage(fieldPath, errors[fieldPath]) });
               
-              // If it's association name error, also apply to user form where it's displayed
-              if (assocFieldPath === 'associationName') {
-                const userAssocNameControl = this.userForm.get('associationName');
-                if (userAssocNameControl) {
-                  userAssocNameControl.markAsTouched();
-                  userAssocNameControl.setErrors({ serverError: this.getServerErrorMessage(fieldPath, errors[fieldPath]) });
-                }
+            // If it's association name error, also apply to user form where it's displayed
+            if (assocFieldPath === 'associationName') {
+              const userAssocNameControl = this.userForm.get('associationName');
+              if (userAssocNameControl) {
+                userAssocNameControl.markAsTouched();
+                userAssocNameControl.setErrors({ serverError: this.getServerErrorMessage(fieldPath, errors[fieldPath]) });
               }
             }
           }

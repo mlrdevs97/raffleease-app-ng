@@ -107,8 +107,11 @@ export class PhoneNumberInputComponent implements OnInit, AfterViewInit {
     const control = fieldName === 'prefix' ? this.prefixControl : this.nationalNumberControl;
     if (!control || !control.touched || !control.errors) return null;
 
-    // Check for server-side errors first
     if (control.errors['serverError']) {
+      const groupError = this.getPhoneNumberGroupError();
+      if (groupError) {
+        return null;
+      }
       return control.errors['serverError'];
     }
 
