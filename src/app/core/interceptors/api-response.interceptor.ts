@@ -27,6 +27,10 @@ export class ApiInterceptor implements HttpInterceptor {
   constructor(private authService: AuthService) {}
 
   intercept(request: HttpRequest<unknown>, next: HttpHandler): Observable<HttpEvent<unknown>> {
+    request = request.clone({
+      withCredentials: true
+    });
+    
     if (!isPublicApiRoute(request.url)) {
       const token = this.authService.getToken();
       if (token) {
