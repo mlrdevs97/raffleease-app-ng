@@ -58,7 +58,6 @@ export class CreateAccountFormComponent implements OnInit {
     }, { validators: passwordMatchValidator() });
   }
 
-  // Phone number control getters - following the same pattern as register component
   get prefixControl(): FormControl {
     return this.userForm.get('phoneNumber.prefix') as FormControl;
   }

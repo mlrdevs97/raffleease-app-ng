@@ -1,4 +1,4 @@
-import { Component, signal, OnInit, inject, computed } from '@angular/core';
+import { Component, signal, OnInit, OnDestroy, inject, computed } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { UsersListComponent } from '../../components/users-list/users-list.component';
 import { UsersSearchDialogComponent, UserSearchResult } from '../../components/users-search-dialog/users-search-dialog.component';
@@ -8,6 +8,9 @@ import { ErrorHandlerService } from '../../../../core/services/error-handler.ser
 import { User } from '../../../../core/models/user.model';
 import { PaginationComponent, PaginationInfo } from '../../../../shared/components/pagination/pagination.component';
 import { PageResponse } from '../../../../core/models/pagination.model';
+import { ActivatedRoute, Router } from '@angular/router';
+import { takeUntil } from 'rxjs/operators';
+import { Subject } from 'rxjs';
 
 @Component({
   selector: 'app-manage-accounts-page',
@@ -21,14 +24,18 @@ import { PageResponse } from '../../../../core/models/pagination.model';
   ],
   templateUrl: './manage-accounts-page.component.html',
 })
-export class ManageAccountsPageComponent implements OnInit {
+export class ManageAccountsPageComponent implements OnInit, OnDestroy {
   private readonly manageAccountsService = inject(ManageAccountsService);
   private readonly errorHandler = inject(ErrorHandlerService);
+  private readonly route = inject(ActivatedRoute);
+  private readonly router = inject(Router);
+  private readonly destroy$ = new Subject<void>();
 
   users = signal<User[]>([]);
   isLoading = signal(false);
   error = signal<string | null>(null);
   isSearchDialogOpen = signal<boolean>(false);
+  successMessage = signal<string | null>(null);
 
   searchTerm = signal<string>('');
   selectedRole = signal<string | null>(null);
@@ -64,7 +71,31 @@ export class ManageAccountsPageComponent implements OnInit {
   ngOnInit(): void {
     this.sortBy.set('createdAt');
     this.sortDirection.set('desc');
+    
+    // Listen to query params changes
+    this.route.queryParams.pipe(
+      takeUntil(this.destroy$)
+    ).subscribe(params => {
+      console.log('Query params changed:', params);
+      if (params['message']) {
+        console.log('Found message param:', params['message']);
+        this.successMessage.set(params['message']);
+        this.loadUsers(); 
+        this.router.navigate([], {
+          relativeTo: this.route,
+          queryParams: {},
+          replaceUrl: true
+        });
+      }
+    });
+
+    // Initial load
     this.loadUsers();
+  }
+
+  ngOnDestroy(): void {
+    this.destroy$.next();
+    this.destroy$.complete();
   }
 
   loadUsers(page: number = 0): void {
